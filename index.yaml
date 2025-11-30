@@ -2,6 +2,35 @@ apiVersion: v1
 entries:
   eostat:
   - apiVersion: v2
+    created: "2025-11-30T16:39:21.189476904Z"
+    dependencies:
+    - name: library-chart
+      repository: https://inseefrlab.github.io/helm-charts-interactive-services
+      version: 1.7.14
+    description: JupyterLab environment for Earth Observation Statistics with R, Python,
+      and geospatial libraries
+    digest: f87c7595ac67671d45f630c9d4f6553f77092ccb6b29fe845330255e602d48bc
+    home: https://fao-eostat.github.io/UN-Handbook/
+    icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/jupyter.png
+    keywords:
+    - Jupyter
+    - Earth Observation
+    - Remote Sensing
+    - Geospatial
+    - R
+    - Python
+    maintainers:
+    - email: lovells@un.org
+      name: UN Global Platform
+    name: eostat
+    sources:
+    - https://github.com/UNGlobalPlatform/images-datascience
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services
+    type: application
+    urls:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/eostat-0.2.3/eostat-0.2.3.tgz
+    version: 0.2.3
+  - apiVersion: v2
     created: "2025-11-30T16:25:30.032750023Z"
     dependencies:
     - name: library-chart
@@ -615,4 +644,4 @@ entries:
     urls:
     - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/vscode-tensorflow-gpu-2.4.0/vscode-tensorflow-gpu-2.4.0.tgz
     version: 2.4.0
-generated: "2025-11-30T16:25:30.032775012Z"
+generated: "2025-11-30T16:39:21.189508123Z"

@@ -2,6 +2,35 @@ apiVersion: v1
 entries:
   eostat:
   - apiVersion: v2
+    created: "2025-12-02T00:06:36.454543056Z"
+    dependencies:
+    - name: library-chart
+      repository: https://inseefrlab.github.io/helm-charts-interactive-services
+      version: 1.7.14
+    description: JupyterLab environment for Earth Observation Statistics with R, Python,
+      and geospatial libraries
+    digest: 8158fc83d61e243c35e069c4e75682a0d55ad42c2ed8e9a1349b26f0fde0ebb5
+    home: https://fao-eostat.github.io/UN-Handbook/
+    icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/jupyter.png
+    keywords:
+    - Jupyter
+    - Earth Observation
+    - Remote Sensing
+    - Geospatial
+    - R
+    - Python
+    maintainers:
+    - email: lovells@un.org
+      name: UN Global Platform
+    name: eostat
+    sources:
+    - https://github.com/UNGlobalPlatform/images-datascience
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services
+    type: application
+    urls:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/eostat-0.2.14/eostat-0.2.14.tgz
+    version: 0.2.14
+  - apiVersion: v2
     created: "2025-12-01T23:41:50.32971648Z"
     dependencies:
     - name: library-chart
@@ -464,6 +493,28 @@ entries:
     type: application
     urls:
     - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/eostat-0.1.0/eostat-0.1.0.tgz
+    version: 0.1.0
+  eostat-autoshutdown:
+  - apiVersion: v2
+    created: "2025-12-02T00:06:36.612803285Z"
+    description: Auto-shutdown manager for EOStat sessions - suspends sessions older
+      than threshold
+    digest: d4ce3d70ca8f578e05f9917e33ab26fd065248cf6ca9155f9f43196d33e90913
+    home: https://fao-eostat.github.io/UN-Handbook/
+    icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/jupyter.png
+    keywords:
+    - automation
+    - cost-optimization
+    - session-management
+    maintainers:
+    - email: lovells@un.org
+      name: UN Global Platform
+    name: eostat-autoshutdown
+    sources:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services
+    type: application
+    urls:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/eostat-autoshutdown-0.1.0/eostat-autoshutdown-0.1.0.tgz
     version: 0.1.0
   jupyter-pyspark:
   - apiVersion: v2
@@ -934,4 +985,4 @@ entries:
     urls:
     - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/vscode-tensorflow-gpu-2.4.0/vscode-tensorflow-gpu-2.4.0.tgz
     version: 2.4.0
-generated: "2025-12-01T23:41:50.329845521Z"
+generated: "2025-12-02T00:06:36.612939109Z"

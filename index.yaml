@@ -496,6 +496,27 @@ entries:
     version: 0.1.0
   eostat-autoshutdown:
   - apiVersion: v2
+    created: "2025-12-03T16:34:54.719265527Z"
+    description: Auto-shutdown manager for EOStat sessions - suspends sessions older
+      than threshold
+    digest: c9786a1a60501a22b0ce25c74c678609dc0d0a98c957e6a391ac2c5f37d4deb6
+    home: https://fao-eostat.github.io/UN-Handbook/
+    icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/jupyter.png
+    keywords:
+    - automation
+    - cost-optimization
+    - session-management
+    maintainers:
+    - email: lovells@un.org
+      name: UN Global Platform
+    name: eostat-autoshutdown
+    sources:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services
+    type: application
+    urls:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/eostat-autoshutdown-0.2.1/eostat-autoshutdown-0.2.1.tgz
+    version: 0.2.1
+  - apiVersion: v2
     created: "2025-12-02T13:45:55.782309426Z"
     description: Auto-shutdown manager for EOStat sessions - suspends sessions older
       than threshold
@@ -1249,4 +1270,4 @@ entries:
     urls:
     - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/vscode-tensorflow-gpu-2.4.0/vscode-tensorflow-gpu-2.4.0.tgz
     version: 2.4.0
-generated: "2025-12-03T16:26:40.759272557Z"
+generated: "2025-12-03T16:34:54.719368499Z"

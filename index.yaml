@@ -711,6 +711,34 @@ entries:
     version: 0.2.14
   eostat-rstudio:
   - apiVersion: v2
+    created: "2025-12-04T12:51:43.421413289Z"
+    dependencies:
+    - name: library-chart
+      repository: https://inseefrlab.github.io/helm-charts-interactive-services
+      version: 1.7.14
+    description: RStudio environment for Earth Observation Statistics with R and geospatial
+      libraries
+    digest: bcb9bb986a935ca9d560338a23fe84185941619a4716b37509ed8ea5a1866a2a
+    home: https://fao-eostat.github.io/UN-Handbook/
+    icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/rstudio.png
+    keywords:
+    - RStudio
+    - Earth Observation
+    - Remote Sensing
+    - Geospatial
+    - R
+    maintainers:
+    - email: lovells@un.org
+      name: UN Global Platform
+    name: eostat-rstudio
+    sources:
+    - https://github.com/UNGlobalPlatform/images-datascience
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services
+    type: application
+    urls:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/eostat-rstudio-0.2.0/eostat-rstudio-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     created: "2025-12-03T16:26:40.759175947Z"
     dependencies:
     - name: library-chart
@@ -1291,4 +1319,4 @@ entries:
     urls:
     - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/vscode-tensorflow-gpu-2.4.0/vscode-tensorflow-gpu-2.4.0.tgz
     version: 2.4.0
-generated: "2025-12-03T20:16:09.873641121Z"
+generated: "2025-12-04T12:51:43.421531299Z"

@@ -623,6 +623,35 @@ entries:
     version: 0.1.0
   eostat-jupyter:
   - apiVersion: v2
+    created: "2025-12-05T11:32:45.154017791Z"
+    dependencies:
+    - name: library-chart
+      repository: https://inseefrlab.github.io/helm-charts-interactive-services
+      version: 1.7.14
+    description: JupyterLab environment for Earth Observation Statistics with R, Python,
+      and geospatial libraries
+    digest: 0e21505b65daa838b66a01979c718e17910da18d8b951174aa58e9210b03b73d
+    home: https://fao-eostat.github.io/UN-Handbook/
+    icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/jupyter.png
+    keywords:
+    - Jupyter
+    - Earth Observation
+    - Remote Sensing
+    - Geospatial
+    - R
+    - Python
+    maintainers:
+    - email: lovells@un.org
+      name: UN Global Platform
+    name: eostat-jupyter
+    sources:
+    - https://github.com/UNGlobalPlatform/images-datascience
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services
+    type: application
+    urls:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/eostat-jupyter-0.3.2/eostat-jupyter-0.3.2.tgz
+    version: 0.3.2
+  - apiVersion: v2
     created: "2025-12-05T11:19:57.997266778Z"
     dependencies:
     - name: library-chart
@@ -768,6 +797,34 @@ entries:
     - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/eostat-jupyter-0.2.14/eostat-jupyter-0.2.14.tgz
     version: 0.2.14
   eostat-rstudio:
+  - apiVersion: v2
+    created: "2025-12-05T11:32:45.307560914Z"
+    dependencies:
+    - name: library-chart
+      repository: https://inseefrlab.github.io/helm-charts-interactive-services
+      version: 1.7.14
+    description: RStudio environment for Earth Observation Statistics with R and geospatial
+      libraries
+    digest: 1dff504ce8e51352ec5b9e7c900d9820a6519e8fce139e7743f5d450b27587f2
+    home: https://fao-eostat.github.io/UN-Handbook/
+    icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/rstudio.png
+    keywords:
+    - RStudio
+    - Earth Observation
+    - Remote Sensing
+    - Geospatial
+    - R
+    maintainers:
+    - email: lovells@un.org
+      name: UN Global Platform
+    name: eostat-rstudio
+    sources:
+    - https://github.com/UNGlobalPlatform/images-datascience
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services
+    type: application
+    urls:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/eostat-rstudio-0.4.2/eostat-rstudio-0.4.2.tgz
+    version: 0.4.2
   - apiVersion: v2
     created: "2025-12-05T11:19:58.213176296Z"
     dependencies:
@@ -1713,4 +1770,4 @@ entries:
     urls:
     - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/vscode-tensorflow-gpu-2.4.0/vscode-tensorflow-gpu-2.4.0.tgz
     version: 2.4.0
-generated: "2025-12-05T11:19:58.213372781Z"
+generated: "2025-12-05T11:32:45.307755465Z"

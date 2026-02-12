@@ -178,8 +178,8 @@
       "properties": {
         "maxExecutors": {
           "title": "Max executors",
-          "type": "integer",
-          "default": 3,
+          "type": "string",
+          "default": "3",
           "render": "slider",
           "sliderMin": 0,
           "sliderMax": 5,
@@ -207,8 +207,8 @@
         },
         "cores": {
           "title": "CPU cores per executor",
-          "type": "integer",
-          "default": 2,
+          "type": "string",
+          "default": "2",
           "render": "slider",
           "sliderMin": 1,
           "sliderMax": 4,

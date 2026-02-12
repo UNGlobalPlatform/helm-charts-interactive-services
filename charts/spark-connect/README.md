@@ -1,6 +1,6 @@
 # spark-connect
 
-![Version: 1.1.2](https://img.shields.io/badge/Version-1.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.3](https://img.shields.io/badge/Version-1.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 
@@ -104,8 +104,8 @@ Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 | sparkConnect.env[2].value | string | `"s3a://ais-data-142496269814/register/"` |  |
 | sparkConnect.instanceLifecycle | string | `"spot"` |  |
 | sparkConnect.packages | string | `"org.apache.spark:spark-connect_2.12:3.5.0"` |  |
-| sparkExecutors.cores | int | `2` |  |
-| sparkExecutors.maxExecutors | int | `3` |  |
+| sparkExecutors.cores | string | `"2"` |  |
+| sparkExecutors.maxExecutors | string | `"3"` |  |
 | sparkExecutors.memory | string | `"4"` |  |
 | sparkExecutors.memoryOverhead | string | `"1"` |  |
 | startupProbe.failureThreshold | int | `30` |  |

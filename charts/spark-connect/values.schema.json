@@ -172,6 +172,30 @@
         }
       }
     },
+    "executorNamespace": {
+      "title": "Shared Executor Namespace",
+      "description": "Run executors in a shared pre-created namespace instead of the user namespace",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "title": "Use shared executor namespace",
+          "type": "boolean",
+          "default": false
+        },
+        "namespace": {
+          "title": "Executor namespace",
+          "type": "string",
+          "default": "spark-executors",
+          "hidden": { "value": false, "path": "executorNamespace/enabled" }
+        },
+        "serviceAccountName": {
+          "title": "Executor ServiceAccount",
+          "type": "string",
+          "default": "spark-executor-sa",
+          "hidden": { "value": false, "path": "executorNamespace/enabled" }
+        }
+      }
+    },
     "kubernetes": {
       "title": "Kubernetes permissions",
       "type": "object",

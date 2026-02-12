@@ -67,6 +67,9 @@ spark:
     spark.hadoop.fs.s3a.multipart.threshold: "104857600"
     # Executor node selector
     spark.kubernetes.executor.node.selector.workload-type: spark
+    # Executor namespace & SA (shared namespace support)
+    spark.kubernetes.executor.namespace: '{{ if .Values.executorNamespace.enabled }}{{ .Values.executorNamespace.namespace }}{{ else }}{{ .Release.Namespace }}{{ end }}'
+    spark.kubernetes.executor.serviceAccountName: '{{ if .Values.executorNamespace.enabled }}{{ .Values.executorNamespace.serviceAccountName }}{{ else }}{{ include "library-chart.fullname" . }}{{ end }}'
   userConfig:
     spark.dynamicAllocation.enabled: "true"
     spark.dynamicAllocation.initialExecutors: "1"
@@ -79,6 +82,11 @@ spark:
     spark.kubernetes.executor.request.cores: "2"
     spark.kubernetes.executor.limit.cores: "2"
     spark.driver.memory: 10g
+
+executorNamespace:
+  enabled: false
+  namespace: "spark-executors"
+  serviceAccountName: "spark-executor-sa"
 
 sparkConnect:
   packages: "org.apache.spark:spark-connect_2.12:3.5.0"

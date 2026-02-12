@@ -1,6 +1,6 @@
 # spark-connect
 
-![Version: 1.1.4](https://img.shields.io/badge/Version-1.1.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.5](https://img.shields.io/badge/Version-1.1.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 
@@ -32,7 +32,7 @@ Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 | networking.service.port | int | `15002` |  |
 | networking.sparkui.port | int | `4040` |  |
 | networking.type | string | `"ClusterIP"` |  |
-| nodeSelector | object | `{}` |  |
+| nodeSelector.workload-type | string | `"spark"` |  |
 | resources.limits.cpu | string | `"2"` |  |
 | resources.limits.memory | string | `"12Gi"` |  |
 | resources.requests.cpu | string | `"2"` |  |
@@ -66,7 +66,6 @@ Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 | spark.config."spark.hadoop.fs.s3a.multipart.threshold" | string | `"104857600"` |  |
 | spark.config."spark.hadoop.mapreduce.outputcommitter.factory.scheme.s3a" | string | `"org.apache.hadoop.fs.s3a.commit.S3ACommitterFactory"` |  |
 | spark.config."spark.hadoop.parquet.enable.summary-metadata" | string | `"false"` |  |
-| spark.config."spark.kryo.registrator" | string | `"org.apache.sedona.core.serde.SedonaKryoRegistrator"` |  |
 | spark.config."spark.kubernetes.authenticate.driver.serviceAccountName" | string | `"{{ include \"library-chart.fullname\" . }}"` |  |
 | spark.config."spark.kubernetes.container.image" | string | `"{{ ternary .Values.service.image.custom.version .Values.service.image.version .Values.service.image.custom.enabled }}"` |  |
 | spark.config."spark.kubernetes.executor.node.selector.workload-type" | string | `"spark"` |  |
@@ -78,7 +77,6 @@ Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 | spark.config."spark.sql.adaptive.coalescePartitions.enabled" | string | `"true"` |  |
 | spark.config."spark.sql.adaptive.enabled" | string | `"true"` |  |
 | spark.config."spark.sql.execution.arrow.pyspark.enabled" | string | `"false"` |  |
-| spark.config."spark.sql.extensions" | string | `"org.apache.sedona.viz.sql.SedonaVizExtensions,org.apache.sedona.sql.SedonaSqlExtensions"` |  |
 | spark.config."spark.sql.hive.metastorePartitionPruning" | string | `"true"` |  |
 | spark.config."spark.sql.parquet.enableVectorizedReader" | string | `"false"` |  |
 | spark.config."spark.sql.parquet.filterPushdown" | string | `"true"` |  |
@@ -93,8 +91,13 @@ Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 | spark.userConfig."spark.dynamicAllocation.enabled" | string | `"true"` |  |
 | spark.userConfig."spark.dynamicAllocation.executorIdleTimeout" | string | `"120s"` |  |
 | spark.userConfig."spark.dynamicAllocation.initialExecutors" | string | `"1"` |  |
+| spark.userConfig."spark.dynamicAllocation.maxExecutors" | string | `"10"` |  |
 | spark.userConfig."spark.dynamicAllocation.minExecutors" | string | `"0"` |  |
 | spark.userConfig."spark.dynamicAllocation.shuffleTracking.enabled" | string | `"true"` |  |
+| spark.userConfig."spark.executor.memory" | string | `"4g"` |  |
+| spark.userConfig."spark.executor.memoryOverhead" | string | `"1g"` |  |
+| spark.userConfig."spark.kubernetes.executor.limit.cores" | string | `"2"` |  |
+| spark.userConfig."spark.kubernetes.executor.request.cores" | string | `"2"` |  |
 | sparkConnect.emrInternalId | string | `"spark-connect-server"` |  |
 | sparkConnect.env[0].name | string | `"AIS_S3PATH"` |  |
 | sparkConnect.env[0].value | string | `"s3a://ais-data-142496269814/exact-earth-data/transformed/prod/"` |  |
@@ -102,12 +105,7 @@ Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 | sparkConnect.env[1].value | string | `"s3a://ais-data-142496269814/user_temp/"` |  |
 | sparkConnect.env[2].name | string | `"SHIP_REGISTER_LATEST_S3PATH"` |  |
 | sparkConnect.env[2].value | string | `"s3a://ais-data-142496269814/register/"` |  |
-| sparkConnect.instanceLifecycle | string | `"spot"` |  |
 | sparkConnect.packages | string | `"org.apache.spark:spark-connect_2.12:3.5.0"` |  |
-| sparkExecutors.cores | string | `"2"` |  |
-| sparkExecutors.maxExecutors | string | `"3"` |  |
-| sparkExecutors.memory | string | `"4"` |  |
-| sparkExecutors.memoryOverhead | string | `"1"` |  |
 | startupProbe.failureThreshold | int | `30` |  |
 | startupProbe.initialDelaySeconds | int | `10` |  |
 | startupProbe.periodSeconds | int | `10` |  |

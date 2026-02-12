@@ -86,10 +86,10 @@ sparkConnect:
       value: "s3a://ais-data-142496269814/register/"
 
 sparkExecutors:
-  maxExecutors: 3
+  maxExecutors: "3"
   memory: "4"
   memoryOverhead: "1"
-  cores: 2
+  cores: "2"
 
 security:
   networkPolicy:

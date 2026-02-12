@@ -20,7 +20,6 @@
               "title": "EMR Spark image",
               "type": "string",
               "listEnum": [
-                "142496269814.dkr.ecr.us-west-2.amazonaws.com/emr-on-eks/spark-connect:1.1.0",
                 "142496269814.dkr.ecr.us-west-2.amazonaws.com/emr-on-eks/spark:emr-7.1.0"
               ],
               "render": "list",
@@ -28,7 +27,7 @@
                 "value": true,
                 "path": "service/image/custom/enabled"
               },
-              "default": "142496269814.dkr.ecr.us-west-2.amazonaws.com/emr-on-eks/spark-connect:1.1.0"
+              "default": "142496269814.dkr.ecr.us-west-2.amazonaws.com/emr-on-eks/spark:emr-7.1.0"
             },
             "custom": {
               "title": "Custom image",

@@ -58,6 +58,9 @@
     "spark": {
       "title": "Spark",
       "type": "object",
+      "x-onyxia": {
+        "overwriteSchemaWith": "spark.json"
+      },
       "properties": {
         "sparkui": {
           "title": "Enable Spark UI monitoring interface",

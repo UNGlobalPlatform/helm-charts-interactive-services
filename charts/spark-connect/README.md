@@ -1,6 +1,6 @@
 # spark-connect
 
-![Version: 1.1.8](https://img.shields.io/badge/Version-1.1.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.9](https://img.shields.io/badge/Version-1.1.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 
@@ -16,9 +16,6 @@ Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
 | autoscaling.enabled | bool | `false` |  |
-| executorNamespace.enabled | bool | `false` |  |
-| executorNamespace.namespace | string | `"spark-executors"` |  |
-| executorNamespace.serviceAccountName | string | `"spark-executor-sa"` |  |
 | global.suspend | bool | `false` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.certManagerClusterIssuer | string | `""` |  |
@@ -75,9 +72,7 @@ Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 | spark.config."spark.hadoop.parquet.enable.summary-metadata" | string | `"false"` |  |
 | spark.config."spark.kubernetes.authenticate.driver.serviceAccountName" | string | `"{{ include \"library-chart.fullname\" . }}"` |  |
 | spark.config."spark.kubernetes.container.image" | string | `"{{ ternary .Values.service.image.custom.version .Values.service.image.version .Values.service.image.custom.enabled }}"` |  |
-| spark.config."spark.kubernetes.executor.namespace" | string | `"{{ if .Values.executorNamespace.enabled }}{{ .Values.executorNamespace.namespace }}{{ else }}{{ .Release.Namespace }}{{ end }}"` |  |
 | spark.config."spark.kubernetes.executor.node.selector.workload-type" | string | `"spark"` |  |
-| spark.config."spark.kubernetes.executor.serviceAccountName" | string | `"{{ if .Values.executorNamespace.enabled }}{{ .Values.executorNamespace.serviceAccountName }}{{ else }}{{ include \"library-chart.fullname\" . }}{{ end }}"` |  |
 | spark.config."spark.kubernetes.namespace" | string | `"{{ .Release.Namespace }}"` |  |
 | spark.config."spark.master" | string | `"k8s://https://kubernetes.default.svc"` |  |
 | spark.config."spark.network.timeout" | string | `"1000s"` |  |

@@ -1863,6 +1863,19 @@ entries:
     version: 2.3.17
   spark-connect:
   - apiVersion: v2
+    created: "2026-02-12T02:26:51.435818522Z"
+    dependencies:
+    - name: library-chart
+      repository: https://inseefrlab.github.io/helm-charts-interactive-services
+      version: 1.7.14
+    description: Spark Connect server on EMR on EKS with dynamic K8s executor scaling
+    digest: 2316715089ba367635d45d8134b21e470ee05a6c048e0dc8ccc6f71b93c0b171
+    name: spark-connect
+    type: application
+    urls:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/spark-connect-1.1.2/spark-connect-1.1.2.tgz
+    version: 1.1.2
+  - apiVersion: v2
     created: "2026-02-12T02:17:44.231026396Z"
     dependencies:
     - name: library-chart
@@ -2084,4 +2097,4 @@ entries:
     urls:
     - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/vscode-tensorflow-gpu-2.4.0/vscode-tensorflow-gpu-2.4.0.tgz
     version: 2.4.0
-generated: "2026-02-12T02:17:44.231160939Z"
+generated: "2026-02-12T02:26:51.435920753Z"

@@ -1,6 +1,6 @@
 # spark-connect
 
-![Version: 1.1.5](https://img.shields.io/badge/Version-1.1.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.7](https://img.shields.io/badge/Version-1.1.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 
@@ -51,7 +51,11 @@ Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 | serviceAccount.name | string | `""` |  |
 | spark.config."spark.connect.grpc.binding.port" | string | `"15002"` |  |
 | spark.config."spark.connect.grpc.maxInboundMessageSize" | string | `"134217728"` |  |
+| spark.config."spark.driver.extraClassPath" | string | `"/usr/lib/hadoop-lzo/lib/*:/usr/lib/hadoop/hadoop-aws.jar:/usr/share/aws/aws-java-sdk/*:/usr/share/aws/aws-java-sdk-v2/*:/usr/share/aws/emr/emrfs/conf:/usr/share/aws/emr/emrfs/lib/*:/usr/share/aws/emr/emrfs/auxlib/*:/usr/share/aws/emr/goodies/lib/emr-spark-goodies.jar:/usr/share/aws/emr/security/conf:/usr/share/aws/emr/security/lib/*:/usr/share/aws/hmclient/lib/aws-glue-datacatalog-spark-client.jar:/usr/share/java/Hive-JSON-Serde/hive-openx-serde.jar:/usr/share/aws/sagemaker-spark-sdk/lib/sagemaker-spark-sdk.jar:/usr/share/aws/emr/s3select/lib/emr-s3-select-spark-connector.jar:/docker/usr/lib/hadoop-lzo/lib/*:/docker/usr/lib/hadoop/hadoop-aws.jar:/docker/usr/share/aws/aws-java-sdk/*:/docker/usr/share/aws/aws-java-sdk-v2/*:/docker/usr/share/aws/emr/emrfs/conf:/docker/usr/share/aws/emr/emrfs/lib/*:/docker/usr/share/aws/emr/emrfs/auxlib/*:/docker/usr/share/aws/emr/goodies/lib/emr-spark-goodies.jar:/docker/usr/share/aws/emr/security/conf:/docker/usr/share/aws/emr/security/lib/*:/docker/usr/share/aws/hmclient/lib/aws-glue-datacatalog-spark-client.jar:/docker/usr/share/java/Hive-JSON-Serde/hive-openx-serde.jar:/docker/usr/share/aws/sagemaker-spark-sdk/lib/sagemaker-spark-sdk.jar:/docker/usr/share/aws/emr/s3select/lib/emr-s3-select-spark-connector.jar"` |  |
+| spark.config."spark.driver.extraLibraryPath" | string | `"/usr/lib/hadoop/lib/native:/usr/lib/hadoop-lzo/lib/native:/docker/usr/lib/hadoop/lib/native:/docker/usr/lib/hadoop-lzo/lib/native"` |  |
 | spark.config."spark.driver.maxResultSize" | string | `"5g"` |  |
+| spark.config."spark.executor.extraClassPath" | string | `"/usr/lib/hadoop-lzo/lib/*:/usr/lib/hadoop/hadoop-aws.jar:/usr/share/aws/aws-java-sdk/*:/usr/share/aws/aws-java-sdk-v2/*:/usr/share/aws/emr/emrfs/conf:/usr/share/aws/emr/emrfs/lib/*:/usr/share/aws/emr/emrfs/auxlib/*:/usr/share/aws/emr/goodies/lib/emr-spark-goodies.jar:/usr/share/aws/emr/security/conf:/usr/share/aws/emr/security/lib/*:/usr/share/aws/hmclient/lib/aws-glue-datacatalog-spark-client.jar:/usr/share/java/Hive-JSON-Serde/hive-openx-serde.jar:/usr/share/aws/sagemaker-spark-sdk/lib/sagemaker-spark-sdk.jar:/usr/share/aws/emr/s3select/lib/emr-s3-select-spark-connector.jar:/docker/usr/lib/hadoop-lzo/lib/*:/docker/usr/lib/hadoop/hadoop-aws.jar:/docker/usr/share/aws/aws-java-sdk/*:/docker/usr/share/aws/aws-java-sdk-v2/*:/docker/usr/share/aws/emr/emrfs/conf:/docker/usr/share/aws/emr/emrfs/lib/*:/docker/usr/share/aws/emr/emrfs/auxlib/*:/docker/usr/share/aws/emr/goodies/lib/emr-spark-goodies.jar:/docker/usr/share/aws/emr/security/conf:/docker/usr/share/aws/emr/security/lib/*:/docker/usr/share/aws/hmclient/lib/aws-glue-datacatalog-spark-client.jar:/docker/usr/share/java/Hive-JSON-Serde/hive-openx-serde.jar:/docker/usr/share/aws/sagemaker-spark-sdk/lib/sagemaker-spark-sdk.jar:/docker/usr/share/aws/emr/s3select/lib/emr-s3-select-spark-connector.jar"` |  |
+| spark.config."spark.executor.extraLibraryPath" | string | `"/usr/lib/hadoop/lib/native:/usr/lib/hadoop-lzo/lib/native:/docker/usr/lib/hadoop/lib/native:/docker/usr/lib/hadoop-lzo/lib/native"` |  |
 | spark.config."spark.hadoop.fs.s3a.aws.credentials.provider" | string | `"com.amazonaws.auth.WebIdentityTokenCredentialsProvider"` |  |
 | spark.config."spark.hadoop.fs.s3a.block.size" | string | `"256m"` |  |
 | spark.config."spark.hadoop.fs.s3a.committer.magic.enabled" | string | `"true"` |  |
@@ -99,12 +103,14 @@ Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 | spark.userConfig."spark.kubernetes.executor.limit.cores" | string | `"2"` |  |
 | spark.userConfig."spark.kubernetes.executor.request.cores" | string | `"2"` |  |
 | sparkConnect.emrInternalId | string | `"spark-connect-server"` |  |
-| sparkConnect.env[0].name | string | `"AIS_S3PATH"` |  |
-| sparkConnect.env[0].value | string | `"s3a://ais-data-142496269814/exact-earth-data/transformed/prod/"` |  |
-| sparkConnect.env[1].name | string | `"USER_TEMP_S3PATH"` |  |
-| sparkConnect.env[1].value | string | `"s3a://ais-data-142496269814/user_temp/"` |  |
-| sparkConnect.env[2].name | string | `"SHIP_REGISTER_LATEST_S3PATH"` |  |
-| sparkConnect.env[2].value | string | `"s3a://ais-data-142496269814/register/"` |  |
+| sparkConnect.env[0].name | string | `"PYTHONPATH"` |  |
+| sparkConnect.env[0].value | string | `"/home/hadoop/.local/lib/python3.11/site-packages"` |  |
+| sparkConnect.env[1].name | string | `"AIS_S3PATH"` |  |
+| sparkConnect.env[1].value | string | `"s3a://ais-data-142496269814/exact-earth-data/transformed/prod/"` |  |
+| sparkConnect.env[2].name | string | `"USER_TEMP_S3PATH"` |  |
+| sparkConnect.env[2].value | string | `"s3a://ais-data-142496269814/user_temp/"` |  |
+| sparkConnect.env[3].name | string | `"SHIP_REGISTER_LATEST_S3PATH"` |  |
+| sparkConnect.env[3].value | string | `"s3a://ais-data-142496269814/register/"` |  |
 | sparkConnect.packages | string | `"org.apache.spark:spark-connect_2.12:3.5.0"` |  |
 | startupProbe.failureThreshold | int | `30` |  |
 | startupProbe.initialDelaySeconds | int | `10` |  |

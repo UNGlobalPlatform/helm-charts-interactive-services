@@ -1,16 +1,12 @@
 {{- template "library-chart.notes" (dict "serviceName" "RStudio (R)" "context" $) -}}
 {{- if .Values.sparkConnect.enabled }}
 
-== Spark Connect ==
+### Spark Connect
 
-  gRPC endpoint (from inside this pod):
-    sc://{{ include "library-chart.fullname" . }}-spark-connect:15002
-
-  Spark UI:
+- **gRPC endpoint** (from inside this pod): `sc://{{ include "library-chart.fullname" . }}-spark-connect:15002`
 {{- if and .Values.ingress.enabled .Values.sparkConnect.sparkui.hostname }}
-    {{ .Values.ingress.tls | ternary "https" "http" }}://{{ .Values.sparkConnect.sparkui.hostname }}
+- When Spark is running, you can access the **Spark UI** using [this link]({{ .Values.ingress.tls | ternary "https" "http" }}://{{ .Values.sparkConnect.sparkui.hostname }}).
 {{- else }}
-    kubectl port-forward svc/{{ include "library-chart.fullname" . }}-spark-connect 4040:4040 -n {{ .Release.Namespace }}
-    Then open: http://localhost:4040
+- **Spark UI**: `kubectl port-forward svc/{{ include "library-chart.fullname" . }}-spark-connect 4040:4040 -n {{ .Release.Namespace }}` then open `http://localhost:4040`
 {{- end }}
 {{- end }}

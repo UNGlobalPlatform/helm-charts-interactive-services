@@ -750,7 +750,7 @@
             "hidden": true
           }
         },
-        "tlsSecretName":{
+        "tlsSecretName": {
           "type": "string",
           "default": "",
           "x-onyxia": {
@@ -949,15 +949,27 @@
                 "requests": {
                   "type": "object",
                   "properties": {
-                    "cpu": { "type": "string", "default": "2" },
-                    "memory": { "type": "string", "default": "10Gi" }
+                    "cpu": {
+                      "type": "string",
+                      "default": "2"
+                    },
+                    "memory": {
+                      "type": "string",
+                      "default": "10Gi"
+                    }
                   }
                 },
                 "limits": {
                   "type": "object",
                   "properties": {
-                    "cpu": { "type": "string", "default": "2" },
-                    "memory": { "type": "string", "default": "12Gi" }
+                    "cpu": {
+                      "type": "string",
+                      "default": "2"
+                    },
+                    "memory": {
+                      "type": "string",
+                      "default": "12Gi"
+                    }
                   }
                 }
               }
@@ -1001,6 +1013,24 @@
               "default": "1g",
               "x-onyxia": {
                 "hidden": true
+              }
+            }
+          }
+        },
+        "sparkui": {
+          "title": "Spark UI",
+          "type": "object",
+          "x-onyxia": {
+            "hidden": true
+          },
+          "properties": {
+            "hostname": {
+              "type": "string",
+              "title": "Spark UI hostname",
+              "default": "",
+              "x-onyxia": {
+                "hidden": true,
+                "overwriteDefaultWith": "{{project.id}}-{{k8s.randomSubdomain}}-sparkui.{{k8s.domain}}"
               }
             }
           }

@@ -50,6 +50,7 @@ stringData:
     spark.hadoop.fs.s3a.multipart.threshold 104857600
     spark.kubernetes.executor.node.selector.workload-type spark
     spark.kubernetes.executor.podTemplateFile file:///opt/spark-connect/executor-pod-template.yaml
+    spark.kubernetes.executor.podTemplateContainerName spark-kubernetes-executor
     spark.dynamicAllocation.enabled true
     spark.dynamicAllocation.initialExecutors 1
     spark.dynamicAllocation.minExecutors 0
@@ -64,6 +65,8 @@ stringData:
     apiVersion: v1
     kind: Pod
     spec:
+      containers:
+        - name: spark-kubernetes-executor
       tolerations:
         - key: workload-type
           operator: Equal

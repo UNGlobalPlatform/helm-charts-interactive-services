@@ -1,5 +1,27 @@
 {{- if and .Values.sparkConnect.enabled .Values.ingress.enabled .Values.sparkConnect.sparkui.hostname }}
 {{- $fullName := include "library-chart.fullname" . -}}
+{{- if eq (.Values.ingress.ingressClassName | default "") "apisix" }}
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: {{ $fullName }}-spark-connect-ui
+  labels:
+    {{- include "library-chart.labels" . | nindent 4 }}
+    app.kubernetes.io/component: spark-connect
+spec:
+  http:
+    - name: {{ $fullName }}-spark-ui
+      match:
+        hosts:
+          - {{ .Values.sparkConnect.sparkui.hostname | quote }}
+        paths:
+          - "/*"
+      plugin_config_name: global-sso-policy
+      plugin_config_namespace: ingress-apisix
+      backends:
+        - serviceName: {{ $fullName }}-spark-connect
+          servicePort: 4040
+{{- else }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -34,4 +56,5 @@ spec:
                 name: {{ $fullName }}-spark-connect
                 port:
                   number: 4040
+{{- end }}
 {{- end }}

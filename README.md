@@ -10,6 +10,20 @@ The repo is also browsable directly https://inseefrlab.github.io/helm-charts-int
 
 Contributions are much welcome! Feel free to open issues or submit pull requests :)
 
+## Chart inheritance (parent → child auto-propagation)
+
+Charts are organized into **parent** and **child** groups defined in [`utils/charts-inheritance.yaml`](utils/charts-inheritance.yaml). When changes are merged to `main`, the CI pipeline runs [`utils/generate-children-charts.py`](utils/generate-children-charts.py) which **copies the entire parent chart directory** (via `shutil.copytree`) into each child, then patches `Chart.yaml` (name/description), `values.schema.json` (images, GPU config), and `values.yaml` (images).
+
+**Only edit the 3 parent charts directly:**
+
+| Parent | Children |
+|--------|----------|
+| `jupyter-python` | `jupyter-python-gpu`, `jupyter-pytorch`, `jupyter-pytorch-gpu`, `jupyter-r-python-julia`, `jupyter-tensorflow`, `jupyter-tensorflow-gpu` |
+| `rstudio` | `rstudio-gpu`, `rstudio-r-python-julia` |
+| `vscode-python` | `vscode-python-gpu`, `vscode-pytorch`, `vscode-pytorch-gpu`, `vscode-r-python-julia`, `vscode-tensorflow`, `vscode-tensorflow-gpu` |
+
+Changes to child chart directories will be **overwritten** on the next merge to `main`. The PR lint CI (`ct lint`) checks version bumps per-chart against `main`, so you only need to bump the parent `Chart.yaml` version — children inherit it automatically.
+
 ## Create your own schemas for [Onyxia](https://github.com/inseefrlab/onyxia)
 
 Our charts allow to customize the user experience on your platform by defining json schemas.

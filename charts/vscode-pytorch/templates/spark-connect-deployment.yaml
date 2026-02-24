@@ -87,4 +87,9 @@ spec:
               readOnly: true
       nodeSelector:
         workload-type: spark
+      tolerations:
+        - key: workload-type
+          operator: Equal
+          value: spark
+          effect: NoSchedule
 {{- end }}

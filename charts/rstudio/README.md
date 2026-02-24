@@ -1,6 +1,6 @@
 # rstudio
 
-![Version: 2.3.20](https://img.shields.io/badge/Version-2.3.20-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.3.21](https://img.shields.io/badge/Version-2.3.21-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 The RStudio IDE with a collection of standard data science packages.
 
@@ -128,6 +128,7 @@ The RStudio IDE with a collection of standard data science packages.
 | sparkConnect.server.resources.limits.memory | string | `"12Gi"` |  |
 | sparkConnect.server.resources.requests.cpu | string | `"2"` |  |
 | sparkConnect.server.resources.requests.memory | string | `"10Gi"` |  |
+| sparkConnect.sparkui.hostname | string | `""` |  |
 | startupProbe.failureThreshold | int | `60` |  |
 | startupProbe.initialDelaySeconds | int | `10` |  |
 | startupProbe.periodSeconds | int | `10` |  |

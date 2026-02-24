@@ -1,6 +1,6 @@
 # vscode-python
 
-![Version: 2.4.2](https://img.shields.io/badge/Version-2.4.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.4.3](https://img.shields.io/badge/Version-2.4.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 The Visual Studio Code IDE with Python, Julia, and a collection of standard data science packages.
 
@@ -140,6 +140,7 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | sparkConnect.server.resources.limits.memory | string | `"12Gi"` |  |
 | sparkConnect.server.resources.requests.cpu | string | `"2"` |  |
 | sparkConnect.server.resources.requests.memory | string | `"10Gi"` |  |
+| sparkConnect.sparkui.hostname | string | `""` |  |
 | startupProbe.failureThreshold | int | `60` |  |
 | startupProbe.initialDelaySeconds | int | `10` |  |
 | startupProbe.periodSeconds | int | `10` |  |

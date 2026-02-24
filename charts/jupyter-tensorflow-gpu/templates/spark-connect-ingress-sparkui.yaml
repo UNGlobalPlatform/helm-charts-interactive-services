@@ -1,0 +1,37 @@
+{{- if and .Values.sparkConnect.enabled .Values.ingress.enabled .Values.sparkConnect.sparkui.hostname }}
+{{- $fullName := include "library-chart.fullname" . -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-spark-connect-ui
+  labels:
+    {{- include "library-chart.labels" . | nindent 4 }}
+    app.kubernetes.io/component: spark-connect
+  annotations:
+    {{- include "library-chart.ingress.annotations" . | nindent 4 }}
+spec:
+  {{- if and .Values.ingress.ingressClassName (eq "true" (include "library-chart.ingress.supportsIngressClassname" .)) }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  {{- end }}
+  {{- if .Values.ingress.tls }}
+  tls:
+    - hosts:
+        - {{ .Values.sparkConnect.sparkui.hostname | quote }}
+      {{- if and .Values.ingress.useTlsSecret (ne .Values.ingress.tlsSecretName "") }}
+      secretName: {{ .Values.ingress.tlsSecretName }}
+      {{- else if or .Values.ingress.useCertManager .Values.ingress.useTlsSecret }}
+      secretName: tls-cert-{{ $fullName }}
+      {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.sparkConnect.sparkui.hostname | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}-spark-connect
+                port:
+                  number: 4040
+{{- end }}

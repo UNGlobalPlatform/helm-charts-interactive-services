@@ -49,6 +49,7 @@ stringData:
     spark.hadoop.fs.s3a.multipart.size 268435456
     spark.hadoop.fs.s3a.multipart.threshold 104857600
     spark.kubernetes.executor.node.selector.workload-type spark
+    spark.kubernetes.executor.podTemplateFile file:///opt/spark-connect/executor-pod-template.yaml
     spark.dynamicAllocation.enabled true
     spark.dynamicAllocation.initialExecutors 1
     spark.dynamicAllocation.minExecutors 0
@@ -59,4 +60,13 @@ stringData:
     spark.executor.memoryOverhead {{ .Values.sparkConnect.executor.memoryOverhead }}
     spark.kubernetes.executor.request.cores {{ .Values.sparkConnect.executor.cores }}
     spark.kubernetes.executor.limit.cores {{ .Values.sparkConnect.executor.cores }}
+  executor-pod-template.yaml: |
+    apiVersion: v1
+    kind: Pod
+    spec:
+      tolerations:
+        - key: workload-type
+          operator: Equal
+          value: spark
+          effect: NoSchedule
 {{- end }}

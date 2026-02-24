@@ -1,1 +1,16 @@
 {{- template "library-chart.notes" (dict "serviceName" "Visual Studio Code (Python)" "context" $) -}}
+{{- if .Values.sparkConnect.enabled }}
+
+== Spark Connect ==
+
+  gRPC endpoint (from inside this pod):
+    sc://{{ include "library-chart.fullname" . }}-spark-connect:15002
+
+  Spark UI:
+{{- if and .Values.ingress.enabled .Values.sparkConnect.sparkui.hostname }}
+    {{ .Values.ingress.tls | ternary "https" "http" }}://{{ .Values.sparkConnect.sparkui.hostname }}
+{{- else }}
+    kubectl port-forward svc/{{ include "library-chart.fullname" . }}-spark-connect 4040:4040 -n {{ .Release.Namespace }}
+    Then open: http://localhost:4040
+{{- end }}
+{{- end }}

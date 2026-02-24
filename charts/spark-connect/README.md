@@ -1,6 +1,6 @@
 # spark-connect
 
-![Version: 1.1.9](https://img.shields.io/badge/Version-1.1.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 
@@ -43,9 +43,9 @@ Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 | security.networkPolicy.enabled | bool | `false` |  |
 | security.networkPolicy.from | list | `[]` |  |
 | service.image.custom.enabled | bool | `false` |  |
-| service.image.custom.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/emr-on-eks/spark-connect:1.1.0"` |  |
+| service.image.custom.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.6.0-consolidated"` |  |
 | service.image.pullPolicy | string | `"IfNotPresent"` |  |
-| service.image.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/emr-on-eks/spark-connect:1.1.0"` |  |
+| service.image.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.6.0-consolidated"` |  |
 | serviceAccount.annotations."eks.amazonaws.com/role-arn" | string | `"arn:aws:iam::142496269814:role/emr-job-execution-role"` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |
@@ -111,7 +111,6 @@ Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 | sparkConnect.env[2].value | string | `"s3a://ais-data-142496269814/user_temp/"` |  |
 | sparkConnect.env[3].name | string | `"SHIP_REGISTER_LATEST_S3PATH"` |  |
 | sparkConnect.env[3].value | string | `"s3a://ais-data-142496269814/register/"` |  |
-| sparkConnect.packages | string | `"org.apache.spark:spark-connect_2.12:3.5.0"` |  |
 | startupProbe.failureThreshold | int | `30` |  |
 | startupProbe.initialDelaySeconds | int | `10` |  |
 | startupProbe.periodSeconds | int | `10` |  |

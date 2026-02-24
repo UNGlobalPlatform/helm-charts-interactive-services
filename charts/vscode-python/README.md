@@ -1,6 +1,6 @@
 # vscode-python
 
-![Version: 2.4.0](https://img.shields.io/badge/Version-2.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.4.1](https://img.shields.io/badge/Version-2.4.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 The Visual Studio Code IDE with Python, Julia, and a collection of standard data science packages.
 
@@ -128,6 +128,18 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |
+| sparkConnect.enabled | bool | `false` |  |
+| sparkConnect.executor.cores | string | `"2"` |  |
+| sparkConnect.executor.maxExecutors | string | `"10"` |  |
+| sparkConnect.executor.memory | string | `"4g"` |  |
+| sparkConnect.executor.memoryOverhead | string | `"1g"` |  |
+| sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.6.0-consolidated"` |  |
+| sparkConnect.keda.enabled | bool | `true` |  |
+| sparkConnect.pysparkVersion | string | `"3.5.0"` |  |
+| sparkConnect.server.resources.limits.cpu | string | `"2"` |  |
+| sparkConnect.server.resources.limits.memory | string | `"12Gi"` |  |
+| sparkConnect.server.resources.requests.cpu | string | `"2"` |  |
+| sparkConnect.server.resources.requests.memory | string | `"10Gi"` |  |
 | startupProbe.failureThreshold | int | `60` |  |
 | startupProbe.initialDelaySeconds | int | `10` |  |
 | startupProbe.periodSeconds | int | `10` |  |

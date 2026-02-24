@@ -233,6 +233,8 @@ sparkConnect:
     cores: "2"
     memory: "4g"
     memoryOverhead: "1g"
+  sparkui:
+    hostname: ""
 
 openshiftSCC:
   enabled: false

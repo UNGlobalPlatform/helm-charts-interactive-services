@@ -1,6 +1,6 @@
 # rstudio
 
-![Version: 2.3.23](https://img.shields.io/badge/Version-2.3.23-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.3.24](https://img.shields.io/badge/Version-2.3.24-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 The RStudio IDE with a collection of standard data science packages.
 
@@ -38,6 +38,7 @@ The RStudio IDE with a collection of standard data science packages.
 | git.name | string | `""` |  |
 | git.repository | string | `""` |  |
 | git.secretName | string | `""` |  |
+| git.sshKnownHosts | string | `""` |  |
 | git.token | string | `""` |  |
 | global.suspend | bool | `false` |  |
 | imagePullSecrets | list | `[]` |  |
@@ -116,12 +117,13 @@ The RStudio IDE with a collection of standard data science packages.
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |
+| sparkConnect.aisBasepath | string | `"s3a://ais-data-142496269814/exact-earth-data/transformed/prod/"` |  |
 | sparkConnect.enabled | bool | `false` |  |
 | sparkConnect.executor.cores | string | `"2"` |  |
 | sparkConnect.executor.maxExecutors | string | `"10"` |  |
 | sparkConnect.executor.memory | string | `"4g"` |  |
 | sparkConnect.executor.memoryOverhead | string | `"1g"` |  |
-| sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.6.0-consolidated"` |  |
+| sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.7.0-spark-hadoop-cloud"` |  |
 | sparkConnect.keda.enabled | bool | `true` |  |
 | sparkConnect.pysparkVersion | string | `"3.5.0"` |  |
 | sparkConnect.server.resources.limits.cpu | string | `"2"` |  |

@@ -1,6 +1,6 @@
 # vscode-python
 
-![Version: 2.4.5](https://img.shields.io/badge/Version-2.4.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.4.6](https://img.shields.io/badge/Version-2.4.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 The Visual Studio Code IDE with Python, Julia, and a collection of standard data science packages.
 
@@ -46,6 +46,7 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | git.enabled | bool | `true` |  |
 | git.name | string | `""` |  |
 | git.secretName | string | `""` |  |
+| git.sshKnownHosts | string | `""` |  |
 | global.suspend | bool | `false` |  |
 | hive.secretName | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
@@ -128,12 +129,13 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |
+| sparkConnect.aisBasepath | string | `"s3a://ais-data-142496269814/exact-earth-data/transformed/prod/"` |  |
 | sparkConnect.enabled | bool | `false` |  |
 | sparkConnect.executor.cores | string | `"2"` |  |
 | sparkConnect.executor.maxExecutors | string | `"10"` |  |
 | sparkConnect.executor.memory | string | `"4g"` |  |
 | sparkConnect.executor.memoryOverhead | string | `"1g"` |  |
-| sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.6.0-consolidated"` |  |
+| sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.7.0-spark-hadoop-cloud"` |  |
 | sparkConnect.keda.enabled | bool | `true` |  |
 | sparkConnect.pysparkVersion | string | `"3.5.0"` |  |
 | sparkConnect.server.resources.limits.cpu | string | `"2"` |  |

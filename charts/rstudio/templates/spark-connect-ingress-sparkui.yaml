@@ -21,6 +21,22 @@ spec:
       backends:
         - serviceName: {{ $fullName }}-spark-connect
           servicePort: 4040
+{{- if and .Values.ingress.useTlsSecret (ne .Values.ingress.tlsSecretName "") }}
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixTls
+metadata:
+  name: {{ $fullName }}-spark-connect-tls
+  labels:
+    {{- include "library-chart.labels" . | nindent 4 }}
+    app.kubernetes.io/component: spark-connect
+spec:
+  hosts:
+    - {{ .Values.sparkConnect.sparkui.hostname | quote }}
+  secret:
+    name: {{ .Values.ingress.tlsSecretName }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}
 {{- else }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress

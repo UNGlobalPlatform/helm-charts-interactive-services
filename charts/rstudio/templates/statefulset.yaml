@@ -124,7 +124,7 @@ spec:
           {{- end }}
           {{- $sparkInit := "" -}}
           {{- if .Values.sparkConnect.enabled -}}
-          {{- $sparkInit = printf "pip install --quiet 'pyspark==%s' grpcio grpcio-status protobuf && " .Values.sparkConnect.pysparkVersion -}}
+          {{- $sparkInit = printf "pip install --quiet 'pyspark==%s' 'apache-sedona==%s' grpcio grpcio-status protobuf && " .Values.sparkConnect.pysparkVersion .Values.sparkConnect.sedonaVersion -}}
           {{- end }}
           command: ["/bin/sh","-c"]
           args: ["{{ $sparkInit }}{{ .Values.init.standardInitPath }} /init"]

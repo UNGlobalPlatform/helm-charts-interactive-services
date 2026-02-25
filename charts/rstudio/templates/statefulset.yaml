@@ -71,7 +71,7 @@ spec:
         {{- if and (.Values.git).enabled (.Values.git).sshKnownHosts }}
         - name: ssh-known-hosts
           configMap:
-            name: {{ include "library-chart.configMapNameSshKnownHosts" . }}
+            name: {{ include "library-chart.fullname" . }}-ssh-known-hosts
         {{- end }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:

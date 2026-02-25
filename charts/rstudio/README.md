@@ -1,6 +1,6 @@
 # rstudio
 
-![Version: 2.3.27](https://img.shields.io/badge/Version-2.3.27-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.3.28](https://img.shields.io/badge/Version-2.3.28-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 The RStudio IDE with a collection of standard data science packages.
 
@@ -126,6 +126,7 @@ The RStudio IDE with a collection of standard data science packages.
 | sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.7.0-spark-hadoop-cloud"` |  |
 | sparkConnect.keda.enabled | bool | `true` |  |
 | sparkConnect.pysparkVersion | string | `"3.5.0"` |  |
+| sparkConnect.sedonaVersion | string | `"1.7.0"` |  |
 | sparkConnect.server.resources.limits.cpu | string | `"2"` |  |
 | sparkConnect.server.resources.limits.memory | string | `"12Gi"` |  |
 | sparkConnect.server.resources.requests.cpu | string | `"2"` |  |

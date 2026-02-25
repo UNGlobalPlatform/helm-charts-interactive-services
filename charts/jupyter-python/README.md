@@ -1,6 +1,6 @@
 # jupyter-python
 
-![Version: 2.3.33](https://img.shields.io/badge/Version-2.3.33-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.3.34](https://img.shields.io/badge/Version-2.3.34-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 The JupyterLab IDE with Python and a collection of standard data science packages.
 
@@ -139,6 +139,7 @@ The JupyterLab IDE with Python and a collection of standard data science package
 | sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.7.0-spark-hadoop-cloud"` |  |
 | sparkConnect.keda.enabled | bool | `true` |  |
 | sparkConnect.pysparkVersion | string | `"3.5.0"` |  |
+| sparkConnect.sedonaVersion | string | `"1.7.0"` |  |
 | sparkConnect.server.resources.limits.cpu | string | `"2"` |  |
 | sparkConnect.server.resources.limits.memory | string | `"12Gi"` |  |
 | sparkConnect.server.resources.requests.cpu | string | `"2"` |  |

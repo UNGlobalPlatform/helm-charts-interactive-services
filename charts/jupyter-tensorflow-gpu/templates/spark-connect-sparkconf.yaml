@@ -31,6 +31,11 @@ stringData:
     spark.hadoop.fs.s3a.aws.credentials.provider com.amazonaws.auth.DefaultAWSCredentialsProviderChain
     spark.hadoop.fs.s3a.endpoint s3.us-west-2.amazonaws.com
     spark.hadoop.fs.s3a.endpoint.region us-west-2
+    {{- if (.Values.s3).enabled }}
+    spark.kubernetes.executor.secretKeyRef.AWS_ACCESS_KEY_ID {{ include "library-chart.secretNameS3" . }}:AWS_ACCESS_KEY_ID
+    spark.kubernetes.executor.secretKeyRef.AWS_SECRET_ACCESS_KEY {{ include "library-chart.secretNameS3" . }}:AWS_SECRET_ACCESS_KEY
+    spark.kubernetes.executor.secretKeyRef.AWS_SESSION_TOKEN {{ include "library-chart.secretNameS3" . }}:AWS_SESSION_TOKEN
+    {{- end }}
     spark.hadoop.fs.s3a.committer.name magic
     spark.hadoop.fs.s3a.committer.magic.enabled true
     spark.sql.sources.commitProtocolClass org.apache.spark.internal.io.cloud.PathOutputCommitProtocol

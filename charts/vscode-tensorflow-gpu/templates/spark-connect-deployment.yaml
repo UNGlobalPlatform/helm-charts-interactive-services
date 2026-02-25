@@ -53,6 +53,11 @@ spec:
                   fieldPath: status.podIP
             - name: AWS_REGION
               value: "us-west-2"
+          {{- if (.Values.s3).enabled }}
+          envFrom:
+            - secretRef:
+                name: {{ include "library-chart.secretNameS3" . }}
+          {{- end }}
           ports:
             - containerPort: 15002
               name: grpc

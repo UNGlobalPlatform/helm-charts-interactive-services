@@ -100,6 +100,11 @@ spec:
           secret:
             secretName: {{ include "library-chart.secretNameAssistantJupyter" . }}
         {{- end }}
+        {{- if and (.Values.git).enabled (.Values.git).sshKnownHosts }}
+        - name: ssh-known-hosts
+          configMap:
+            name: {{ include "library-chart.configMapNameSshKnownHosts" . }}
+        {{- end }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -230,6 +235,10 @@ spec:
             {{- if .Values.sparkConnect.enabled }}
             - name: SPARK_REMOTE
               value: "sc://{{ include "library-chart.fullname" . }}-spark-connect:15002"
+            {{- if .Values.sparkConnect.aisBasepath }}
+            - name: AIS_BASEPATH
+              value: {{ .Values.sparkConnect.aisBasepath | quote }}
+            {{- end }}
             {{- end }}
           envFrom:
             - secretRef:
@@ -320,6 +329,12 @@ spec:
             - name: config-files
               mountPath: {{ .Values.certificates.pathToCaBundle }}
               subPath: cacerts
+            {{- end }}
+            {{- if and (.Values.git).enabled (.Values.git).sshKnownHosts }}
+            - name: ssh-known-hosts
+              mountPath: /opt/ssh/known_hosts
+              subPath: known_hosts
+              readOnly: true
             {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

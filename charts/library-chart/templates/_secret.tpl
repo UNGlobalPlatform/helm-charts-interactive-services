@@ -119,6 +119,31 @@ stringData:
   GIT_PERSONAL_ACCESS_TOKEN: {{ .Values.git.token | quote }}
   GIT_REPOSITORY: {{ .Values.git.repository | quote }}
   GIT_BRANCH: {{ .Values.git.branch | quote }}
+  {{- if .Values.git.sshKnownHosts }}
+  GIT_SSH_COMMAND: "ssh -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/opt/ssh/known_hosts"
+  {{- else }}
+  GIT_SSH_COMMAND: "ssh -o UserKnownHostsFile=/home/{{ .Values.environment.user }}/work/.ssh_known_hosts"
+  {{- end }}
+{{- end }}
+{{- end }}
+
+{{/* Create the name of the ConfigMap for SSH known hosts */}}
+{{- define "library-chart.configMapNameSshKnownHosts" -}}
+{{- printf "%s-ssh-known-hosts" (include "library-chart.fullname" .) }}
+{{- end }}
+
+{{/* Template to generate a ConfigMap for SSH known hosts */}}
+{{- define "library-chart.configMapSshKnownHosts" -}}
+{{- if and (.Values.git).enabled (.Values.git).sshKnownHosts -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "library-chart.configMapNameSshKnownHosts" . }}
+  labels:
+    {{- include "library-chart.labels" . | nindent 4 }}
+data:
+  known_hosts: |
+    {{- .Values.git.sshKnownHosts | nindent 4 }}
 {{- end }}
 {{- end }}
 

@@ -934,6 +934,14 @@
             "hidden": true
           }
         },
+        "sedonaVersion": {
+          "title": "Apache Sedona version",
+          "type": "string",
+          "default": "1.7.0",
+          "x-onyxia": {
+            "hidden": true
+          }
+        },
         "keda": {
           "title": "KEDA autoscaling",
           "type": "object",

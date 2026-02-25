@@ -22,6 +22,8 @@ stringData:
     spark.connect.grpc.maxInboundMessageSize 134217728
     spark.scheduler.mode FAIR
     spark.serializer org.apache.spark.serializer.KryoSerializer
+    spark.kryo.registrator org.apache.sedona.core.serde.SedonaKryoRegistrator
+    spark.sql.extensions org.apache.sedona.sql.SedonaSqlExtensions
     spark.driver.maxResultSize 5g
     spark.driver.memory 10g
     spark.network.timeout 1000s

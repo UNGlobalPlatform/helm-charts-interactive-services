@@ -1,0 +1,11 @@
+{{- if and (.Values.git).enabled (.Values.git).sshKnownHosts -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "library-chart.fullname" . }}-ssh-known-hosts
+  labels:
+    {{- include "library-chart.labels" . | nindent 4 }}
+data:
+  known_hosts: |
+    {{- .Values.git.sshKnownHosts | nindent 4 }}
+{{- end }}

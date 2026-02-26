@@ -176,7 +176,7 @@ spec:
           {{- end }}
           {{- $sparkInit := "" -}}
           {{- if .Values.sparkConnect.enabled -}}
-          {{- $sparkInit = printf "pip install --quiet 'pyspark==%s' 'apache-sedona==%s' grpcio grpcio-status protobuf && " .Values.sparkConnect.pysparkVersion .Values.sparkConnect.sedonaVersion -}}
+          {{- $sparkInit = printf "pip install --quiet 'pyspark==%s' 'apache-sedona==%s' 'h3==%s' grpcio grpcio-status protobuf && " .Values.sparkConnect.pysparkVersion .Values.sparkConnect.sedonaVersion .Values.sparkConnect.h3Version -}}
           {{- end }}
           command: ["/bin/sh","-c"]
           {{- if .Values.git.asCodeServerRoot }}

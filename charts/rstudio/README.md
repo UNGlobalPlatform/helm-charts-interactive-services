@@ -121,7 +121,7 @@ The RStudio IDE with a collection of standard data science packages.
 | sparkConnect.executor.maxExecutors | string | `"10"` |  |
 | sparkConnect.executor.memory | string | `"4g"` |  |
 | sparkConnect.executor.memoryOverhead | string | `"1g"` |  |
-| sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.6.0-consolidated"` |  |
+| sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.7.0-spark-hadoop-cloud"` |  |
 | sparkConnect.keda.enabled | bool | `true` |  |
 | sparkConnect.pysparkVersion | string | `"3.5.0"` |  |
 | sparkConnect.server.resources.limits.cpu | string | `"2"` |  |

@@ -66,6 +66,7 @@
       "title": "Resources (CPU/RAM)",
       "type": "object",
       "x-onyxia": {
+        "hidden": true,
         "overwriteSchemaWith": "ide/resources.json"
       },
       "properties": {
@@ -77,7 +78,7 @@
               "description": "Guaranteed CPU allocation",
               "title": "CPU",
               "type": "string",
-              "default": "100m",
+              "default": "1000m",
               "render": "slider",
               "sliderMin": 50,
               "sliderMax": 40000,
@@ -95,7 +96,7 @@
               "description": "Guaranteed memory allocation",
               "title": "memory",
               "type": "string",
-              "default": "2Gi",
+              "default": "4Gi",
               "render": "slider",
               "sliderMin": 1,
               "sliderMax": 200,
@@ -119,7 +120,7 @@
               "description": "Maximum CPU allocation",
               "title": "CPU",
               "type": "string",
-              "default": "30000m",
+              "default": "4000m",
               "render": "slider",
               "sliderMin": 50,
               "sliderMax": 40000,
@@ -137,7 +138,7 @@
               "description": "Maximum memory allocation",
               "title": "Memory",
               "type": "string",
-              "default": "50Gi",
+              "default": "16Gi",
               "render": "slider",
               "sliderMin": 1,
               "sliderMax": 200,
@@ -1079,15 +1080,15 @@
                 "requests": {
                   "type": "object",
                   "properties": {
-                    "cpu": { "type": "string", "default": "2" },
-                    "memory": { "type": "string", "default": "10Gi" }
+                    "cpu": { "type": "string", "default": "8" },
+                    "memory": { "type": "string", "default": "20Gi" }
                   }
                 },
                 "limits": {
                   "type": "object",
                   "properties": {
-                    "cpu": { "type": "string", "default": "2" },
-                    "memory": { "type": "string", "default": "12Gi" }
+                    "cpu": { "type": "string", "default": "8" },
+                    "memory": { "type": "string", "default": "24Gi" }
                   }
                 }
               }
@@ -1101,28 +1102,25 @@
             "maxExecutors": {
               "title": "Maximum number of executors",
               "type": "string",
-              "default": "10",
-              "hidden": {
-                "value": false,
-                "path": "sparkConnect/enabled"
+              "default": "25",
+              "x-onyxia": {
+                "hidden": true
               }
             },
             "cores": {
               "title": "Cores per executor",
               "type": "string",
               "default": "2",
-              "hidden": {
-                "value": false,
-                "path": "sparkConnect/enabled"
+              "x-onyxia": {
+                "hidden": true
               }
             },
             "memory": {
               "title": "Memory per executor",
               "type": "string",
               "default": "4g",
-              "hidden": {
-                "value": false,
-                "path": "sparkConnect/enabled"
+              "x-onyxia": {
+                "hidden": true
               }
             },
             "memoryOverhead": {

@@ -195,17 +195,12 @@ route:
   wildcardPolicy: None
 
 resources:
-  {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  requests:
+    cpu: "1000m"
+    memory: "4Gi"
+  limits:
+    cpu: "4000m"
+    memory: "16Gi"
 
 persistence:
   enabled: true
@@ -265,13 +260,13 @@ sparkConnect:
   server:
     resources:
       requests:
-        cpu: "2"
-        memory: "10Gi"
+        cpu: "8"
+        memory: "20Gi"
       limits:
-        cpu: "2"
-        memory: "12Gi"
+        cpu: "8"
+        memory: "24Gi"
   executor:
-    maxExecutors: "10"
+    maxExecutors: "25"
     cores: "2"
     memory: "4g"
     memoryOverhead: "1g"

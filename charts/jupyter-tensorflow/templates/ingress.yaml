@@ -1,1 +1,41 @@
+{{- if and (eq (.Values.ingress.ingressClassName | default "") "apisix") .Values.ingress.enabled }}
+{{- if or (.Values.autoscaling).enabled (not (.Values.global).suspend) }}
+{{- $fullName := include "library-chart.fullname" . -}}
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "library-chart.labels" . | nindent 4 }}
+spec:
+  http:
+    - name: {{ $fullName }}
+      match:
+        hosts:
+          - {{ .Values.ingress.hostname | quote }}
+        paths:
+          - "/*"
+      plugin_config_name: global-sso-policy
+      plugin_config_namespace: ingress-apisix
+      backends:
+        - serviceName: {{ $fullName }}
+          servicePort: {{ .Values.networking.service.port }}
+{{- if and .Values.ingress.useTlsSecret (ne .Values.ingress.tlsSecretName "") }}
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixTls
+metadata:
+  name: {{ $fullName }}-tls
+  labels:
+    {{- include "library-chart.labels" . | nindent 4 }}
+spec:
+  hosts:
+    - {{ .Values.ingress.hostname | quote }}
+  secret:
+    name: {{ .Values.ingress.tlsSecretName }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}
+{{- end }}
+{{- else }}
 {{ include "library-chart.ingress" . }}
+{{- end }}

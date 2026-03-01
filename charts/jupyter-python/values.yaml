@@ -7,11 +7,11 @@ service:
     image: "inseefrlab/onyxia-base:latest"
     pullPolicy: IfNotPresent
   image:
-    version: "inseefrlab/onyxia-jupyter-python:py3.13.7"
+    version: "142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-jupyter-python:py3.11.14"
     pullPolicy: IfNotPresent
     custom:
       enabled: false
-      version: "inseefrlab/onyxia-jupyter-python:py3.13.7"
+      version: "142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-jupyter-python:py3.11.14"
 
 security:
   password: "changeme"
@@ -251,7 +251,7 @@ sparkConnect:
   pysparkVersion: "3.5.0"
   sedonaVersion: "1.7.0"
   h3Version: "4.4.2"
-  pythonImage: "inseefrlab/onyxia-jupyter-python:py3.11.13"
+  pythonImage: "142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-jupyter-python:py3.11.14"
   aisBasepath: "s3a://ais-data-142496269814/exact-earth-data/transformed/prod/"
   keda:
     enabled: true

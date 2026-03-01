@@ -163,7 +163,7 @@ userPreferences:
     useLegacyCompletionsEndpoint: false
 sparkConnect:
   enabled: false
-  image: 142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.7.0-spark-hadoop-cloud
+  image: 142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.8.0-python311
   pysparkVersion: 3.5.0
   sedonaVersion: 1.7.0
   h3Version: 4.4.2

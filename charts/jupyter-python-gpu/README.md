@@ -1,10 +1,10 @@
-# vscode-python
+# jupyter-python-gpu
 
-![Version: 2.4.16](https://img.shields.io/badge/Version-2.4.16-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.3.40](https://img.shields.io/badge/Version-2.3.40-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-The Visual Studio Code IDE with Python, Julia, and a collection of standard data science packages.
+The JupyterLab IDE with Python, and a collection of standard data science packages, with GPU support.
 
-**Homepage:** <https://code.visualstudio.com/>
+**Homepage:** <https://jupyter.org/>
 
 ## Source Code
 
@@ -39,14 +39,15 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | environment.user | string | `"onyxia"` |  |
 | extraEnvVars | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
-| git.asCodeServerRoot | bool | `false` |  |
 | git.branch | string | `""` |  |
 | git.cache | string | `""` |  |
 | git.email | string | `""` |  |
-| git.enabled | bool | `true` |  |
+| git.enabled | bool | `false` |  |
 | git.name | string | `""` |  |
+| git.repository | string | `""` |  |
 | git.secretName | string | `""` |  |
 | git.sshKnownHosts | string | `""` |  |
+| git.token | string | `""` |  |
 | global.suspend | bool | `false` |  |
 | hive.secretName | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
@@ -65,9 +66,8 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | init.personalInit | string | `""` |  |
 | init.personalInitArgs | string | `""` |  |
 | init.regionInit | string | `""` |  |
-| init.regionInitCheckSum | string | `""` |  |
 | init.standardInitPath | string | `"/opt/onyxia-init.sh"` |  |
-| kubernetes.enabled | bool | `true` |  |
+| kubernetes.enabled | bool | `false` |  |
 | kubernetes.role | string | `"view"` |  |
 | message.en | string | `""` |  |
 | message.fr | string | `""` |  |
@@ -76,7 +76,8 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | mlflow.secretName | string | `""` |  |
 | nameOverride | string | `""` |  |
 | networking.clusterIP | string | `"None"` |  |
-| networking.service.port | int | `8080` |  |
+| networking.service.port | int | `8888` |  |
+| networking.sparkui.port | int | `4040` |  |
 | networking.type | string | `"ClusterIP"` |  |
 | networking.user.enabled | bool | `false` |  |
 | networking.user.port | int | `5000` |  |
@@ -85,7 +86,7 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | openshiftSCC.enabled | bool | `false` |  |
 | openshiftSCC.scc | string | `""` |  |
 | persistence.accessMode | string | `"ReadWriteOnce"` |  |
-| persistence.enabled | bool | `true` |  |
+| persistence.enabled | bool | `false` |  |
 | persistence.size | string | `"10Gi"` |  |
 | podAnnotations | object | `{}` |  |
 | podSecurityContext.fsGroup | int | `100` |  |
@@ -124,9 +125,9 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | security.password | string | `"changeme"` |  |
 | securityContext | object | `{}` |  |
 | service.image.custom.enabled | bool | `false` |  |
-| service.image.custom.version | string | `"inseefrlab/onyxia-vscode-python:py3.13.8"` |  |
+| service.image.custom.version | string | `"inseefrlab/onyxia-jupyter-python:py3.13.8-gpu"` |  |
 | service.image.pullPolicy | string | `"IfNotPresent"` |  |
-| service.image.version | string | `"inseefrlab/onyxia-vscode-python:py3.13.8"` |  |
+| service.image.version | string | `"inseefrlab/onyxia-jupyter-python:py3.13.8-gpu"` |  |
 | service.initContainer.image | string | `"inseefrlab/onyxia-base:latest"` |  |
 | service.initContainer.pullPolicy | string | `"IfNotPresent"` |  |
 | serviceAccount.annotations | object | `{}` |  |
@@ -142,7 +143,7 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.8.0-python311"` |  |
 | sparkConnect.keda.enabled | bool | `true` |  |
 | sparkConnect.pysparkVersion | string | `"3.5.0"` |  |
-| sparkConnect.pythonImage | string | `"inseefrlab/onyxia-vscode-python:py3.11.13"` |  |
+| sparkConnect.pythonImage | string | `"inseefrlab/onyxia-jupyter-python:py3.11.13"` |  |
 | sparkConnect.sedonaVersion | string | `"1.7.0"` |  |
 | sparkConnect.server.resources.limits.cpu | string | `"8"` |  |
 | sparkConnect.server.resources.limits.memory | string | `"24Gi"` |  |
@@ -157,11 +158,10 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | tolerations | list | `[]` |  |
 | userPreferences.aiAssistant.apiBase | string | `""` |  |
 | userPreferences.aiAssistant.apiKey | string | `""` |  |
+| userPreferences.aiAssistant.embeddingsProvider | string | `""` |  |
 | userPreferences.aiAssistant.enabled | bool | `false` |  |
-| userPreferences.aiAssistant.model | string | `""` |  |
-| userPreferences.aiAssistant.provider | string | `""` |  |
+| userPreferences.aiAssistant.modelProvider | string | `""` |  |
 | userPreferences.aiAssistant.secretName | string | `""` |  |
-| userPreferences.aiAssistant.useLegacyCompletionsEndpoint | bool | `false` |  |
 | userPreferences.darkMode | bool | `false` |  |
 | userPreferences.language | string | `"en"` |  |
 | vault.directory | string | `""` |  |

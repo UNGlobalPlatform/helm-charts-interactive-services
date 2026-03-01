@@ -1,6 +1,6 @@
 # spark-connect
 
-![Version: 1.2.1](https://img.shields.io/badge/Version-1.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.2.2](https://img.shields.io/badge/Version-1.2.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 
@@ -76,6 +76,8 @@ Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 | spark.config."spark.kubernetes.namespace" | string | `"{{ .Release.Namespace }}"` |  |
 | spark.config."spark.master" | string | `"k8s://https://kubernetes.default.svc"` |  |
 | spark.config."spark.network.timeout" | string | `"1000s"` |  |
+| spark.config."spark.pyspark.driver.python" | string | `"/usr/bin/python3.11"` |  |
+| spark.config."spark.pyspark.python" | string | `"/usr/bin/python3.11"` |  |
 | spark.config."spark.scheduler.mode" | string | `"FAIR"` |  |
 | spark.config."spark.serializer" | string | `"org.apache.spark.serializer.KryoSerializer"` |  |
 | spark.config."spark.sql.adaptive.coalescePartitions.enabled" | string | `"true"` |  |

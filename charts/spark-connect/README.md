@@ -1,6 +1,6 @@
 # spark-connect
 
-![Version: 1.2.4](https://img.shields.io/badge/Version-1.2.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.2.5](https://img.shields.io/badge/Version-1.2.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 
@@ -43,9 +43,9 @@ Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 | security.networkPolicy.enabled | bool | `false` |  |
 | security.networkPolicy.from | list | `[]` |  |
 | service.image.custom.enabled | bool | `false` |  |
-| service.image.custom.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.9.0-python311-envfix"` |  |
+| service.image.custom.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.9.0-python311"` |  |
 | service.image.pullPolicy | string | `"IfNotPresent"` |  |
-| service.image.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.9.0-python311-envfix"` |  |
+| service.image.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.9.0-python311"` |  |
 | serviceAccount.annotations."eks.amazonaws.com/role-arn" | string | `"arn:aws:iam::142496269814:role/emr-job-execution-role"` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |

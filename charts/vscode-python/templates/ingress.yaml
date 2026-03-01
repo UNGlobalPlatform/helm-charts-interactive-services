@@ -15,6 +15,7 @@ spec:
           - {{ .Values.ingress.hostname | quote }}
         paths:
           - "/*"
+      websocket: true
       plugin_config_name: global-sso-policy
       plugin_config_namespace: ingress-apisix
       backends:

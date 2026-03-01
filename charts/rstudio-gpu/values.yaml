@@ -139,7 +139,7 @@ userPreferences:
   language: en
 sparkConnect:
   enabled: false
-  image: 142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.9.0-python311-envfix
+  image: 142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.9.0-python311
   pysparkVersion: 3.5.0
   sedonaVersion: 1.7.0
   h3Version: 4.4.2

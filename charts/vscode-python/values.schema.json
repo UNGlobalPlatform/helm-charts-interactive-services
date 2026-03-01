@@ -1165,6 +1165,14 @@
             }
           }
         },
+        "pythonImage": {
+          "title": "IDE image for Spark Connect (Python 3.11)",
+          "type": "string",
+          "default": "inseefrlab/onyxia-vscode-python:py3.11.13",
+          "x-onyxia": {
+            "hidden": true
+          }
+        },
         "sparkui": {
           "title": "Spark UI",
           "type": "object",

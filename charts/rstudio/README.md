@@ -1,6 +1,6 @@
 # rstudio
 
-![Version: 2.3.30](https://img.shields.io/badge/Version-2.3.30-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.3.31](https://img.shields.io/badge/Version-2.3.31-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 The RStudio IDE with a collection of standard data science packages.
 
@@ -86,7 +86,10 @@ The RStudio IDE with a collection of standard data science packages.
 | repository.configMapName | string | `""` |  |
 | repository.packageManagerUrl | string | `""` |  |
 | repository.rRepository | string | `""` |  |
-| resources | object | `{}` |  |
+| resources.limits.cpu | string | `"4000m"` |  |
+| resources.limits.memory | string | `"16Gi"` |  |
+| resources.requests.cpu | string | `"1000m"` |  |
+| resources.requests.memory | string | `"4Gi"` |  |
 | route.annotations | list | `[]` |  |
 | route.enabled | bool | `false` |  |
 | route.hostname | string | `"chart-example.local"` |  |
@@ -120,17 +123,18 @@ The RStudio IDE with a collection of standard data science packages.
 | sparkConnect.aisBasepath | string | `"s3a://ais-data-142496269814/exact-earth-data/transformed/prod/"` |  |
 | sparkConnect.enabled | bool | `false` |  |
 | sparkConnect.executor.cores | string | `"2"` |  |
-| sparkConnect.executor.maxExecutors | string | `"10"` |  |
+| sparkConnect.executor.maxExecutors | string | `"25"` |  |
 | sparkConnect.executor.memory | string | `"4g"` |  |
 | sparkConnect.executor.memoryOverhead | string | `"1g"` |  |
+| sparkConnect.h3Version | string | `"4.4.2"` |  |
 | sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.7.0-spark-hadoop-cloud"` |  |
 | sparkConnect.keda.enabled | bool | `true` |  |
 | sparkConnect.pysparkVersion | string | `"3.5.0"` |  |
 | sparkConnect.sedonaVersion | string | `"1.7.0"` |  |
-| sparkConnect.server.resources.limits.cpu | string | `"2"` |  |
-| sparkConnect.server.resources.limits.memory | string | `"12Gi"` |  |
-| sparkConnect.server.resources.requests.cpu | string | `"2"` |  |
-| sparkConnect.server.resources.requests.memory | string | `"10Gi"` |  |
+| sparkConnect.server.resources.limits.cpu | string | `"8"` |  |
+| sparkConnect.server.resources.limits.memory | string | `"24Gi"` |  |
+| sparkConnect.server.resources.requests.cpu | string | `"8"` |  |
+| sparkConnect.server.resources.requests.memory | string | `"20Gi"` |  |
 | sparkConnect.sparkui.hostname | string | `""` |  |
 | startupProbe.failureThreshold | int | `60` |  |
 | startupProbe.initialDelaySeconds | int | `10` |  |

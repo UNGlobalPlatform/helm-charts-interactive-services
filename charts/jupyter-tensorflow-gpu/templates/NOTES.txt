@@ -9,4 +9,5 @@
 {{- else }}
 - **Spark UI**: `kubectl port-forward svc/{{ include "library-chart.fullname" . }}-spark-connect 4040:4040 -n {{ .Release.Namespace }}` then open `http://localhost:4040`
 {{- end }}
+- For assistance on how to access the AIS data using Spark, please consult the [guide](https://static-assets.officialstatistics.org/spark-connect-reference-guide.pdf).
 {{- end }}

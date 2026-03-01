@@ -109,7 +109,13 @@ route:
   tls:
     termination: edge
   wildcardPolicy: None
-resources: {}
+resources:
+  requests:
+    cpu: 1000m
+    memory: 4Gi
+  limits:
+    cpu: 4000m
+    memory: 16Gi
 persistence:
   enabled: true
   accessMode: ReadWriteOnce
@@ -143,13 +149,13 @@ sparkConnect:
   server:
     resources:
       requests:
-        cpu: '2'
-        memory: 10Gi
+        cpu: '8'
+        memory: 20Gi
       limits:
-        cpu: '2'
-        memory: 12Gi
+        cpu: '8'
+        memory: 24Gi
   executor:
-    maxExecutors: '10'
+    maxExecutors: '25'
     cores: '2'
     memory: 4g
     memoryOverhead: 1g

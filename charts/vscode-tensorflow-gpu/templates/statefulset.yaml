@@ -171,6 +171,8 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           {{- if .Values.service.image.custom.enabled }}
           image: "{{ .Values.service.image.custom.version }}"
+          {{- else if .Values.sparkConnect.enabled }}
+          image: "{{ .Values.sparkConnect.pythonImage }}"
           {{- else }}
           image: "{{ .Values.service.image.version }}"
           {{- end }}

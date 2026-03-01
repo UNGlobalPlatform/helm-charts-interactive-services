@@ -24,8 +24,8 @@ stringData:
     spark.serializer org.apache.spark.serializer.KryoSerializer
     spark.kryo.registrator org.apache.sedona.core.serde.SedonaKryoRegistrator
     spark.sql.extensions org.apache.sedona.sql.SedonaSqlExtensions
-    spark.driver.maxResultSize 5g
-    spark.driver.memory 10g
+    spark.driver.maxResultSize 10g
+    spark.driver.memory 20g
     spark.network.timeout 1000s
     spark.hadoop.fs.s3a.impl org.apache.hadoop.fs.s3a.S3AFileSystem
     spark.hadoop.fs.s3a.aws.credentials.provider com.amazonaws.auth.DefaultAWSCredentialsProviderChain

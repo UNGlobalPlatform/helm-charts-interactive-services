@@ -1,6 +1,6 @@
 # rstudio
 
-![Version: 2.3.42](https://img.shields.io/badge/Version-2.3.42-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.3.43](https://img.shields.io/badge/Version-2.3.43-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 The RStudio IDE with a collection of standard data science packages.
 

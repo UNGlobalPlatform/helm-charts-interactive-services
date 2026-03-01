@@ -1,6 +1,6 @@
 # vscode-python
 
-![Version: 2.4.26](https://img.shields.io/badge/Version-2.4.26-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.4.27](https://img.shields.io/badge/Version-2.4.27-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 The Visual Studio Code IDE with Python, Julia, and a collection of standard data science packages.
 
@@ -124,9 +124,9 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | security.password | string | `"changeme"` |  |
 | securityContext | object | `{}` |  |
 | service.image.custom.enabled | bool | `false` |  |
-| service.image.custom.version | string | `"inseefrlab/onyxia-vscode-python:py3.13.8"` |  |
+| service.image.custom.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-vscode-python:py3.11.14"` |  |
 | service.image.pullPolicy | string | `"IfNotPresent"` |  |
-| service.image.version | string | `"inseefrlab/onyxia-vscode-python:py3.13.8"` |  |
+| service.image.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-vscode-python:py3.11.14"` |  |
 | service.initContainer.image | string | `"inseefrlab/onyxia-base:latest"` |  |
 | service.initContainer.pullPolicy | string | `"IfNotPresent"` |  |
 | serviceAccount.annotations | object | `{}` |  |
@@ -142,7 +142,7 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.9.0-python311"` |  |
 | sparkConnect.keda.enabled | bool | `true` |  |
 | sparkConnect.pysparkVersion | string | `"3.5.0"` |  |
-| sparkConnect.pythonImage | string | `"inseefrlab/onyxia-vscode-python:py3.11.13"` |  |
+| sparkConnect.pythonImage | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-vscode-python:py3.11.14"` |  |
 | sparkConnect.sedonaVersion | string | `"1.7.0"` |  |
 | sparkConnect.server.resources.limits.cpu | string | `"8"` |  |
 | sparkConnect.server.resources.limits.memory | string | `"24Gi"` |  |

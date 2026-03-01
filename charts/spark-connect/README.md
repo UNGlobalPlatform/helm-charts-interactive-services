@@ -43,9 +43,9 @@ Spark Connect server on EMR on EKS with dynamic K8s executor scaling
 | security.networkPolicy.enabled | bool | `false` |  |
 | security.networkPolicy.from | list | `[]` |  |
 | service.image.custom.enabled | bool | `false` |  |
-| service.image.custom.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.6.0-consolidated"` |  |
+| service.image.custom.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.7.0-spark-hadoop-cloud"` |  |
 | service.image.pullPolicy | string | `"IfNotPresent"` |  |
-| service.image.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.6.0-consolidated"` |  |
+| service.image.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.7.0-spark-hadoop-cloud"` |  |
 | serviceAccount.annotations."eks.amazonaws.com/role-arn" | string | `"arn:aws:iam::142496269814:role/emr-job-execution-role"` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |

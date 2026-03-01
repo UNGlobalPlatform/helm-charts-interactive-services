@@ -136,7 +136,6 @@ The JupyterLab IDE with Python and a collection of standard data science package
 | sparkConnect.executor.maxExecutors | string | `"10"` |  |
 | sparkConnect.executor.memory | string | `"4g"` |  |
 | sparkConnect.executor.memoryOverhead | string | `"1g"` |  |
-| sparkConnect.h3Version | string | `"4.4.2"` |  |
 | sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.7.0-spark-hadoop-cloud"` |  |
 | sparkConnect.keda.enabled | bool | `true` |  |
 | sparkConnect.pysparkVersion | string | `"3.5.0"` |  |

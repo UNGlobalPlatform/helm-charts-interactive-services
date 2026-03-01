@@ -38,6 +38,7 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
+              sed -i 's|/usr/bin/python3$|/usr/bin/python3.11|' /etc/spark/conf/spark-env.sh
               exec /usr/lib/spark/bin/spark-submit \
                 --class org.apache.spark.sql.connect.service.SparkConnectServer \
                 --deploy-mode client \

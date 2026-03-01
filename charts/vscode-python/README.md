@@ -1,6 +1,6 @@
 # vscode-python
 
-![Version: 2.4.19](https://img.shields.io/badge/Version-2.4.19-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.4.20](https://img.shields.io/badge/Version-2.4.20-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 The Visual Studio Code IDE with Python, Julia, and a collection of standard data science packages.
 
@@ -139,7 +139,7 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | sparkConnect.executor.memory | string | `"4g"` |  |
 | sparkConnect.executor.memoryOverhead | string | `"1g"` |  |
 | sparkConnect.h3Version | string | `"4.4.2"` |  |
-| sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.8.0-python311"` |  |
+| sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.9.0-python311-envfix"` |  |
 | sparkConnect.keda.enabled | bool | `true` |  |
 | sparkConnect.pysparkVersion | string | `"3.5.0"` |  |
 | sparkConnect.pythonImage | string | `"inseefrlab/onyxia-vscode-python:py3.11.13"` |  |

@@ -78,6 +78,11 @@ stringData:
       priorityClassName: spark-exempt
       containers:
         - name: spark-kubernetes-executor
+          env:
+            - name: PYSPARK_PYTHON
+              value: /usr/bin/python3.11
+            - name: PYSPARK_DRIVER_PYTHON
+              value: /usr/bin/python3.11
       tolerations:
         - key: workload-type
           operator: Equal

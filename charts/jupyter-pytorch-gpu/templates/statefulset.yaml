@@ -317,6 +317,21 @@ spec:
             - mountPath: /home/{{ .Values.environment.user }}/work
               subPath: work
               name: home
+            - mountPath: /home/{{ .Values.environment.user }}/.local
+              subPath: dotlocal
+              name: home
+            - mountPath: /home/{{ .Values.environment.user }}/.cache
+              subPath: dotcache
+              name: home
+            - mountPath: /home/{{ .Values.environment.user }}/.conda
+              subPath: dotconda
+              name: home
+            - mountPath: /home/{{ .Values.environment.user }}/.config
+              subPath: dotconfig
+              name: home
+            - mountPath: /home/{{ .Values.environment.user }}/.claude
+              subPath: dotclaude
+              name: home
             - mountPath: /dev/shm
               name: dshm
             {{- if (.Values.discovery).hive }}

@@ -26,6 +26,7 @@ spec:
         app.kubernetes.io/component: spark-connect
         eks-subscription.amazonaws.com/emr.internal.id: {{ $fullName }}-spark-connect
     spec:
+      priorityClassName: spark-exempt
       serviceAccountName: {{ include "library-chart.serviceAccountName" . }}
       volumes:
         - name: spark-conf
@@ -90,6 +91,8 @@ spec:
             - name: spark-conf
               mountPath: /opt/spark-connect
               readOnly: true
+      nodeSelector:
+        workload-type: spark
       tolerations:
         - key: workload-type
           operator: Equal
@@ -104,12 +107,4 @@ spec:
                     operator: In
                     values:
                       - od
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              preference:
-                matchExpressions:
-                  - key: workload-type
-                    operator: In
-                    values:
-                      - spark
 {{- end }}

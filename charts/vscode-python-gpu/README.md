@@ -1,10 +1,10 @@
-# jupyter-python
+# vscode-python-gpu
 
-![Version: 2.3.54](https://img.shields.io/badge/Version-2.3.54-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.4.29](https://img.shields.io/badge/Version-2.4.29-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-The JupyterLab IDE with Python and a collection of standard data science packages.
+The VSCOde IDE with Python, Julia, and a collection of standard data science packages, with GPU support.
 
-**Homepage:** <https://jupyter.org/>
+**Homepage:** <https://code.visualstudio.com/>
 
 ## Source Code
 
@@ -39,15 +39,14 @@ The JupyterLab IDE with Python and a collection of standard data science package
 | environment.user | string | `"onyxia"` |  |
 | extraEnvVars | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
+| git.asCodeServerRoot | bool | `false` |  |
 | git.branch | string | `""` |  |
 | git.cache | string | `""` |  |
 | git.email | string | `""` |  |
-| git.enabled | bool | `false` |  |
+| git.enabled | bool | `true` |  |
 | git.name | string | `""` |  |
-| git.repository | string | `""` |  |
 | git.secretName | string | `""` |  |
 | git.sshKnownHosts | string | `""` |  |
-| git.token | string | `""` |  |
 | global.suspend | bool | `false` |  |
 | hive.secretName | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
@@ -66,8 +65,9 @@ The JupyterLab IDE with Python and a collection of standard data science package
 | init.personalInit | string | `""` |  |
 | init.personalInitArgs | string | `""` |  |
 | init.regionInit | string | `""` |  |
+| init.regionInitCheckSum | string | `""` |  |
 | init.standardInitPath | string | `"/opt/onyxia-init.sh"` |  |
-| kubernetes.enabled | bool | `false` |  |
+| kubernetes.enabled | bool | `true` |  |
 | kubernetes.role | string | `"view"` |  |
 | message.en | string | `""` |  |
 | message.fr | string | `""` |  |
@@ -76,8 +76,7 @@ The JupyterLab IDE with Python and a collection of standard data science package
 | mlflow.secretName | string | `""` |  |
 | nameOverride | string | `""` |  |
 | networking.clusterIP | string | `"None"` |  |
-| networking.service.port | int | `8888` |  |
-| networking.sparkui.port | int | `4040` |  |
+| networking.service.port | int | `8080` |  |
 | networking.type | string | `"ClusterIP"` |  |
 | networking.user.enabled | bool | `false` |  |
 | networking.user.port | int | `5000` |  |
@@ -86,7 +85,7 @@ The JupyterLab IDE with Python and a collection of standard data science package
 | openshiftSCC.enabled | bool | `false` |  |
 | openshiftSCC.scc | string | `""` |  |
 | persistence.accessMode | string | `"ReadWriteOnce"` |  |
-| persistence.enabled | bool | `false` |  |
+| persistence.enabled | bool | `true` |  |
 | persistence.size | string | `"10Gi"` |  |
 | podAnnotations | object | `{}` |  |
 | podSecurityContext.fsGroup | int | `100` |  |
@@ -125,9 +124,9 @@ The JupyterLab IDE with Python and a collection of standard data science package
 | security.password | string | `"changeme"` |  |
 | securityContext | object | `{}` |  |
 | service.image.custom.enabled | bool | `false` |  |
-| service.image.custom.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-jupyter-python:py3.11.14"` |  |
+| service.image.custom.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-vscode-python:py3.11.14-gpu"` |  |
 | service.image.pullPolicy | string | `"IfNotPresent"` |  |
-| service.image.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-jupyter-python:py3.11.14"` |  |
+| service.image.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-vscode-python:py3.11.14-gpu"` |  |
 | service.initContainer.image | string | `"inseefrlab/onyxia-base:latest"` |  |
 | service.initContainer.pullPolicy | string | `"IfNotPresent"` |  |
 | serviceAccount.annotations | object | `{}` |  |
@@ -143,7 +142,7 @@ The JupyterLab IDE with Python and a collection of standard data science package
 | sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.9.0-python311"` |  |
 | sparkConnect.keda.enabled | bool | `true` |  |
 | sparkConnect.pysparkVersion | string | `"3.5.0"` |  |
-| sparkConnect.pythonImage | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-jupyter-python:py3.11.14"` |  |
+| sparkConnect.pythonImage | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-vscode-python:py3.11.14"` |  |
 | sparkConnect.sedonaVersion | string | `"1.7.0"` |  |
 | sparkConnect.server.resources.limits.cpu | string | `"8"` |  |
 | sparkConnect.server.resources.limits.memory | string | `"24Gi"` |  |
@@ -158,10 +157,11 @@ The JupyterLab IDE with Python and a collection of standard data science package
 | tolerations | list | `[]` |  |
 | userPreferences.aiAssistant.apiBase | string | `""` |  |
 | userPreferences.aiAssistant.apiKey | string | `""` |  |
-| userPreferences.aiAssistant.embeddingsProvider | string | `""` |  |
 | userPreferences.aiAssistant.enabled | bool | `false` |  |
-| userPreferences.aiAssistant.modelProvider | string | `""` |  |
+| userPreferences.aiAssistant.model | string | `""` |  |
+| userPreferences.aiAssistant.provider | string | `""` |  |
 | userPreferences.aiAssistant.secretName | string | `""` |  |
+| userPreferences.aiAssistant.useLegacyCompletionsEndpoint | bool | `false` |  |
 | userPreferences.darkMode | bool | `false` |  |
 | userPreferences.language | string | `"en"` |  |
 | vault.directory | string | `""` |  |

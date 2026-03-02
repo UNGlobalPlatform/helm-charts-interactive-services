@@ -110,6 +110,9 @@ spec:
       serviceAccountName: {{ include "library-chart.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.sparkConnect.enabled }}
+      priorityClassName: spark-ide
+      {{- end }}
       initContainers:
         - name: make-secrets-writable
           image: {{ .Values.service.initContainer.image }}

@@ -1,6 +1,6 @@
 # vscode-python
 
-![Version: 2.4.30](https://img.shields.io/badge/Version-2.4.30-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.4.32](https://img.shields.io/badge/Version-2.4.32-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 The Visual Studio Code IDE with Python, Julia, and a collection of standard data science packages.
 
@@ -101,7 +101,7 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | resources.limits.cpu | string | `"4000m"` |  |
 | resources.limits.memory | string | `"16Gi"` |  |
 | resources.requests.cpu | string | `"1000m"` |  |
-| resources.requests.memory | string | `"4Gi"` |  |
+| resources.requests.memory | string | `"2Gi"` |  |
 | route.annotations | list | `[]` |  |
 | route.enabled | bool | `false` |  |
 | route.hostname | string | `"chart-example.local"` |  |

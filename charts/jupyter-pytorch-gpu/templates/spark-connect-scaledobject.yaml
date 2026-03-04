@@ -1,4 +1,4 @@
-{{- if and .Values.sparkConnect.enabled .Values.sparkConnect.keda.enabled }}
+{{- if and .Values.sparkConnect.enabled .Values.sparkConnect.keda.enabled (not .Values.global.suspend) }}
 {{- $fullName := include "library-chart.fullname" . -}}
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject

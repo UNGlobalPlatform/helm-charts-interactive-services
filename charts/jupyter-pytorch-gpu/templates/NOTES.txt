@@ -11,3 +11,20 @@
 {{- end }}
 - For assistance on how to access the AIS data using Spark, please consult the [guide](https://static-assets.officialstatistics.org/spark-connect-reference-guide.pdf).
 {{- end }}
+{{- if eq .Values.userPreferences.language "fr" }}
+
+### Cycle de vie du service
+
+- Veuillez **arrêter votre service** dès que vous avez terminé votre travail.
+- Les services inactifs seront **automatiquement supprimés après 12 heures**.
+- Mettre en pause puis redémarrer votre service **réinitialise ce délai**.
+- Les rôles IAM attribués à votre service **expirent après 12 heures**. Passé ce délai, l'accès aux buckets S3 — y compris les données AIS et vos buckets utilisateur — cessera de fonctionner.
+{{- else }}
+
+### Service lifecycle
+
+- Please **stop your service** as soon as you are done working.
+- Idle services will be **automatically removed after 12 hours**.
+- Pausing and restarting your service **resets this timer**.
+- The IAM roles assumed by your service **expire after 12 hours**. After this, access to S3 buckets — including AIS data and your user buckets — will stop working.
+{{- end }}

@@ -58,6 +58,9 @@ spec:
         {{- end }}
       labels:
         {{- include "library-chart.selectorLabels" . | nindent 8 }}
+        {{- if (.Values.etlTools).enabled }}
+        platform.dev/etl-tools: "true"
+        {{- end }}
     spec:
       volumes:
         - name: config-files

@@ -1282,6 +1282,20 @@
         }
       }
     },
+    "etlTools": {
+      "type": "object",
+      "description": "UN Data ETL Tools",
+      "x-onyxia": {
+        "hidden": true
+      },
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Install UN Data ETL tools on startup",
+          "default": false
+        }
+      }
+    },
     "message": {
       "type": "object",
       "description": "Warning message",

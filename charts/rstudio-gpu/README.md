@@ -1,10 +1,10 @@
-# vscode-python
+# rstudio-gpu
 
-![Version: 2.4.35](https://img.shields.io/badge/Version-2.4.35-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.3.49](https://img.shields.io/badge/Version-2.3.49-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-The Visual Studio Code IDE with Python, Julia, and a collection of standard data science packages.
+The RStudio IDE with a collection of standard data science packages, with GPU support.
 
-**Homepage:** <https://code.visualstudio.com/>
+**Homepage:** <https://www.rstudio.com/>
 
 ## Source Code
 
@@ -26,36 +26,26 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | autoscaling.maxReplicas | int | `100` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
-| certificates | object | `{}` |  |
-| chromadb.secretName | string | `""` |  |
-| coresite.secretName | string | `""` |  |
-| discovery.chromadb | bool | `true` |  |
-| discovery.hive | bool | `true` |  |
-| discovery.metaflow | bool | `true` |  |
-| discovery.milvus | bool | `true` |  |
-| discovery.mlflow | bool | `true` |  |
 | discovery.postgresql | bool | `true` |  |
 | environment.group | string | `"users"` |  |
 | environment.user | string | `"onyxia"` |  |
-| etlTools.enabled | bool | `false` |  |
 | extraEnvVars | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
-| git.asCodeServerRoot | bool | `false` |  |
 | git.branch | string | `""` |  |
 | git.cache | string | `""` |  |
 | git.email | string | `""` |  |
-| git.enabled | bool | `true` |  |
+| git.enabled | bool | `false` |  |
 | git.name | string | `""` |  |
+| git.repository | string | `""` |  |
 | git.secretName | string | `""` |  |
 | git.sshKnownHosts | string | `""` |  |
+| git.token | string | `""` |  |
 | global.suspend | bool | `false` |  |
-| hive.secretName | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | list | `[]` |  |
 | ingress.certManagerClusterIssuer | string | `""` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hostname | string | `"chart-example.local"` |  |
-| ingress.ingressClassName | string | `""` |  |
 | ingress.path | string | `"/"` |  |
 | ingress.tls | bool | `true` |  |
 | ingress.tlsSecretName | string | `""` |  |
@@ -66,18 +56,15 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | init.personalInit | string | `""` |  |
 | init.personalInitArgs | string | `""` |  |
 | init.regionInit | string | `""` |  |
-| init.regionInitCheckSum | string | `""` |  |
 | init.standardInitPath | string | `"/opt/onyxia-init.sh"` |  |
 | kubernetes.enabled | bool | `true` |  |
 | kubernetes.role | string | `"view"` |  |
 | message.en | string | `""` |  |
 | message.fr | string | `""` |  |
-| metaflow.secretName | string | `""` |  |
-| milvus.secretName | string | `""` |  |
-| mlflow.secretName | string | `""` |  |
 | nameOverride | string | `""` |  |
 | networking.clusterIP | string | `"None"` |  |
-| networking.service.port | int | `8080` |  |
+| networking.service.port | int | `8787` |  |
+| networking.sparkui.port | int | `4040` |  |
 | networking.type | string | `"ClusterIP"` |  |
 | networking.user.enabled | bool | `false` |  |
 | networking.user.port | int | `5000` |  |
@@ -96,9 +83,9 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | proxy.httpsProxy | string | `""` |  |
 | proxy.noProxy | string | `""` |  |
 | replicaCount | int | `1` |  |
-| repository.condaRepository | string | `""` |  |
 | repository.configMapName | string | `""` |  |
-| repository.pipRepository | string | `""` |  |
+| repository.packageManagerUrl | string | `""` |  |
+| repository.rRepository | string | `""` |  |
 | resources.limits.cpu | string | `"4000m"` |  |
 | resources.limits.memory | string | `"16Gi"` |  |
 | resources.requests.cpu | string | `"1000m"` |  |
@@ -125,9 +112,9 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | security.password | string | `"changeme"` |  |
 | securityContext | object | `{}` |  |
 | service.image.custom.enabled | bool | `false` |  |
-| service.image.custom.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-vscode-python:py3.11.14"` |  |
+| service.image.custom.version | string | `"inseefrlab/onyxia-rstudio:r4.5.1-gpu"` |  |
 | service.image.pullPolicy | string | `"IfNotPresent"` |  |
-| service.image.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-vscode-python:py3.11.14"` |  |
+| service.image.version | string | `"inseefrlab/onyxia-rstudio:r4.5.1-gpu"` |  |
 | service.initContainer.image | string | `"inseefrlab/onyxia-base:latest"` |  |
 | service.initContainer.pullPolicy | string | `"IfNotPresent"` |  |
 | serviceAccount.annotations | object | `{}` |  |
@@ -143,7 +130,6 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.9.0-python311"` |  |
 | sparkConnect.keda.enabled | bool | `true` |  |
 | sparkConnect.pysparkVersion | string | `"3.5.0"` |  |
-| sparkConnect.pythonImage | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-vscode-python:py3.11.14"` |  |
 | sparkConnect.sedonaVersion | string | `"1.7.0"` |  |
 | sparkConnect.server.resources.limits.cpu | string | `"8"` |  |
 | sparkConnect.server.resources.limits.memory | string | `"24Gi"` |  |
@@ -156,13 +142,6 @@ The Visual Studio Code IDE with Python, Julia, and a collection of standard data
 | startupProbe.successThreshold | int | `1` |  |
 | startupProbe.timeoutSeconds | int | `2` |  |
 | tolerations | list | `[]` |  |
-| userPreferences.aiAssistant.apiBase | string | `""` |  |
-| userPreferences.aiAssistant.apiKey | string | `""` |  |
-| userPreferences.aiAssistant.enabled | bool | `false` |  |
-| userPreferences.aiAssistant.model | string | `""` |  |
-| userPreferences.aiAssistant.provider | string | `""` |  |
-| userPreferences.aiAssistant.secretName | string | `""` |  |
-| userPreferences.aiAssistant.useLegacyCompletionsEndpoint | bool | `false` |  |
 | userPreferences.darkMode | bool | `false` |  |
 | userPreferences.language | string | `"en"` |  |
 | vault.directory | string | `""` |  |

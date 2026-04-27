@@ -1274,15 +1274,14 @@
       }
     },
     "etlTools": {
+      "title": "unidata-etl-cli",
+      "description": "Install unidata-etl-cli tools",
       "type": "object",
-      "description": "UN Data ETL Tools",
-      "x-onyxia": {
-        "hidden": true
-      },
       "properties": {
         "enabled": {
+          "title": "Install unidata-etl-cli tools",
+          "description": "Install unidata-etl-cli tools on startup",
           "type": "boolean",
-          "description": "Install UN Data ETL tools on startup",
           "default": false
         }
       }

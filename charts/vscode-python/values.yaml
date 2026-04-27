@@ -274,6 +274,9 @@ sparkConnect:
   sparkui:
     hostname: ""
 
+etlTools:
+  enabled: false
+
 openshiftSCC:
   enabled: false
   scc: ""

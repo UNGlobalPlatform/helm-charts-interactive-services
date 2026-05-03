@@ -1,0 +1,17 @@
+{{- if not .Values.global.suspend }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "database-restore.fullname" . }}
+  labels:
+    {{- include "database-restore.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.mssql.port }}
+      targetPort: 1433
+      protocol: TCP
+      name: mssql
+  selector:
+    {{- include "database-restore.selectorLabels" . | nindent 4 }}
+{{- end }}

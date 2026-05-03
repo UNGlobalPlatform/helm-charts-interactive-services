@@ -1,0 +1,50 @@
+# --- Snapshot source (fill in after Step 1) ---
+snapshot:
+  id: "snap-REPLACEME"
+  availabilityZone: "us-west-2b"
+
+# --- Database identity ---
+database:
+  name: "Geonames02"
+  mdfFile: "Geonames02.mdf"
+  ldfFile: "Geonames02_log.ldf"
+
+# --- Volume ---
+volume:
+  size: "60Gi"
+  storageClass: "fast-gp3"
+  snapshotClass: "ebs-snapshot-sc"
+
+# --- MSSQL ---
+mssql:
+  image: "142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-mssql:2022"
+  pullPolicy: IfNotPresent
+  saPassword: "DevAccess2026!"
+  memoryLimitMB: "6144"
+  port: 1433
+
+# --- Read-only credentials (baked into snapshot) ---
+reader:
+  username: "statdb_reader"
+  password: "readonly"
+
+# --- Resources ---
+resources:
+  requests:
+    cpu: "1000m"
+    memory: "4Gi"
+  limits:
+    cpu: "4000m"
+    memory: "8Gi"
+
+# --- Pod security ---
+podSecurityContext:
+  fsGroup: 10001
+
+# --- Discovery (enabled in Step 5) ---
+discovery:
+  enabled: false
+
+# --- Global ---
+global:
+  suspend: false

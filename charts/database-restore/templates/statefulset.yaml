@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "database-restore.fullname" . }}
+  labels:
+    {{- include "database-restore.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.global.suspend }}
+  replicas: 0
+  {{- else }}
+  replicas: 1
+  {{- end }}
+  serviceName: {{ include "database-restore.fullname" . }}
+  selector:
+    matchLabels:
+      {{- include "database-restore.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "database-restore.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        fsGroup: {{ .Values.podSecurityContext.fsGroup }}
+      # Zone pinning: EBS volumes are zonal — pod must land in the same AZ
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: topology.kubernetes.io/zone
+                    operator: In
+                    values:
+                      - {{ .Values.snapshot.availabilityZone }}
+      containers:
+        - name: mssql
+          image: {{ .Values.mssql.image }}
+          imagePullPolicy: {{ .Values.mssql.pullPolicy }}
+          env:
+            - name: ACCEPT_EULA
+              value: "Y"
+            - name: MSSQL_SA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "database-restore.fullname" . }}-sa
+                  key: sa-password
+            - name: MSSQL_MEMORY_LIMIT_MB
+              value: {{ .Values.mssql.memoryLimitMB | quote }}
+            - name: MSSQL_DATA_DIR
+              value: "/data"
+            - name: MSSQL_LOG_DIR
+              value: "/data"
+            - name: MSSQL_ATTACH_DBS
+              value: '[{"dbName":"{{ .Values.database.name }}","dbFiles":["/data/{{ .Values.database.mdfFile }}","/data/{{ .Values.database.ldfFile }}"]}]'
+          ports:
+            - name: mssql
+              containerPort: 1433
+              protocol: TCP
+          startupProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -Q "SELECT 1"
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -Q "SELECT DB_ID('{{ .Values.database.name }}')"
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -Q "SELECT 1"
+            periodSeconds: 30
+            timeoutSeconds: 5
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "database-restore.fullname" . }}-data

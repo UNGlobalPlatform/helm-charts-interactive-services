@@ -1,0 +1,15 @@
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotContent
+metadata:
+  name: {{ include "database-restore.fullname" . }}-snapcontent
+  labels:
+    {{- include "database-restore.labels" . | nindent 4 }}
+spec:
+  deletionPolicy: Retain
+  driver: ebs.csi.aws.com
+  source:
+    snapshotHandle: {{ .Values.snapshot.id }}
+  volumeSnapshotRef:
+    name: {{ include "database-restore.fullname" . }}-snapshot
+    namespace: {{ .Release.Namespace }}
+  volumeSnapshotClassName: {{ .Values.volume.snapshotClass }}

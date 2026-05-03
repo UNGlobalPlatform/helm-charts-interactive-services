@@ -1,0 +1,11 @@
+apiVersion: v2
+name: database-restore
+description: >-
+  Restore a statistical database from an EBS snapshot.
+  Runs SQL Server Developer Edition.
+type: application
+version: 0.1.0
+appVersion: "2022"
+maintainers:
+  - name: UN Global Platform
+    email: lovells@un.org

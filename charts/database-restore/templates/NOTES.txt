@@ -1,0 +1,39 @@
+Statistical Database: {{ .Values.database.name }}
+Engine: SQL Server 2022 Developer Edition
+Source snapshot: {{ .Values.snapshot.id }}
+
+Connection details:
+  Host: {{ include "database-restore.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  Port: {{ .Values.mssql.port }}
+  Database: {{ .Values.database.name }}
+  User: {{ .Values.reader.username }}
+  Password: {{ .Values.reader.password }}
+
+{{- if .Values.discovery.enabled }}
+
+Discovery secret: {{ include "database-restore.fullname" . }}-discovery
+  annotation: onyxia/discovery: mssql
+{{- end }}
+
+Quick connect from a notebook in the same namespace:
+
+  Python (pyodbc):
+    import pyodbc
+    conn = pyodbc.connect(
+        "DRIVER={ODBC Driver 18 for SQL Server};"
+        "SERVER={{ include "database-restore.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local,{{ .Values.mssql.port }};"
+        "DATABASE={{ .Values.database.name }};"
+        "UID={{ .Values.reader.username }};"
+        "PWD={{ .Values.reader.password }};"
+        "TrustServerCertificate=yes"
+    )
+
+  R (odbc):
+    conn <- DBI::dbConnect(odbc::odbc(),
+        Driver = "ODBC Driver 18 for SQL Server",
+        Server = "{{ include "database-restore.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local,{{ .Values.mssql.port }}",
+        Database = "{{ .Values.database.name }}",
+        UID = "{{ .Values.reader.username }}",
+        PWD = "{{ .Values.reader.password }}",
+        TrustServerCertificate = "yes"
+    )

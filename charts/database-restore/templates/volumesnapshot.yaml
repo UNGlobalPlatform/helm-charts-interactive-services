@@ -1,0 +1,10 @@
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: {{ include "database-restore.fullname" . }}-snapshot
+  labels:
+    {{- include "database-restore.labels" . | nindent 4 }}
+spec:
+  source:
+    volumeSnapshotContentName: {{ include "database-restore.fullname" . }}-snapcontent
+  volumeSnapshotClassName: {{ .Values.volume.snapshotClass }}

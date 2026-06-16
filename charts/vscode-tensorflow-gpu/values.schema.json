@@ -1166,7 +1166,7 @@
             "memoryOverhead": {
               "title": "Memory overhead per executor",
               "type": "string",
-              "default": "1g",
+              "default": "3g",
               "x-onyxia": {
                 "hidden": true
               }

@@ -184,7 +184,7 @@ sparkConnect:
     maxExecutors: '25'
     cores: '2'
     memory: 4g
-    memoryOverhead: 1g
+    memoryOverhead: 3g
   sparkui:
     hostname: ''
 openshiftSCC:

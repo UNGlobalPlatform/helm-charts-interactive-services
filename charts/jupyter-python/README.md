@@ -1,6 +1,6 @@
 # jupyter-python
 
-![Version: 2.3.58](https://img.shields.io/badge/Version-2.3.58-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.3.59](https://img.shields.io/badge/Version-2.3.59-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 The JupyterLab IDE with Python and a collection of standard data science packages.
 
@@ -138,7 +138,7 @@ The JupyterLab IDE with Python and a collection of standard data science package
 | sparkConnect.executor.cores | string | `"2"` |  |
 | sparkConnect.executor.maxExecutors | string | `"25"` |  |
 | sparkConnect.executor.memory | string | `"4g"` |  |
-| sparkConnect.executor.memoryOverhead | string | `"1g"` |  |
+| sparkConnect.executor.memoryOverhead | string | `"3g"` |  |
 | sparkConnect.h3Version | string | `"4.4.2"` |  |
 | sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.9.0-python311"` |  |
 | sparkConnect.keda.enabled | bool | `true` |  |

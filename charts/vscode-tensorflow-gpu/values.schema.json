@@ -1082,6 +1082,15 @@
             "hidden": true
           }
         },
+        "logLevel": {
+          "title": "Spark log level",
+          "description": "Root log level for the Spark Connect server and executors. Pinned to WARN because INFO logs full query plans, generating very high CloudWatch Logs volume.",
+          "type": "string",
+          "default": "WARN",
+          "x-onyxia": {
+            "hidden": true
+          }
+        },
         "keda": {
           "title": "KEDA autoscaling",
           "type": "object",

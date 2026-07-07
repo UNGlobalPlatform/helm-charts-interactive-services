@@ -1,6 +1,6 @@
 # jupyter-python
 
-![Version: 2.3.59](https://img.shields.io/badge/Version-2.3.59-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.3.60](https://img.shields.io/badge/Version-2.3.60-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 The JupyterLab IDE with Python and a collection of standard data science packages.
 
@@ -142,6 +142,7 @@ The JupyterLab IDE with Python and a collection of standard data science package
 | sparkConnect.h3Version | string | `"4.4.2"` |  |
 | sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.9.0-python311"` |  |
 | sparkConnect.keda.enabled | bool | `true` |  |
+| sparkConnect.logLevel | string | `"WARN"` |  |
 | sparkConnect.pysparkVersion | string | `"3.5.0"` |  |
 | sparkConnect.pythonImage | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-jupyter-python:py3.11.14"` |  |
 | sparkConnect.sedonaVersion | string | `"1.7.0"` |  |

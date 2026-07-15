@@ -162,6 +162,16 @@ share the same database and object store anyway.
 {{- else }}
 {{- $s3 := dict "Region" .Values.objectStorage.s3.region "ForcePathStyle" .Values.objectStorage.s3.forcePathStyle }}
 {{- if .Values.objectStorage.s3.endpoint }}{{- $_ := set $s3 "Endpoint" .Values.objectStorage.s3.endpoint }}{{- end }}
+{{- /* Onyxia gives one shared bucket + a per-user prefix as workingDirectoryPath
+       (e.g. "datalab-<acct>-user-bucket/user-<handle>/"). Split it: first path
+       segment is the real bucket, the rest is the base prefix the logical buckets
+       (domainfile/…) live under. FileService folds its logical buckets into this. */}}
+{{- $wd := trimAll "/" (.Values.objectStorage.s3.workingDirectoryPath | default "") }}
+{{- if $wd }}
+{{- $parts := splitList "/" $wd }}
+{{- $_ := set $s3 "Bucket" (first $parts) }}
+{{- $_ := set $s3 "BasePrefix" (rest $parts | join "/") }}
+{{- end }}
 {{- $_ := set $cfg "ObjectStorage" (dict "Provider" "s3" "S3" $s3) }}
 {{- end }}
 {{- $_ := set $cfg "DatasetProcessingSettings" (dict "BucketName" .Values.objectStorage.buckets.system) }}

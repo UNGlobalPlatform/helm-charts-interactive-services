@@ -12,6 +12,26 @@ tests:
     asserts:
       - hasDocuments:
           count: 3
+  - it: s3 mode splits workingDirectoryPath into a shared bucket + base prefix
+    templates: [secrets.yaml]
+    set:
+      objectStorage:
+        provider: s3
+        s3:
+          region: us-west-2
+          accessKeyId: AK
+          secretAccessKey: SK
+          workingDirectoryPath: "datalab-142496269814-user-bucket/user-sean/"
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "\"Bucket\": \"datalab-142496269814-user-bucket\""
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "\"BasePrefix\": \"user-sean\""
   - it: s3 mode deploys no MinIO
     templates: [minio.yaml]
     set:

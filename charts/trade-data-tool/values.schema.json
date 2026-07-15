@@ -163,6 +163,19 @@
                 "hidden": true,
                 "overwriteDefaultWith": "{{s3.pathStyleAccess}}"
               }
+            },
+            "workingDirectoryPath": {
+              "type": "string",
+              "title": "Working directory",
+              "description": "Your S3 path (shared bucket + personal prefix). Files are stored here.",
+              "default": "",
+              "hidden": {
+                "value": "minio",
+                "path": "objectStorage/provider"
+              },
+              "x-onyxia": {
+                "overwriteDefaultWith": "datalab-142496269814-user-bucket/{{project.id}}/"
+              }
             }
           }
         }

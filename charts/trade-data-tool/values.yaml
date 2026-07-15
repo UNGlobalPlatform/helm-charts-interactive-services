@@ -7,7 +7,7 @@ global:
 image:
   registry: 142496269814.dkr.ecr.us-west-2.amazonaws.com/tdt
   # One tag for every service image (built together from the same commit).
-  tag: "v1.0.0"
+  tag: "v1.1.0"
   pullPolicy: IfNotPresent
   # Name of an existing docker-registry Secret in the release namespace, if the
   # registry is private.
@@ -98,6 +98,10 @@ objectStorage:
     secretAccessKey: ""
     sessionToken: ""
     forcePathStyle: false
+    # Onyxia's per-user working directory: "<shared-bucket>/<prefix>/". The chart
+    # splits it into the real bucket + the base prefix the logical buckets live
+    # under. Filled from the platform's ide/s3.json (see values.schema.json).
+    workingDirectoryPath: ""
   buckets:
     domain: domainfile
     metadata: metadatafile

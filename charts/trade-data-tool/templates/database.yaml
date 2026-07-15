@@ -1,0 +1,63 @@
+{{/*
+Serverless database on the platform's shared MariaDB: SQL-tier CRs only,
+no pods. Names are tenant-prefixed so the Kyverno tenancy policies pass
+by construction.
+*/}}
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Database
+metadata:
+  name: {{ include "tdt.fullname" . }}
+  labels:
+    {{- include "tdt.labels" . | nindent 4 }}
+spec:
+  mariaDbRef:
+    name: {{ .Values.database.cluster.name }}
+    namespace: {{ .Values.database.cluster.namespace }}
+    waitForIt: true
+  name: {{ include "tdt.dbName" . }}
+  characterSet: utf8mb4
+  # collate MUST match characterSet (operator default is utf8mb3-based;
+  # mismatch fails with MariaDB error 1253).
+  collate: utf8mb4_general_ci
+  cleanupPolicy: {{ include "tdt.dbCleanupPolicy" . }}
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: User
+metadata:
+  name: {{ include "tdt.fullname" . }}
+  labels:
+    {{- include "tdt.labels" . | nindent 4 }}
+spec:
+  mariaDbRef:
+    name: {{ .Values.database.cluster.name }}
+    namespace: {{ .Values.database.cluster.namespace }}
+    waitForIt: true
+  name: {{ include "tdt.dbUserName" . }}
+  passwordSecretKeyRef:
+    name: {{ include "tdt.fullname" . }}-db
+    key: password
+  host: "%"
+  maxUserConnections: {{ include "tdt.dbMaxUserConnections" . }}
+  cleanupPolicy: {{ include "tdt.dbCleanupPolicy" . }}
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  name: {{ include "tdt.fullname" . }}
+  labels:
+    {{- include "tdt.labels" . | nindent 4 }}
+spec:
+  mariaDbRef:
+    name: {{ .Values.database.cluster.name }}
+    namespace: {{ .Values.database.cluster.namespace }}
+    waitForIt: true
+  # ALL on the tenant database: the schema bootstrap creates tables, views and
+  # stored procedures, and the app's procs do runtime CREATE TABLE.
+  privileges:
+    - "ALL"
+  database: {{ include "tdt.dbName" . }}
+  table: "*"
+  username: {{ include "tdt.dbUserName" . }}
+  host: "%"
+  grantOption: false
+  cleanupPolicy: {{ include "tdt.dbCleanupPolicy" . }}

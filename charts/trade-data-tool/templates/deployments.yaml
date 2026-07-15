@@ -1,0 +1,90 @@
+{{- $ctx := . }}
+{{- $all := dict }}
+{{- range $key, $s := .Values.services }}{{- $_ := set $all $key $s }}{{- end }}
+{{- $_ := set $all "web" .Values.web }}
+{{- range $key, $s := $all }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tdt.svcName" (dict "ctx" $ctx "key" $key) }}
+  labels:
+    {{- include "tdt.labels" $ctx | nindent 4 }}
+    app.kubernetes.io/component: {{ $key }}
+spec:
+  replicas: {{ $ctx.Values.global.suspend | ternary 0 1 }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ $ctx.Release.Name }}
+      app.kubernetes.io/component: {{ $key }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "tdt.name" $ctx }}
+        app.kubernetes.io/instance: {{ $ctx.Release.Name }}
+        app.kubernetes.io/component: {{ $key }}
+      annotations:
+        # Roll pods when configuration changes.
+        checksum/appsettings: {{ include "tdt.appsettings" $ctx | sha256sum }}
+    spec:
+      automountServiceAccountToken: false
+      {{- with $ctx.Values.image.pullSecretName }}
+      imagePullSecrets:
+        - name: {{ . }}
+      {{- end }}
+      containers:
+        - name: {{ $key }}
+          image: "{{ $ctx.Values.image.registry }}/{{ $s.image }}:{{ $ctx.Values.image.tag }}"
+          imagePullPolicy: {{ $ctx.Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+          {{- if and (eq $key "fileservice") (eq $ctx.Values.objectStorage.provider "s3") }}
+          # FileService's S3 adapter reads STS credentials from the AWS_* env.
+          envFrom:
+            - secretRef:
+                name: {{ include "tdt.fullname" $ctx }}-s3
+          {{- end }}
+          volumeMounts:
+            - name: appsettings
+              mountPath: /app/appsettings.Production.json
+              subPath: appsettings.Production.json
+              readOnly: true
+          {{- if eq $key "userservice" }}
+          readinessProbe:
+            httpGet: { path: /health, port: http }
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          {{- else }}
+          readinessProbe:
+            tcpSocket: { port: http }
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          {{- end }}
+          resources:
+            {{- toYaml $ctx.Values.resources | nindent 12 }}
+      volumes:
+        - name: appsettings
+          secret:
+            secretName: {{ include "tdt.fullname" $ctx }}-appsettings
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tdt.svcName" (dict "ctx" $ctx "key" $key) }}
+  labels:
+    {{- include "tdt.labels" $ctx | nindent 4 }}
+    app.kubernetes.io/component: {{ $key }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ $s.port }}
+      targetPort: http
+      name: http
+  selector:
+    app.kubernetes.io/instance: {{ $ctx.Release.Name }}
+    app.kubernetes.io/component: {{ $key }}
+{{- end }}

@@ -1,0 +1,65 @@
+suite: object storage modes (bundled MinIO vs platform S3)
+templates:
+  - minio.yaml
+  - secrets.yaml
+  - deployments.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  - it: minio mode (default) deploys MinIO with a PVC
+    templates: [minio.yaml]
+    asserts:
+      - hasDocuments:
+          count: 3
+  - it: s3 mode deploys no MinIO
+    templates: [minio.yaml]
+    set:
+      objectStorage:
+        provider: s3
+        s3:
+          region: us-west-2
+          accessKeyId: AK
+          secretAccessKey: SK
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: s3 mode injects AWS credentials only into fileservice
+    templates: [deployments.yaml]
+    set:
+      objectStorage:
+        provider: s3
+        s3:
+          region: us-west-2
+          accessKeyId: AK
+          secretAccessKey: SK
+    documentSelector:
+      # the Service shares the Deployment's name — select on a pod-spec path
+      path: spec.template.spec.containers[0].name
+      value: fileservice
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[0].secretRef.name
+          value: mytdt-trade-data-tool-s3
+  - it: s3 mode without credentials fails loudly at render time
+    templates: [secrets.yaml]
+    set:
+      objectStorage:
+        provider: s3
+        s3:
+          region: us-west-2
+    asserts:
+      - failedTemplate: {}
+  - it: suspend scales every deployment to zero
+    templates: [deployments.yaml]
+    set:
+      global:
+        suspend: true
+    documentSelector:
+      path: kind
+      value: Deployment
+      matchMany: true
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 0

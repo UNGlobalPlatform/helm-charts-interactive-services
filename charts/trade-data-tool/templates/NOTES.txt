@@ -1,0 +1,25 @@
+- Trade Data Tool is starting: 8 services + web UI{{ if eq .Values.objectStorage.provider "minio" }} + MinIO{{ end }}.
+{{- if .Values.ingress.enabled }}
+- Web UI: **http{{ if .Values.ingress.tls }}s{{ end }}://{{ .Values.ingress.hostname }}**
+{{- end }}
+- Database: **{{ include "tdt.dbName" . }}** on the platform's shared MariaDB
+  ({{ include "tdt.dbHost" . }}) — no database pods were created for this service.
+  Username: **{{ include "tdt.dbUserName" . }}**
+{{- if .Values.database.schema.bootstrap }}
+- The TDT schema (tables + stored procedures) is loaded automatically by the
+  `schema-bootstrap` job on first start; services become ready once it completes.
+{{- end }}
+{{- if .Values.database.lifecycle.retainOnDelete }}
+- On deletion, the database and user are **kept** on the shared cluster.
+{{- else }}
+- ⚠️ On deletion, the database and user are **dropped permanently**.
+{{- end }}
+{{- if eq .Values.objectStorage.provider "minio" }}
+- Files are stored in this release's MinIO ({{ include "tdt.minioSvcName" . }}:9000,
+  user `{{ .Values.objectStorage.minio.rootUser }}`).
+{{- else }}
+- Files are stored in S3 (region {{ .Values.objectStorage.s3.region }}) using your
+  platform credentials. Buckets: {{ .Values.objectStorage.buckets.domain }},
+  {{ .Values.objectStorage.buckets.metadata }}, {{ .Values.objectStorage.buckets.system }} —
+  your credentials must be allowed to create/use them.
+{{- end }}

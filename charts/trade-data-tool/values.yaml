@@ -1,0 +1,125 @@
+# Default values for trade-data-tool.
+
+global:
+  # Onyxia sets this from the service "pause" control; all workloads scale to 0.
+  suspend: false
+
+image:
+  registry: 142496269814.dkr.ecr.us-west-2.amazonaws.com/tdt
+  # One tag for every service image (built together from the same commit).
+  tag: "v1.0.0"
+  pullPolicy: IfNotPresent
+  # Name of an existing docker-registry Secret in the release namespace, if the
+  # registry is private.
+  pullSecretName: ""
+
+# The eight application services. Ports are cluster-internal (Service port ->
+# container :80); names become <release>-<key>.
+services:
+  fileservice:
+    port: 6702
+    image: file-service
+  userservice:
+    port: 6904
+    image: user-service
+  domainservice:
+    port: 6902
+    image: domain-service
+  dataservice:
+    port: 6901
+    image: data-service
+  metadataservice:
+    port: 6801
+    image: metadata-service
+  ruleengineservice:
+    port: 8402
+    image: ruleengine-service
+  coreservice:
+    port: 6912
+    image: core-service
+
+web:
+  port: 7108
+  image: web-app
+
+# Every container must declare cpu+memory limits (namespace ResourceQuota).
+resources:
+  requests:
+    cpu: 50m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
+
+database:
+  # The platform's shared MariaDB (mariadb-operator SQL-tier CRs, no pods).
+  cluster:
+    name: production
+    namespace: mariadb
+  auth:
+    # Logical names; the real identifiers are namespace-prefixed by the chart
+    # (Kyverno tenancy policies require it).
+    database: tdt
+    username: tdt
+    password: "changeme"
+  connections:
+    tier: medium  # small | medium | large -> maxUserConnections 10/50/200
+  lifecycle:
+    # When true, helm uninstall keeps the database and user on the cluster.
+    retainOnDelete: false
+  schema:
+    # Load the TDT schema (tables + stored procedures) on install/upgrade.
+    bootstrap: true
+    # Image containing /docker-entrypoint-initdb.d/*.sql; defaults to the
+    # release's own mariadb-service image (same commit as the app images).
+    image: mariadb-service
+
+objectStorage:
+  # minio: a small MinIO deployed with this release (default).
+  # s3: AWS S3 with the caller's credentials.
+  provider: minio
+  minio:
+    image: minio/minio:RELEASE.2024-01-16T16-07-38Z
+    rootUser: tdt
+    rootPassword: "changeme-minio"
+    persistence:
+      size: 10Gi
+      storageClass: ""
+    resources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  s3:
+    region: ""
+    endpoint: ""
+    accessKeyId: ""
+    secretAccessKey: ""
+    sessionToken: ""
+    forcePathStyle: false
+  buckets:
+    domain: domainfile
+    metadata: metadatafile
+    system: system
+
+security:
+  jwt:
+    # Symmetric signing key for UserService-issued JWTs; generated per release
+    # when left empty.
+    key: ""
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  hostname: chart-example.local
+  tls: true
+  certManagerClusterIssuer: letsencrypt-prod
+  useCertManager: true
+
+userPreferences:
+  language: en
+
+# Extra appsettings merged into every service's configuration (escape hatch).
+extraAppSettings: {}

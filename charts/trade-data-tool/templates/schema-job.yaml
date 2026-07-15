@@ -1,0 +1,73 @@
+{{- if .Values.database.schema.bootstrap }}
+{{/*
+Loads the TDT schema into the tenant database on the shared cluster. The
+scripts ship inside the release's own mariadb-service image (same commit as
+the app images) under /docker-entrypoint-initdb.d. CREATE DATABASE / USE
+lines are stripped — the target database comes from the connection.
+Tenant SqlJob CRs are (rightly) blocked by policy, so this is a plain Job.
+*/}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "tdt.fullname" . }}-schema-{{ .Release.Revision }}
+  labels:
+    {{- include "tdt.labels" . | nindent 4 }}
+    app.kubernetes.io/component: schema-bootstrap
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: schema-bootstrap
+    spec:
+      restartPolicy: OnFailure
+      automountServiceAccountToken: false
+      {{- with .Values.image.pullSecretName }}
+      imagePullSecrets:
+        - name: {{ . }}
+      {{- end }}
+      containers:
+        - name: schema
+          image: "{{ .Values.image.registry }}/{{ .Values.database.schema.image }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: TDT_DB_HOST
+              value: {{ include "tdt.dbHost" . | quote }}
+            - name: TDT_DB_NAME
+              value: {{ include "tdt.dbName" . | quote }}
+            - name: TDT_DB_USER
+              value: {{ include "tdt.dbUserName" . | quote }}
+            - name: TDT_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "tdt.fullname" . }}-db
+                  key: password
+          command: ["bash", "-ec"]
+          args:
+            - |
+              run() { mariadb -h "$TDT_DB_HOST" -P 3306 -u "$TDT_DB_USER" -p"$TDT_DB_PASSWORD" -D "$TDT_DB_NAME" "$@"; }
+              echo "waiting for database $TDT_DB_NAME on $TDT_DB_HOST ..."
+              until run -e "SELECT 1" >/dev/null 2>&1; do sleep 5; done
+              run -e "CREATE TABLE IF NOT EXISTS \`__tdt_schema_applied\` (script VARCHAR(255) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
+              shopt -s nullglob
+              for f in /docker-entrypoint-initdb.d/*.sql; do
+                n=$(basename "$f")
+                done_already=$(run -N -e "SELECT COUNT(*) FROM \`__tdt_schema_applied\` WHERE script='${n//\'/}'")
+                if [ "$done_already" = "1" ]; then echo "skip $n (already applied)"; continue; fi
+                echo "applying $n"
+                # Strip database selection — the connection owns the target db.
+                sed -E 's/^\s*CREATE DATABASE [^;]*;//; s/^\s*USE [^;]*;//' "$f" | run
+                run -e "INSERT INTO \`__tdt_schema_applied\` (script) VALUES ('${n//\'/}')"
+              done
+              # Schema must actually be usable, not just loaded without error.
+              procs=$(run -N -e "SELECT COUNT(*) FROM information_schema.routines WHERE routine_schema = DATABASE()")
+              echo "routines present: $procs"
+              [ "$procs" -ge 100 ] || { echo "schema bootstrap incomplete (routines=$procs)"; exit 1; }
+              run -e "SELECT COUNT(*) FROM \`vw_GetUsers\`" >/dev/null
+              echo "schema bootstrap complete"
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { cpu: 500m, memory: 256Mi }
+{{- end }}

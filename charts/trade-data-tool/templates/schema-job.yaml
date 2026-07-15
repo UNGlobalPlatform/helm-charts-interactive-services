@@ -19,7 +19,9 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        # Deliberately NO app.kubernetes.io/instance: Onyxia derives readiness from
+        # pods carrying that label (tasks), and a completed Job pod reports
+        # ready=false forever — if it sorts first it pins the service to "starting".
         app.kubernetes.io/component: schema-bootstrap
     spec:
       restartPolicy: OnFailure

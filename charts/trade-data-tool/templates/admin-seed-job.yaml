@@ -23,7 +23,8 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        # No app.kubernetes.io/instance — see schema-job.yaml: a completed Job pod
+        # with this label is read by Onyxia as a never-ready task.
         app.kubernetes.io/component: admin-seed
     spec:
       restartPolicy: OnFailure

@@ -1,0 +1,68 @@
+suite: admin login seeding (Onyxia project password)
+templates:
+  - admin-seed-job.yaml
+  - secrets.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  - it: renders an admin-seed job that targets the configured admin user
+    templates: [admin-seed-job.yaml]
+    asserts:
+      - isKind:
+          of: Job
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name=="TDT_ADMIN_USER")].value
+          value: SAdmin
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name=="TDT_DEACTIVATE")].value
+          value: DAdmin
+  - it: pulls the admin password from the admin secret, never inlines it
+    templates: [admin-seed-job.yaml]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name=="TDT_ADMIN_PASSWORD")].valueFrom.secretKeyRef.name
+          value: mytdt-trade-data-tool-admin
+  - it: the admin secret carries the password
+    templates: [secrets.yaml]
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-admin
+    set:
+      security:
+        admin:
+          password: hunter2
+    asserts:
+      - equal:
+          path: stringData.password
+          value: hunter2
+  - it: disabling seed renders no admin-seed job
+    templates: [admin-seed-job.yaml]
+    set:
+      security:
+        admin:
+          seed: false
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: seed on adds the admin secret (db + admin + appsettings + minio = 4)
+    templates: [secrets.yaml]
+    asserts:
+      - hasDocuments:
+          count: 4
+  - it: disabling seed drops the admin secret (db + appsettings + minio = 3)
+    templates: [secrets.yaml]
+    set:
+      security:
+        admin:
+          seed: false
+    asserts:
+      - hasDocuments:
+          count: 3
+  - it: the seed container declares cpu and memory limits (namespace ResourceQuota)
+    templates: [admin-seed-job.yaml]
+    asserts:
+      - exists:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+      - exists:
+          path: spec.template.spec.containers[0].resources.limits.memory

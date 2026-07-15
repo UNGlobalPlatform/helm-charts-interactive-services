@@ -1,0 +1,103 @@
+{{- if and .Values.security.admin.seed .Values.database.schema.bootstrap }}
+{{/*
+Sets the TDT application admin account's password to the chosen value on every
+deploy, so login tracks the (Onyxia project) password rather than the upstream
+seed's undocumented one. Runs after the schema bootstrap has created and seeded
+usr.User (it waits for the row), and deactivates the other seeded accounts.
+
+The password column holds an ASP.NET Core Identity v3 hash
+(PBKDF2-HMAC-SHA512, 100k iterations, 128-bit salt); the app's PasswordHasher
+ignores the user object on verify, so a hash computed here validates. The
+plaintext is read from a Secret and never logged.
+*/}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "tdt.fullname" . }}-admin-seed-{{ .Release.Revision }}
+  labels:
+    {{- include "tdt.labels" . | nindent 4 }}
+    app.kubernetes.io/component: admin-seed
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: admin-seed
+    spec:
+      restartPolicy: OnFailure
+      automountServiceAccountToken: false
+      containers:
+        - name: admin-seed
+          image: {{ .Values.security.admin.seedImage | default "python:3.12-slim" }}
+          env:
+            - name: TDT_DB_HOST
+              value: {{ include "tdt.dbHost" . | quote }}
+            - name: TDT_DB_NAME
+              value: {{ include "tdt.dbName" . | quote }}
+            - name: TDT_DB_USER
+              value: {{ include "tdt.dbUserName" . | quote }}
+            - name: TDT_DB_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: {{ include "tdt.fullname" . }}-db, key: password }
+            - name: TDT_ADMIN_USER
+              value: {{ .Values.security.admin.username | quote }}
+            - name: TDT_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: {{ include "tdt.fullname" . }}-admin, key: password }
+            - name: TDT_DEACTIVATE
+              value: {{ join "," .Values.security.admin.deactivateUsernames | quote }}
+          command: ["python", "-c"]
+          args:
+            - |
+              import os, time, base64, hashlib, struct, subprocess, sys
+              subprocess.run([sys.executable, "-m", "pip", "install", "-q", "PyMySQL"], check=True)
+              import pymysql
+
+              def aspnet_identity_v3_hash(password, iterations=100000):
+                  salt = os.urandom(16)
+                  subkey = hashlib.pbkdf2_hmac("sha512", password.encode(), salt, iterations, dklen=32)
+                  # 0x01 | prf(HMACSHA512=2) | iterations | saltlen, all big-endian uint32
+                  blob = b"\x01" + struct.pack(">III", 2, iterations, len(salt)) + salt + subkey
+                  return base64.b64encode(blob).decode()
+
+              def connect():
+                  return pymysql.connect(
+                      host=os.environ["TDT_DB_HOST"], port=3306,
+                      user=os.environ["TDT_DB_USER"], password=os.environ["TDT_DB_PASSWORD"],
+                      database=os.environ["TDT_DB_NAME"], autocommit=True)
+
+              admin = os.environ["TDT_ADMIN_USER"]
+              deactivate = [u for u in os.environ.get("TDT_DEACTIVATE", "").split(",") if u]
+
+              # Wait for the schema bootstrap to have created and seeded usr.User.
+              conn = None
+              for _ in range(120):
+                  try:
+                      conn = connect()
+                      with conn.cursor() as c:
+                          c.execute("SELECT COUNT(*) FROM `usr.User` WHERE UserName=%s", (admin,))
+                          if c.fetchone()[0] == 1:
+                              break
+                      print("waiting for admin account %r to be seeded..." % admin)
+                  except Exception as e:
+                      print("waiting for database: %s" % e)
+                  time.sleep(5)
+              else:
+                  sys.exit("admin account %r never appeared" % admin)
+
+              pw_hash = aspnet_identity_v3_hash(os.environ["TDT_ADMIN_PASSWORD"])
+              with conn.cursor() as c:
+                  n = c.execute(
+                      "UPDATE `usr.User` SET Password=%s, IsActive=1, IsPasswordChangeRequired=0 WHERE UserName=%s",
+                      (pw_hash, admin))
+                  print("set password on %r (%d row)" % (admin, n))
+                  for u in deactivate:
+                      d = c.execute("UPDATE `usr.User` SET IsActive=0 WHERE UserName=%s", (u,))
+                      print("deactivated %r (%d row)" % (u, d))
+              print("admin seed complete")
+          resources:
+            requests: { cpu: 50m, memory: 96Mi }
+            limits: { cpu: 250m, memory: 192Mi }
+{{- end }}

@@ -57,8 +57,10 @@ spec:
                 done_already=$(run -N -e "SELECT COUNT(*) FROM \`__tdt_schema_applied\` WHERE script='${n//\'/}'")
                 if [ "$done_already" = "1" ]; then echo "skip $n (already applied)"; continue; fi
                 echo "applying $n"
-                # Strip database selection — the connection owns the target db.
-                sed -E 's/^\s*CREATE DATABASE [^;]*;//; s/^\s*USE [^;]*;//' "$f" | run
+                # Strip database selection (the connection owns the target db) and
+                # server-global statements (SET GLOBAL needs SUPER — server config
+                # is the platform's concern, not a tenant bootstrap's).
+                sed -E 's/^\s*CREATE DATABASE [^;]*;//; s/^\s*USE [^;]*;//; /^\s*SET GLOBAL /d' "$f" | run
                 run -e "INSERT INTO \`__tdt_schema_applied\` (script) VALUES ('${n//\'/}')"
               done
               # Schema must actually be usable, not just loaded without error.

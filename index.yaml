@@ -8409,6 +8409,26 @@ entries:
   trade-data-tool:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-07-15T20:48:46.147051873Z"
+    description: Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web
+      UI for processing trade datasets. Provisions its database serverlessly on the
+      platform's shared MariaDB cluster and stores files in bundled MinIO or S3.
+    digest: aca9fead26d658b11f99b2d4d5f8a6928fbacf598c9b0ca690e61a2bdf78eb02
+    home: https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataTools
+    icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/library.png
+    keywords:
+    - TradeDataTool
+    - TDT
+    - Statistics
+    name: trade-data-tool
+    sources:
+    - https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataTools
+    type: application
+    urls:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/trade-data-tool-0.1.2/trade-data-tool-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-07-15T20:01:36.911948538Z"
     description: Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web
       UI for processing trade datasets. Provisions its database serverlessly on the
@@ -13462,4 +13482,4 @@ entries:
     urls:
     - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/vscode-tensorflow-gpu-2.4.0/vscode-tensorflow-gpu-2.4.0.tgz
     version: 2.4.0
-generated: "2026-07-15T20:01:36.912610855Z"
+generated: "2026-07-15T20:48:46.1478939Z"

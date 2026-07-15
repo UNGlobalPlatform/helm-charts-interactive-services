@@ -24,22 +24,10 @@
         "auth": {
           "type": "object",
           "properties": {
-            "database": {
-              "type": "string",
-              "title": "Database name",
-              "description": "Logical name; the real identifier is prefixed with your namespace.",
-              "default": "tdt",
-              "pattern": "^[a-zA-Z0-9_]{1,32}$"
-            },
-            "username": {
-              "type": "string",
-              "title": "Database username",
-              "default": "tdt",
-              "pattern": "^[a-zA-Z0-9_]{1,24}$"
-            },
             "password": {
               "type": "string",
               "title": "Database password",
+              "description": "Defaults to your project password.",
               "default": "changeme",
               "render": "password",
               "x-onyxia": {

@@ -1,0 +1,50 @@
+suite: database name is release-scoped (no cross-release collision)
+templates:
+  - database.yaml
+tests:
+  # Two releases in the SAME namespace must resolve to DIFFERENT database names,
+  # otherwise uninstalling one drops the other's data (cleanupPolicy Delete).
+  - it: release "alpha" gets its own namespace-prefixed database
+    release:
+      name: alpha
+      namespace: user-sean
+    documentSelector:
+      path: kind
+      value: Database
+    asserts:
+      - equal:
+          path: spec.name
+          value: user_sean_alpha
+  - it: release "beta" in the same namespace gets a distinct database
+    release:
+      name: beta
+      namespace: user-sean
+    documentSelector:
+      path: kind
+      value: Database
+    asserts:
+      - equal:
+          path: spec.name
+          value: user_sean_beta
+  - it: the database user is release-scoped too (matches the database name)
+    release:
+      name: alpha
+      namespace: user-sean
+    documentSelector:
+      path: kind
+      value: User
+    asserts:
+      - equal:
+          path: spec.name
+          value: user_sean_alpha
+  - it: hyphens in the release name are sanitized to underscores
+    release:
+      name: trade-data-tool-729632
+      namespace: user-r2levukldq
+    documentSelector:
+      path: kind
+      value: Database
+    asserts:
+      - equal:
+          path: spec.name
+          value: user_r2levukldq_trade_data_tool_729632

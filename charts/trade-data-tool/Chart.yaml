@@ -14,4 +14,4 @@ sources:
   - https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataTools
 type: application
 version: 0.1.0
-appVersion: "ungp-main"
+appVersion: "1.0.0"

@@ -7,7 +7,7 @@ global:
 image:
   registry: containers.officialstatistics.org/trade-data-tools/tdt-source/tradedatatools
   # One tag for every service image (built together from the same commit).
-  tag: "ungp-main"
+  tag: "v1.0.0"
   pullPolicy: IfNotPresent
   # Name of an existing docker-registry Secret in the release namespace, if the
   # registry is private.

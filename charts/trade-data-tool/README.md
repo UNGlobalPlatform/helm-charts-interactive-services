@@ -1,6 +1,6 @@
 # trade-data-tool
 
-![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 0.1.3](https://img.shields.io/badge/Version-0.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web UI for processing trade datasets. Provisions its database serverlessly on the platform's shared MariaDB cluster and stores files in bundled MinIO or S3.
 
@@ -14,9 +14,7 @@ Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web UI for proc
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| database.auth.database | string | `"tdt"` |  |
 | database.auth.password | string | `"changeme"` |  |
-| database.auth.username | string | `"tdt"` |  |
 | database.cluster.name | string | `"production"` |  |
 | database.cluster.namespace | string | `"mariadb"` |  |
 | database.connections.tier | string | `"medium"` |  |

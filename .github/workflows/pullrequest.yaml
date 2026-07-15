@@ -90,6 +90,8 @@ jobs:
             - 'charts/vscode-tensorflow/**'
           vscode-tensorflow-gpu:
             - 'charts/vscode-tensorflow-gpu/**'
+          trade-data-tool:
+            - 'charts/trade-data-tool/**'
   unittest:
     needs: changes
     if: ${{ needs.changes.outputs.charts != '[]' && needs.changes.outputs.charts != '' }}
@@ -110,4 +112,10 @@ jobs:
           echo "${{ matrix.charts }}"
           helm plugin install https://github.com/helm-unittest/helm-unittest.git
           helm dependency update charts/${{ matrix.charts }}
-          helm unittest charts/${{ matrix.charts }} -f ../../tests/*.yaml
+          # Charts with their own tests/ run those; the shared root suites
+          # target the library-chart IDE layout (statefulset.yaml, ...).
+          if [ -d "charts/${{ matrix.charts }}/tests" ]; then
+            helm unittest charts/${{ matrix.charts }} -f 'tests/*.yaml'
+          else
+            helm unittest charts/${{ matrix.charts }} -f ../../tests/*.yaml
+          fi

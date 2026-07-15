@@ -1,0 +1,293 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "global": {
+      "type": "object",
+      "properties": {
+        "suspend": {
+          "type": "boolean",
+          "title": "Suspend",
+          "default": false,
+          "x-onyxia": {
+            "hidden": true,
+            "overwriteDefaultWith": "false"
+          }
+        }
+      }
+    },
+    "database": {
+      "type": "object",
+      "title": "Database",
+      "description": "Provisioned on the platform's shared MariaDB — no database pods.",
+      "properties": {
+        "auth": {
+          "type": "object",
+          "properties": {
+            "database": {
+              "type": "string",
+              "title": "Database name",
+              "description": "Logical name; the real identifier is prefixed with your namespace.",
+              "default": "tdt",
+              "pattern": "^[a-zA-Z0-9_]{1,32}$"
+            },
+            "username": {
+              "type": "string",
+              "title": "Database username",
+              "default": "tdt",
+              "pattern": "^[a-zA-Z0-9_]{1,24}$"
+            },
+            "password": {
+              "type": "string",
+              "title": "Database password",
+              "default": "changeme",
+              "render": "password",
+              "x-onyxia": {
+                "overwriteDefaultWith": "{{project.password}}"
+              }
+            }
+          }
+        },
+        "connections": {
+          "type": "object",
+          "properties": {
+            "tier": {
+              "type": "string",
+              "title": "Connection tier",
+              "description": "Maximum simultaneous database connections.",
+              "default": "medium",
+              "enum": ["small", "medium", "large"]
+            }
+          }
+        },
+        "lifecycle": {
+          "type": "object",
+          "properties": {
+            "retainOnDelete": {
+              "type": "boolean",
+              "title": "Keep data on deletion",
+              "description": "When enabled, the database and user survive service deletion.",
+              "default": false
+            }
+          }
+        }
+      }
+    },
+    "objectStorage": {
+      "type": "object",
+      "title": "File storage",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "title": "Provider",
+          "description": "MinIO deployed with this service (standard), or S3 with your platform credentials.",
+          "default": "minio",
+          "enum": ["minio", "s3"]
+        },
+        "minio": {
+          "type": "object",
+          "properties": {
+            "rootPassword": {
+              "type": "string",
+              "title": "MinIO password",
+              "default": "changeme-minio",
+              "render": "password",
+              "hidden": {
+                "value": "s3",
+                "path": "objectStorage/provider"
+              },
+              "x-onyxia": {
+                "overwriteDefaultWith": "{{project.password}}"
+              }
+            },
+            "persistence": {
+              "type": "object",
+              "properties": {
+                "size": {
+                  "type": "string",
+                  "title": "MinIO volume size",
+                  "default": "10Gi",
+                  "enum": ["10Gi", "20Gi", "50Gi", "100Gi"],
+                  "hidden": {
+                    "value": "s3",
+                    "path": "objectStorage/provider"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "s3": {
+          "type": "object",
+          "properties": {
+            "region": {
+              "type": "string",
+              "title": "S3 region",
+              "default": "",
+              "hidden": {
+                "value": "minio",
+                "path": "objectStorage/provider"
+              },
+              "x-onyxia": {
+                "overwriteDefaultWith": "{{region.data.S3.region}}"
+              }
+            },
+            "endpoint": {
+              "type": "string",
+              "title": "S3 endpoint (optional)",
+              "default": "",
+              "hidden": {
+                "value": "minio",
+                "path": "objectStorage/provider"
+              },
+              "x-onyxia": {
+                "overwriteDefaultWith": "{{s3.AWS_S3_ENDPOINT}}"
+              }
+            },
+            "accessKeyId": {
+              "type": "string",
+              "default": "",
+              "x-onyxia": {
+                "hidden": true,
+                "overwriteDefaultWith": "{{s3.AWS_ACCESS_KEY_ID}}"
+              }
+            },
+            "secretAccessKey": {
+              "type": "string",
+              "default": "",
+              "x-onyxia": {
+                "hidden": true,
+                "overwriteDefaultWith": "{{s3.AWS_SECRET_ACCESS_KEY}}"
+              }
+            },
+            "sessionToken": {
+              "type": "string",
+              "default": "",
+              "x-onyxia": {
+                "hidden": true,
+                "overwriteDefaultWith": "{{s3.AWS_SESSION_TOKEN}}"
+              }
+            },
+            "forcePathStyle": {
+              "type": "boolean",
+              "default": false,
+              "x-onyxia": {
+                "hidden": true,
+                "overwriteDefaultWith": "{{s3.pathStyleAccess}}"
+              }
+            }
+          }
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "title": "Resources per service",
+      "properties": {
+        "requests": {
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "default": "50m",
+              "render": "slider",
+              "title": "CPU request",
+              "sliderMin": 50,
+              "sliderMax": 2000,
+              "sliderStep": 50,
+              "sliderUnit": "m",
+              "x-onyxia": {
+                "overwriteDefaultWith": "{{region.resources.cpuRequest}}"
+              }
+            },
+            "memory": {
+              "type": "string",
+              "default": "256Mi",
+              "render": "slider",
+              "title": "Memory request",
+              "sliderMin": 256,
+              "sliderMax": 8192,
+              "sliderStep": 256,
+              "sliderUnit": "Mi",
+              "x-onyxia": {
+                "overwriteDefaultWith": "{{region.resources.memoryRequest}}"
+              }
+            }
+          }
+        },
+        "limits": {
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "default": "1000m",
+              "render": "slider",
+              "title": "CPU limit",
+              "sliderMin": 100,
+              "sliderMax": 4000,
+              "sliderStep": 100,
+              "sliderUnit": "m",
+              "x-onyxia": {
+                "overwriteDefaultWith": "{{region.resources.cpuLimit}}"
+              }
+            },
+            "memory": {
+              "type": "string",
+              "default": "1Gi",
+              "render": "slider",
+              "title": "Memory limit",
+              "sliderMin": 512,
+              "sliderMax": 16384,
+              "sliderStep": 512,
+              "sliderUnit": "Mi",
+              "x-onyxia": {
+                "overwriteDefaultWith": "{{region.resources.memoryLimit}}"
+              }
+            }
+          }
+        }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "title": "Network access",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Expose the web UI",
+          "default": true
+        },
+        "hostname": {
+          "type": "string",
+          "title": "Hostname",
+          "default": "chart-example.local",
+          "x-onyxia": {
+            "hidden": true,
+            "overwriteDefaultWith": "{{project.id}}-tdt-{{k8s.randomSubdomain}}.{{k8s.domain}}"
+          }
+        },
+        "ingressClassName": {
+          "type": "string",
+          "default": "nginx",
+          "x-onyxia": {
+            "hidden": true,
+            "overwriteDefaultWith": "{{k8s.ingressClassName}}"
+          }
+        }
+      }
+    },
+    "userPreferences": {
+      "type": "object",
+      "properties": {
+        "language": {
+          "type": "string",
+          "default": "en",
+          "x-onyxia": {
+            "hidden": true,
+            "overwriteDefaultWith": "{{user.lang}}"
+          }
+        }
+      }
+    }
+  }
+}

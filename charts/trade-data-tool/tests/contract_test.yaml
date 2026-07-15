@@ -1,0 +1,72 @@
+suite: platform contracts (Kyverno tenancy, quota, single-db config)
+templates:
+  - database.yaml
+  - secrets.yaml
+  - deployments.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  - it: database and user names carry the namespace tenant prefix (Kyverno requires it)
+    templates: [database.yaml]
+    documentSelector:
+      path: kind
+      value: Database
+    asserts:
+      - equal:
+          path: spec.name
+          value: user_sean_tdt
+      - equal:
+          path: spec.mariaDbRef.namespace
+          value: mariadb
+      - equal:
+          path: spec.collate
+          value: utf8mb4_general_ci
+  - it: grant is scoped to the tenant database only, no grantOption
+    templates: [database.yaml]
+    documentSelector:
+      path: kind
+      value: Grant
+    asserts:
+      - equal:
+          path: spec.database
+          value: user_sean_tdt
+      - equal:
+          path: spec.grantOption
+          value: false
+  - it: every service container declares cpu AND memory limits (namespace ResourceQuota)
+    templates: [deployments.yaml]
+    documentSelector:
+      path: kind
+      value: Deployment
+      matchMany: true
+    asserts:
+      - exists:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+      - exists:
+          path: spec.template.spec.containers[0].resources.limits.memory
+  - it: appsettings points every connection string at the single tenant database
+    templates: [secrets.yaml]
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "Database=user_sean_tdt"
+      - notMatchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "tdtdomaindata|tdtmetadata|tdtfiles|tdtuser|tdtCore"
+  - it: retainOnDelete flips cleanupPolicy to Skip
+    templates: [database.yaml]
+    set:
+      database:
+        lifecycle:
+          retainOnDelete: true
+    documentSelector:
+      path: kind
+      value: Database
+    asserts:
+      - equal:
+          path: spec.cleanupPolicy
+          value: Skip

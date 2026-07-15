@@ -1,0 +1,87 @@
+{{- if eq .Values.objectStorage.provider "minio" }}
+{{/* Small per-release MinIO — the upstream-standard object store for TDT. */}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "tdt.minioSvcName" . }}
+  labels:
+    {{- include "tdt.labels" . | nindent 4 }}
+    app.kubernetes.io/component: minio
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.objectStorage.minio.persistence.size }}
+  {{- with .Values.objectStorage.minio.persistence.storageClass }}
+  storageClassName: {{ . }}
+  {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tdt.minioSvcName" . }}
+  labels:
+    {{- include "tdt.labels" . | nindent 4 }}
+    app.kubernetes.io/component: minio
+spec:
+  replicas: {{ .Values.global.suspend | ternary 0 1 }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: minio
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "tdt.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: minio
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: minio
+          image: {{ .Values.objectStorage.minio.image }}
+          args: ["server", "/data", "--console-address", ":9001"]
+          envFrom:
+            - secretRef:
+                name: {{ include "tdt.fullname" . }}-minio
+          ports:
+            - name: s3
+              containerPort: 9000
+            - name: console
+              containerPort: 9001
+          readinessProbe:
+            httpGet: { path: /minio/health/ready, port: s3 }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          resources:
+            {{- toYaml .Values.objectStorage.minio.resources | nindent 12 }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "tdt.minioSvcName" . }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tdt.minioSvcName" . }}
+  labels:
+    {{- include "tdt.labels" . | nindent 4 }}
+    app.kubernetes.io/component: minio
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      targetPort: s3
+      name: s3
+    - port: 9001
+      targetPort: console
+      name: console
+  selector:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: minio
+{{- end }}

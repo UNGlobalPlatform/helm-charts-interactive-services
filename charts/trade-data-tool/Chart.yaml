@@ -13,5 +13,5 @@ home: https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataT
 sources:
   - https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataTools
 type: application
-version: 0.1.5
+version: 0.1.6
 appVersion: "1.1.0"

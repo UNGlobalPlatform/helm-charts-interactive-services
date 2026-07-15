@@ -1,0 +1,43 @@
+suite: JWT key consistency (login must survive the first request)
+templates:
+  - secrets.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  # UserService SIGNS tokens with Jwt:Key; the Web VALIDATES them with
+  # JWTSettings:Key. If the two paths hold different keys, login succeeds then
+  # the next request fails signature validation → bounce to /login. Both must
+  # carry the SAME per-release key.
+  - it: Jwt:Key and JWTSettings:Key are both present and identical
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      # deterministic per-release key = sha256("<ns>|<release>|<db password>|jwt")
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"Jwt":[^}]*"Key": "3c46b00506b79fbde6f235c679ae1105460df0991d1a6dffca374be7040ccadd"'
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"JWTSettings":[^}]*"Key": "3c46b00506b79fbde6f235c679ae1105460df0991d1a6dffca374be7040ccadd"'
+  - it: both paths track the db password together (still identical after a change)
+    set:
+      database:
+        auth:
+          password: "a-different-password"
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      # the old changeme-derived key is gone from both paths
+      - notMatchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "3c46b00506b79fbde6f235c679ae1105460df0991d1a6dffca374be7040ccadd"
+      # and both paths now carry the new (identical) key
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"Jwt":[^}]*"Key": "59ddd22665925aa49c0e2592e8151ee2f141b48ee5dd5039778b37f70313dcef"'
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"JWTSettings":[^}]*"Key": "59ddd22665925aa49c0e2592e8151ee2f141b48ee5dd5039778b37f70313dcef"'

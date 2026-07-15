@@ -63,7 +63,7 @@ database:
     username: tdt
     password: "changeme"
   connections:
-    tier: medium # small | medium | large -> maxUserConnections 10/50/200
+    tier: medium  # small | medium | large -> maxUserConnections 10/50/200
   lifecycle:
     # When true, helm uninstall keeps the database and user on the cluster.
     retainOnDelete: false

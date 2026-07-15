@@ -248,6 +248,33 @@
         }
       }
     },
+    "security": {
+      "type": "object",
+      "title": "Application login",
+      "properties": {
+        "admin": {
+          "type": "object",
+          "properties": {
+            "username": {
+              "type": "string",
+              "title": "Admin username",
+              "description": "The account you log into the Trade Data Tool with.",
+              "default": "SAdmin"
+            },
+            "password": {
+              "type": "string",
+              "title": "Admin password",
+              "description": "Defaults to your project password.",
+              "default": "changeme",
+              "render": "password",
+              "x-onyxia": {
+                "overwriteDefaultWith": "{{project.password}}"
+              }
+            }
+          }
+        }
+      }
+    },
     "ingress": {
       "type": "object",
       "title": "Network access",

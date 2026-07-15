@@ -109,6 +109,17 @@ security:
     # Symmetric signing key for UserService-issued JWTs; generated per release
     # when left empty.
     key: ""
+  admin:
+    # The TDT application login. On every deploy an admin-seed job sets this
+    # account's password (hashed) so it matches the value below, and deactivates
+    # the other upstream-seeded account. Onyxia fills adminPassword with the
+    # user's stable project password.
+    seed: true
+    username: SAdmin
+    password: "changeme"
+    # Seeded accounts other than `username` to deactivate (IsActive=0).
+    deactivateUsernames:
+      - DAdmin
 
 ingress:
   enabled: true

@@ -1,0 +1,68 @@
+{{- if (default dict .Values.readiness).enabled }}
+{{/*
+Onyxia derives a service's ready/green state from the readiness of the FIRST pod
+(tasks[0]) carrying app.kubernetes.io/instance=<release> — it ignores controllers,
+helm status and HTTP reachability (verified: onyxia-web onyxiaApi.ts areAllTasksReady;
+onyxia-api HelmAppsService lists instance-labelled pods, unsorted → in practice
+lexicographic by name). With many service pods that first pod is arbitrary, so a
+backend can go green before the web UI serves (→ 503 on click).
+
+This marker fixes that: its pod name sorts FIRST (the "0readiness" component begins
+with a digit, which sorts before every service's letter-initial name), so it is
+tasks[0]; and its readiness probe passes only when the WEB Service actually answers
+HTTP. Net effect: Onyxia is green exactly when the web UI is serving.
+*/}}
+{{- $ctx := . }}
+{{- $webSvc := include "tdt.svcName" (dict "ctx" $ctx "key" "web") }}
+{{- $webUrl := printf "http://%s:%d/" $webSvc (int .Values.web.port) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-0readiness" (include "tdt.fullname" .) | trunc 63 | trimSuffix "-" }}
+  labels:
+    {{- include "tdt.labels" . | nindent 4 }}
+    app.kubernetes.io/component: readiness
+spec:
+  replicas: {{ .Values.global.suspend | ternary 0 1 }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: readiness
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "tdt.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: readiness
+    spec:
+      automountServiceAccountToken: false
+      initContainers:
+        # Block until the web UI answers HTTP, so the pod only becomes Ready once
+        # the service is genuinely usable.
+        - name: wait-for-web
+          image: {{ .Values.readiness.image | default "busybox:1.36" }}
+          command: ["sh", "-c"]
+          args:
+            - until wget -q -O /dev/null "{{ $webUrl }}"; do echo "waiting for web at {{ $webUrl }}"; sleep 3; done
+          resources:
+            requests: { cpu: 1m, memory: 8Mi }
+            limits: { cpu: 50m, memory: 16Mi }
+      containers:
+        - name: marker
+          image: {{ .Values.readiness.image | default "busybox:1.36" }}
+          command: ["sh", "-c", "trap 'exit 0' TERM; while true; do sleep 3600 & wait; done"]
+          # Ready reflects live HTTP serving of the web UI (not just an open socket).
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "wget -q -O /dev/null \"{{ $webUrl }}\""]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 1m, memory: 8Mi }
+            limits: { cpu: 50m, memory: 16Mi }
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+{{- end }}

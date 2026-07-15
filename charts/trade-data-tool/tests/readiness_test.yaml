@@ -1,0 +1,73 @@
+suite: Onyxia readiness signalling
+release:
+  name: trade-data-tool-729632
+  namespace: user-r2levukldq
+tests:
+  - it: the readiness marker is labelled as an Onyxia task and gates on the web URL
+    templates: [readiness.yaml]
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: metadata.labels["app.kubernetes.io/component"]
+          value: readiness
+      # carries the instance label so Onyxia counts it as a task
+      - equal:
+          path: spec.template.metadata.labels["app.kubernetes.io/instance"]
+          value: trade-data-tool-729632
+      # probe hits the web Service, not itself
+      - matchRegex:
+          path: spec.template.spec.containers[0].readinessProbe.exec.command[2]
+          pattern: "trade-data-tool-729632-web:7108/"
+  - it: the marker pod name sorts before every service pod (so it is tasks[0])
+    templates: [readiness.yaml]
+    asserts:
+      # component "0readiness" begins with a digit → sorts before coreservice, web, ...
+      - matchRegex:
+          path: metadata.name
+          pattern: "-0readiness$"
+  - it: the marker declares cpu AND memory limits (namespace ResourceQuota)
+    templates: [readiness.yaml]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: 50m
+      - equal:
+          path: spec.template.spec.initContainers[0].resources.limits.cpu
+          value: 50m
+  - it: suspend scales the marker to zero
+    templates: [readiness.yaml]
+    set:
+      global:
+        suspend: true
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 0
+  - it: disabling readiness renders no marker
+    templates: [readiness.yaml]
+    set:
+      readiness:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: the schema-bootstrap job pod is NOT labelled as an Onyxia task
+    templates: [schema-job.yaml]
+    asserts:
+      - notExists:
+          path: spec.template.metadata.labels["app.kubernetes.io/instance"]
+  - it: the admin-seed job pod is NOT labelled as an Onyxia task
+    templates: [admin-seed-job.yaml]
+    asserts:
+      - notExists:
+          path: spec.template.metadata.labels["app.kubernetes.io/instance"]
+  - it: the web pod uses an HTTP readiness probe (not a bare TCP socket)
+    templates: [deployments.yaml]
+    documentSelector:
+      path: spec.template.spec.containers[0].name
+      value: web
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+          value: /

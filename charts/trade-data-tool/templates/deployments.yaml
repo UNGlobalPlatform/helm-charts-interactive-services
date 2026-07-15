@@ -58,6 +58,14 @@ spec:
             httpGet: { path: /health, port: http }
             initialDelaySeconds: 10
             periodSeconds: 15
+          {{- else if eq $key "web" }}
+          # HTTP, not TCP: Kestrel opens the socket before the app can serve, so a
+          # TCP probe reports Ready too early and the ingress 503s. Gate on a real
+          # response so the pod is Ready only when it actually serves.
+          readinessProbe:
+            httpGet: { path: /, port: http }
+            initialDelaySeconds: 10
+            periodSeconds: 10
           {{- else }}
           readinessProbe:
             tcpSocket: { port: http }

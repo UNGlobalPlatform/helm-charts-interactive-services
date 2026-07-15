@@ -3,9 +3,11 @@
 - Web UI: **http{{ if .Values.ingress.tls }}s{{ end }}://{{ .Values.ingress.hostname }}**
 {{- end }}
 {{- if .Values.security.admin.seed }}
-- Log in as **{{ .Values.security.admin.username }}** with your **project password**
-  (the same one shown under *My Account*). It is set on the admin account each
-  time this service deploys.
+- Log in as **{{ .Values.security.admin.username }}**
+  - Password: **`{{ .Values.security.admin.password }}`** (your project password)
+
+  ⚠️ Treat this like any credential — don't paste it into code or share it.
+  It is (re)applied to the admin account on every deploy.
 {{- end }}
 - Database: **{{ include "tdt.dbName" . }}** on the platform's shared MariaDB
   ({{ include "tdt.dbHost" . }}) — no database pods were created for this service.

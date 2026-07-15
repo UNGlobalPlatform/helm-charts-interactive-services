@@ -131,5 +131,11 @@ ingress:
 userPreferences:
   language: en
 
+# Near-zero-footprint marker pod that gives Onyxia an honest "ready" signal
+# (green only once the web UI actually serves HTTP). Disable for headless use.
+readiness:
+  enabled: true
+  image: busybox:1.36
+
 # Extra appsettings merged into every service's configuration (escape hatch).
 extraAppSettings: {}

@@ -129,7 +129,7 @@
                 "path": "objectStorage/provider"
               },
               "x-onyxia": {
-                "overwriteDefaultWith": "{{region.data.S3.region}}"
+                "overwriteDefaultWith": "{{s3.AWS_DEFAULT_REGION}}"
               }
             },
             "endpoint": {
@@ -233,7 +233,7 @@
             },
             "memory": {
               "type": "string",
-              "default": "1Gi",
+              "default": "1024Mi",
               "render": "slider",
               "title": "Memory limit",
               "sliderMin": 512,

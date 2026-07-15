@@ -48,8 +48,8 @@ resources:
     cpu: 50m
     memory: 256Mi
   limits:
-    cpu: "1"
-    memory: 1Gi
+    cpu: "1000m"
+    memory: 1024Mi
 
 database:
   # The platform's shared MariaDB (mariadb-operator SQL-tier CRs, no pods).

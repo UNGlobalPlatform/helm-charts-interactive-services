@@ -39,12 +39,26 @@ tenancy policies REQUIRE database/user names to carry this prefix.
 {{- .Release.Namespace | replace "-" "_" }}
 {{- end }}
 
+{{/*
+Release-scoped database/user identifier: <tenantPrefix>_<release>. Deriving it
+from the release name (not a fixed "tdt") means two TDT services in the same
+namespace get DISTINCT databases and users — so uninstalling one can never drop
+the other's data. Still carries the tenant prefix required by the Kyverno
+policies, sanitized to the identifier charset and capped at 64 (MariaDB's db
+limit; usernames allow 80, so 64 is safe for both).
+*/}}
+{{- define "tdt.dbIdentifier" -}}
+{{- $clean := .Release.Name | lower | replace "-" "_" -}}
+{{- $slug := regexReplaceAll "[^a-z0-9_]+" $clean "_" | trimSuffix "_" -}}
+{{- printf "%s_%s" (include "tdt.tenantPrefix" .) $slug | trunc 64 | trimSuffix "_" }}
+{{- end }}
+
 {{- define "tdt.dbName" -}}
-{{- printf "%s_%s" (include "tdt.tenantPrefix" .) .Values.database.auth.database | trunc 64 | trimSuffix "_" }}
+{{- include "tdt.dbIdentifier" . }}
 {{- end }}
 
 {{- define "tdt.dbUserName" -}}
-{{- printf "%s_%s" (include "tdt.tenantPrefix" .) .Values.database.auth.username | trunc 64 | trimSuffix "_" }}
+{{- include "tdt.dbIdentifier" . }}
 {{- end }}
 
 {{/*

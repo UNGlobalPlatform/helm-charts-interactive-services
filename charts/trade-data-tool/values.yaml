@@ -57,10 +57,9 @@ database:
     name: production
     namespace: mariadb
   auth:
-    # Logical names; the real identifiers are namespace-prefixed by the chart
-    # (Kyverno tenancy policies require it).
-    database: tdt
-    username: tdt
+    # The database and user names are derived per-release by the chart
+    # (<namespace>_<release>) so instances never share a database. Only the
+    # password is configurable.
     password: "changeme"
   connections:
     tier: medium  # small | medium | large -> maxUserConnections 10/50/200

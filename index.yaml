@@ -8406,6 +8406,27 @@ entries:
     urls:
     - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/spark-connect-1.0.0/spark-connect-1.0.0.tgz
     version: 1.0.0
+  trade-data-tool:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-07-15T19:39:11.503734763Z"
+    description: Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web
+      UI for processing trade datasets. Provisions its database serverlessly on the
+      platform's shared MariaDB cluster and stores files in bundled MinIO or S3.
+    digest: b841b0f6f771255ec7f5c9a003f6c03926e4e99aec75992a4641f6111202f8e0
+    home: https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataTools
+    icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/library.png
+    keywords:
+    - TradeDataTool
+    - TDT
+    - Statistics
+    name: trade-data-tool
+    sources:
+    - https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataTools
+    type: application
+    urls:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/trade-data-tool-0.1.0/trade-data-tool-0.1.0.tgz
+    version: 0.1.0
   vscode-pyspark:
   - apiVersion: v2
     created: "2025-11-30T10:41:13.112640459Z"
@@ -13421,4 +13442,4 @@ entries:
     urls:
     - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/vscode-tensorflow-gpu-2.4.0/vscode-tensorflow-gpu-2.4.0.tgz
     version: 2.4.0
-generated: "2026-07-07T00:16:57.524422091Z"
+generated: "2026-07-15T19:39:11.504611302Z"

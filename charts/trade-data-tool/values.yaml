@@ -5,7 +5,7 @@ global:
   suspend: false
 
 image:
-  registry: containers.officialstatistics.org/trade-data-tools/tdt-source/tradedatatools
+  registry: 142496269814.dkr.ecr.us-west-2.amazonaws.com/tdt
   # One tag for every service image (built together from the same commit).
   tag: "v1.0.0"
   pullPolicy: IfNotPresent

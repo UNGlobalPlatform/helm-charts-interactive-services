@@ -175,7 +175,14 @@ share the same database and object store anyway.
 {{- $_ := set $cfg "ObjectStorage" (dict "Provider" "s3" "S3" $s3) }}
 {{- end }}
 {{- $_ := set $cfg "DatasetProcessingSettings" (dict "BucketName" .Values.objectStorage.buckets.system) }}
-{{- $_ := set $cfg "Jwt" (dict "Key" (include "tdt.jwtKey" .)) }}
+{{- /* The JWT signing key. UserService SIGNS with Jwt:Key (HelperMethod.cs) but
+       the Web VALIDATES with JWTSettings:Key (JwtTokenHelper.cs) — two different
+       config paths that happen to hold the same baked value upstream. Overriding
+       only one leaves the web validating against a stale key: login succeeds then
+       the very next request bounces to /login. Set BOTH to the per-release key. */}}
+{{- $jwtKey := include "tdt.jwtKey" . }}
+{{- $_ := set $cfg "Jwt" (dict "Key" $jwtKey "Issuer" "unsd.com" "Audience" "Your_Audience") }}
+{{- $_ := set $cfg "JWTSettings" (dict "Key" $jwtKey "ValidIssuer" "unsd.com" "Audience" "Your_Audience") }}
 {{- $merged := mustMergeOverwrite $cfg (deepCopy .Values.extraAppSettings) }}
 {{- mustToPrettyJson $merged }}
 {{- end }}

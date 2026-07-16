@@ -15,7 +15,7 @@ tests:
     asserts:
       - matchRegex:
           path: stringData["appsettings.Production.json"]
-          pattern: '"AllowedExt": "txt,doc,docx,pdf,xlsx,jpg,csv"'
+          pattern: '"AllowedExt": "tsv,txt,csv"'
       - matchRegex:
           path: stringData["appsettings.Production.json"]
           pattern: '"ImportFileAllowedExt": "xlsx,csv,txt"'

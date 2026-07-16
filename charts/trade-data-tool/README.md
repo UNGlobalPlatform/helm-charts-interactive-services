@@ -78,7 +78,7 @@ Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web UI for proc
 | services.ruleengineservice.port | int | `8402` |  |
 | services.userservice.image | string | `"user-service"` |  |
 | services.userservice.port | int | `6904` |  |
-| uploads.allowedExtensions | string | `"txt,doc,docx,pdf,xlsx,jpg,csv"` |  |
+| uploads.allowedExtensions | string | `"tsv,txt,csv"` |  |
 | uploads.importAllowedExtensions | string | `"xlsx,csv,txt"` |  |
 | uploads.maxFileSizeBytes | int | `314572900` |  |
 | userPreferences.language | string | `"en"` |  |

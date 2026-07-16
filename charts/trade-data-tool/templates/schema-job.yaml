@@ -1,4 +1,4 @@
-{{- if .Values.database.schema.bootstrap }}
+{{- if and .Values.database.schema.bootstrap (not .Values.global.suspend) }}
 {{/*
 Loads the TDT schema into the tenant database on the shared cluster. The
 scripts ship inside the release's own mariadb-service image (same commit as

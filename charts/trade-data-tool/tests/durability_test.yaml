@@ -1,0 +1,77 @@
+suite: data durability across the culler's suspend cycle and deletion
+templates:
+  - minio.yaml
+  - schema-job.yaml
+  - admin-seed-job.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  # The platform culler suspends services after 12h via
+  #   helm upgrade --set global.suspend=true --reuse-values
+  # Suspend must scale MinIO to zero (free compute) while its PVC — and the
+  # data — stays. The PVC is the only copy: the cluster's gp3 storage class
+  # has reclaimPolicy Delete.
+  - it: suspend scales MinIO to zero but keeps the PVC
+    templates: [minio.yaml]
+    set:
+      global:
+        suspend: true
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 0
+        documentSelector:
+          path: kind
+          value: Deployment
+      - hasDocuments:
+          count: 3  # PVC + Deployment + Service all still rendered
+  # Suspend is not an upgrade: re-running schema bootstrap and admin re-seed
+  # on every culler cycle is pure churn (4 job pods per suspend+resume).
+  - it: suspend renders no schema job
+    templates: [schema-job.yaml]
+    set:
+      global:
+        suspend: true
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: suspend renders no admin-seed job
+    templates: [admin-seed-job.yaml]
+    set:
+      global:
+        suspend: true
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: resume (suspend false) renders both jobs again
+    templates: [schema-job.yaml, admin-seed-job.yaml]
+    asserts:
+      - hasDocuments:
+          count: 1
+  # helm uninstall deletes chart-managed PVCs, and gp3's reclaimPolicy Delete
+  # then destroys the EBS volume — the one true data-loss vector. The keep
+  # policy makes the PVC survive uninstall (helm adopts it back on reinstall
+  # under the same release name), mirroring database.lifecycle.retainOnDelete.
+  - it: retainOnDelete marks the PVC keep-on-uninstall
+    templates: [minio.yaml]
+    set:
+      objectStorage:
+        minio:
+          persistence:
+            retainOnDelete: true
+    documentSelector:
+      path: kind
+      value: PersistentVolumeClaim
+    asserts:
+      - equal:
+          path: metadata.annotations["helm.sh/resource-policy"]
+          value: keep
+  - it: default leaves the PVC deletable with the release
+    templates: [minio.yaml]
+    documentSelector:
+      path: kind
+      value: PersistentVolumeClaim
+    asserts:
+      - notExists:
+          path: metadata.annotations["helm.sh/resource-policy"]

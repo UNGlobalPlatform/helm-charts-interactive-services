@@ -107,6 +107,12 @@ objectStorage:
     persistence:
       size: 10Gi
       storageClass: ""
+      # When true, helm uninstall keeps the MinIO volume (and the uploaded
+      # files) on the cluster; a reinstall under the same release name adopts
+      # it back. Mirrors database.lifecycle.retainOnDelete. The cluster's gp3
+      # storage class has reclaimPolicy Delete, so without this the EBS volume
+      # is destroyed with the release.
+      retainOnDelete: false
     resources:
       requests:
         cpu: 50m

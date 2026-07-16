@@ -92,6 +92,8 @@ jobs:
             - 'charts/vscode-tensorflow-gpu/**'
           trade-data-tool:
             - 'charts/trade-data-tool/**'
+          zeppelin:
+            - 'charts/zeppelin/**'
   unittest:
     needs: changes
     if: ${{ needs.changes.outputs.charts != '[]' && needs.changes.outputs.charts != '' }}

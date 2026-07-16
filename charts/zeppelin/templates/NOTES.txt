@@ -1,0 +1,40 @@
+{{- template "library-chart.notes" (dict "serviceName" "Apache Zeppelin" "context" $) -}}
+
+### Login
+
+- Sign in to Zeppelin with username `{{ .Values.environment.user }}` and the password shown above.
+{{- if .Values.sparkConnect.enabled }}
+
+### Spark Connect
+
+- **gRPC endpoint** (from inside this pod): `sc://{{ include "library-chart.fullname" . }}-spark-connect:15002`
+- Use Spark from a `%python` paragraph — the PySpark Spark Connect client is preinstalled and preconfigured (`SPARK_REMOTE`). The `%spark` (Scala) interpreter does **not** support Spark Connect.
+  ```python
+  from pyspark.sql import SparkSession
+  spark = SparkSession.builder.getOrCreate()
+  ```
+{{- if and .Values.ingress.enabled .Values.sparkConnect.sparkui.hostname }}
+- When Spark is running, you can access the **Spark UI** using [this link]({{ .Values.ingress.tls | ternary "https" "http" }}://{{ .Values.sparkConnect.sparkui.hostname }}).
+{{- else }}
+- **Spark UI**: `kubectl port-forward svc/{{ include "library-chart.fullname" . }}-spark-connect 4040:4040 -n {{ .Release.Namespace }}` then open `http://localhost:4040`
+{{- end }}
+- For assistance on how to access the AIS data using Spark, please consult the [guide](https://static-assets.officialstatistics.org/spark-connect-reference-guide.pdf).
+{{- end }}
+{{- include "zeppelin.mariadb-discovery-help" . }}
+{{- if eq .Values.userPreferences.language "fr" }}
+
+### Cycle de vie du service
+
+- Veuillez **arrêter votre service** dès que vous avez terminé votre travail.
+- Les services inactifs seront **automatiquement supprimés après 12 heures**.
+- Mettre en pause puis redémarrer votre service **réinitialise ce délai**.
+- Les rôles IAM attribués à votre service **expirent après 12 heures**. Passé ce délai, l'accès aux buckets S3 — y compris les données AIS et vos buckets utilisateur — cessera de fonctionner.
+{{- else }}
+
+### Service lifecycle
+
+- Please **stop your service** as soon as you are done working.
+- Idle services will be **automatically removed after 12 hours**.
+- Pausing and restarting your service **resets this timer**.
+- The IAM roles assumed by your service **expire after 12 hours**. After this, access to S3 buckets — including AIS data and your user buckets — will stop working.
+{{- end }}

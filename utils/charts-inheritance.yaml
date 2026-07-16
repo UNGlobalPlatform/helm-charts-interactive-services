@@ -43,3 +43,5 @@ vscode-python:
       - inseefrlab/onyxia-vscode-r-python-julia:r4.5.1-py3.13.8
 
 vscode-pyspark: []
+
+zeppelin: []

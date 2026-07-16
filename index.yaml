@@ -13602,4 +13602,30 @@ entries:
     urls:
     - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/vscode-tensorflow-gpu-2.4.0/vscode-tensorflow-gpu-2.4.0.tgz
     version: 2.4.0
-generated: "2026-07-16T16:39:02.238756843Z"
+  zeppelin:
+  - apiVersion: v2
+    appVersion: 0.12.0
+    created: "2026-07-16T18:47:43.488480401Z"
+    dependencies:
+    - name: library-chart
+      repository: https://inseefrlab.github.io/helm-charts-interactive-services
+      version: 1.7.14
+    description: Apache Zeppelin, a web-based notebook for interactive data analytics
+      with SQL, Python and more.
+    digest: 49be013ffcb55c314d7cb5b436e38bdd19398c26d3669e48078d78344baeb6af
+    home: https://zeppelin.apache.org/
+    icon: https://zeppelin.apache.org/assets/themes/zeppelin/img/zeppelin_classic_logo.png
+    keywords:
+    - Zeppelin
+    - Notebook
+    - Python
+    - SQL
+    name: zeppelin
+    sources:
+    - https://github.com/apache/zeppelin
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services
+    type: application
+    urls:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/zeppelin-1.0.0/zeppelin-1.0.0.tgz
+    version: 1.0.0
+generated: "2026-07-16T18:47:43.489080601Z"

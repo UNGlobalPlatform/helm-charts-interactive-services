@@ -75,6 +75,19 @@
         "minio": {
           "type": "object",
           "properties": {
+            "ingress": {
+              "type": "object",
+              "properties": {
+                "hostname": {
+                  "type": "string",
+                  "default": "",
+                  "x-onyxia": {
+                    "hidden": true,
+                    "overwriteDefaultWith": "{{project.id}}-tdt-minio-{{k8s.randomSubdomain}}.{{k8s.domain}}"
+                  }
+                }
+              }
+            },
             "rootPassword": {
               "type": "string",
               "title": "MinIO password",

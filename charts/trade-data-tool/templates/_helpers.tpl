@@ -163,11 +163,22 @@ share the same database and object store anyway.
 {{- $_ := set (get $cfg "FileService") "MaxFileSize" (.Values.uploads.maxFileSizeBytes | int64 | toString) }}
 {{- if eq .Values.objectStorage.provider "minio" }}
 {{- $minioHost := printf "%s:9000" (include "tdt.minioSvcName" .) }}
+{{- /* Presigned upload URLs are built against ApiUrl honoring UseSSL
+       (MinioObjectStorageProvider.CreatePresignClient) and are PUT by the
+       BROWSER, so ApiUrl must be the external ingress host over TLS whenever
+       one exists. EndPoint stays in-cluster plaintext — that's the data plane
+       (CreateDataClient never uses SSL). */}}
+{{- $minioApiHost := "" }}
+{{- if and .Values.ingress.enabled .Values.objectStorage.minio.ingress.hostname }}
+{{- $minioApiHost = .Values.objectStorage.minio.ingress.hostname }}
+{{- end }}
 {{- $_ := set $cfg "MinioConfig" (dict
-      "EndPoint" $minioHost "ApiUrl" $minioHost "ConsoleUrl" $minioHost
+      "EndPoint" $minioHost
+      "ApiUrl" (default $minioHost $minioApiHost)
+      "ConsoleUrl" $minioHost
       "AccessKey" .Values.objectStorage.minio.rootUser
       "SecretKey" .Values.objectStorage.minio.rootPassword
-      "UseSSL" false "ContentType" "application/octet-stream") }}
+      "UseSSL" (ne $minioApiHost "") "ContentType" "application/octet-stream") }}
 {{- $_ := set $cfg "ObjectStorage" (dict "Provider" "minio") }}
 {{- else }}
 {{- $s3 := dict "Region" .Values.objectStorage.s3.region "ForcePathStyle" .Values.objectStorage.s3.forcePathStyle }}

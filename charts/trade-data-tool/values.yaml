@@ -96,6 +96,14 @@ objectStorage:
     image: minio/minio:RELEASE.2024-01-16T16-07-38Z
     rootUser: tdt
     rootPassword: "changeme-minio"
+    ingress:
+      # Browser-reachable hostname for MinIO's S3 API. The web UI uploads by
+      # handing the browser a presigned URL built against MinioConfig:ApiUrl
+      # (over HTTPS), so in minio mode this MUST be set for uploads to work
+      # from outside the cluster. When empty, presigned URLs fall back to the
+      # in-cluster endpoint (fine for headless/in-cluster use only). Onyxia
+      # fills this next to the web hostname; rides the same wildcard cert.
+      hostname: ""
     persistence:
       size: 10Gi
       storageClass: ""

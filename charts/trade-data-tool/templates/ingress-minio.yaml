@@ -1,0 +1,41 @@
+{{- /* Exposes MinIO's S3 API so browsers can PUT to presigned upload URLs.
+The web UI's uploader (UploadFile.razor.cs -> filehelper.js) uploads directly
+from the browser to a presigned URL that FileService builds against
+MinioConfig:ApiUrl. Without a browser-reachable host, every upload dies
+client-side ("Upload Failed") with nothing in any server log. */}}
+{{- if and .Values.ingress.enabled (eq .Values.objectStorage.provider "minio") .Values.objectStorage.minio.ingress.hostname }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ printf "%s-minio-api" (include "tdt.fullname" .) | trunc 63 | trimSuffix "-" }}
+  labels:
+    {{- include "tdt.labels" . | nindent 4 }}
+  annotations:
+    {{- if and .Values.ingress.tls .Values.ingress.useCertManager }}
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.certManagerClusterIssuer }}
+    {{- end }}
+    # nginx-only knobs (ignored by other controllers): uploads are single PUTs
+    # up to uploads.maxFileSizeBytes, far beyond nginx's 1m default.
+    nginx.ingress.kubernetes.io/proxy-body-size: 5g
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+spec:
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  rules:
+    - host: {{ .Values.objectStorage.minio.ingress.hostname | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "tdt.minioSvcName" . }}
+                port:
+                  number: 9000
+  {{- if .Values.ingress.tls }}
+  tls:
+    - hosts:
+        - {{ .Values.objectStorage.minio.ingress.hostname | quote }}
+      secretName: {{ printf "%s-minio-api" (include "tdt.fullname" .) | trunc 53 | trimSuffix "-" }}-tls
+  {{- end }}
+{{- end }}

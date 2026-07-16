@@ -73,6 +73,21 @@ database:
     # release's own mariadb-service image (same commit as the app images).
     image: mariadb-service
 
+# File upload rules read by the web UI (TDT.Web/Helper/AppSettings.cs). The
+# images bake no FileService section at all, so these MUST be set here: a null
+# AllowedExt throws NullReferenceException on the upload pages, and an unset
+# MaxFileSize converts to 0, which rejects every file as too large.
+# Defaults match what the engineers actually deploy: base/TDT.Web/Deploy/
+# tdt-webui-secrets.yaml. (Not overlays/*/patches-secretes.yml — deployment.ps1
+# excludes that file, so its wider extension list is never applied and is stale.)
+uploads:
+  # Extensions accepted by the File Service upload pages (comma-separated, no dots).
+  allowedExtensions: "tsv,txt,csv"
+  # Extensions accepted by the Domain/Metadata import pages.
+  importAllowedExtensions: "xlsx,csv,txt"
+  # Largest accepted upload, in bytes (default ~300 MiB, matching the cloud deploy).
+  maxFileSizeBytes: 314572900
+
 objectStorage:
   # minio: a small MinIO deployed with this release (default).
   # s3: AWS S3 with the caller's credentials.

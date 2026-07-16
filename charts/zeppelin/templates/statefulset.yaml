@@ -148,6 +148,8 @@ spec:
               value: {{ .Values.environment.group }}
             - name: ZEPPELIN_ADDR
               value: "0.0.0.0"
+            - name: ZEPPELIN_SERVER_JETTY_REQUEST_HEADER_SIZE
+              value: "32768"
             - name: ZEPPELIN_PORT
               value: {{ .Values.networking.service.port | quote }}
             # 0.12's default 'auto' mode detects the in-cluster service account and

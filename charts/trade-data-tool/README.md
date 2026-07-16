@@ -1,6 +1,6 @@
 # trade-data-tool
 
-![Version: 0.1.7](https://img.shields.io/badge/Version-0.1.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 0.1.9](https://img.shields.io/badge/Version-0.1.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web UI for processing trade datasets. Provisions its database serverlessly on the platform's shared MariaDB cluster and stores files in bundled MinIO or S3.
 
@@ -37,6 +37,8 @@ Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web UI for proc
 | objectStorage.buckets.metadata | string | `"metadatafile"` |  |
 | objectStorage.buckets.system | string | `"system"` |  |
 | objectStorage.minio.image | string | `"minio/minio:RELEASE.2024-01-16T16-07-38Z"` |  |
+| objectStorage.minio.ingress.hostname | string | `""` |  |
+| objectStorage.minio.persistence.retainOnDelete | bool | `false` |  |
 | objectStorage.minio.persistence.size | string | `"10Gi"` |  |
 | objectStorage.minio.persistence.storageClass | string | `""` |  |
 | objectStorage.minio.resources.limits.cpu | string | `"500m"` |  |

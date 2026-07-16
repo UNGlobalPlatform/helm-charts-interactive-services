@@ -1,0 +1,99 @@
+suite: MinIO S3-API ingress (presigned uploads need a browser-reachable host)
+templates:
+  - ingress-minio.yaml
+  - secrets.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  # The deployed uploader hands the browser a presigned URL built against
+  # MinioConfig:ApiUrl (MinioObjectStorageProvider.CreatePresignClient). If that
+  # is the in-cluster Service name, the browser cannot resolve it and every
+  # upload dies client-side with zero server logs.
+  - it: minio mode with a hostname renders an ingress to minio:9000
+    templates: [ingress-minio.yaml]
+    set:
+      objectStorage:
+        minio:
+          ingress:
+            hostname: user-sean-tdt-minio-abc123.dev.officialstatistics.org
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.rules[0].host
+          value: user-sean-tdt-minio-abc123.dev.officialstatistics.org
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: mytdt-trade-data-tool-minio
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.port.number
+          value: 9000
+      - equal:
+          path: spec.tls[0].hosts[0]
+          value: user-sean-tdt-minio-abc123.dev.officialstatistics.org
+  - it: presigned URLs are built against the external host over TLS
+    templates: [secrets.yaml]
+    set:
+      objectStorage:
+        minio:
+          ingress:
+            hostname: user-sean-tdt-minio-abc123.dev.officialstatistics.org
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"ApiUrl": "user-sean-tdt-minio-abc123.dev.officialstatistics.org"'
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"UseSSL": true'
+      # the data plane keeps talking to the in-cluster endpoint, plaintext
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"EndPoint": "mytdt-trade-data-tool-minio:9000"'
+  - it: no hostname falls back to the in-cluster endpoint (headless use)
+    templates: [secrets.yaml]
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"ApiUrl": "mytdt-trade-data-tool-minio:9000"'
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"UseSSL": false'
+  - it: no hostname renders no minio ingress
+    templates: [ingress-minio.yaml]
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: s3 mode renders no minio ingress even with a hostname
+    templates: [ingress-minio.yaml]
+    set:
+      objectStorage:
+        provider: s3
+        s3:
+          region: us-west-2
+          accessKeyId: AK
+          secretAccessKey: SK
+        minio:
+          ingress:
+            hostname: user-sean-tdt-minio-abc123.dev.officialstatistics.org
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: ingress disabled renders no minio ingress
+    templates: [ingress-minio.yaml]
+    set:
+      ingress:
+        enabled: false
+      objectStorage:
+        minio:
+          ingress:
+            hostname: user-sean-tdt-minio-abc123.dev.officialstatistics.org
+    asserts:
+      - hasDocuments:
+          count: 0

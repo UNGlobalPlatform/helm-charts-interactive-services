@@ -75,6 +75,19 @@
         "minio": {
           "type": "object",
           "properties": {
+            "ingress": {
+              "type": "object",
+              "properties": {
+                "hostname": {
+                  "type": "string",
+                  "default": "",
+                  "x-onyxia": {
+                    "hidden": true,
+                    "overwriteDefaultWith": "{{project.id}}-tdt-minio-{{k8s.randomSubdomain}}.{{k8s.domain}}"
+                  }
+                }
+              }
+            },
             "rootPassword": {
               "type": "string",
               "title": "MinIO password",
@@ -96,6 +109,16 @@
                   "title": "MinIO volume size",
                   "default": "10Gi",
                   "enum": ["10Gi", "20Gi", "50Gi", "100Gi"],
+                  "hidden": {
+                    "value": "s3",
+                    "path": "objectStorage/provider"
+                  }
+                },
+                "retainOnDelete": {
+                  "type": "boolean",
+                  "title": "Keep files on deletion",
+                  "description": "When enabled, the MinIO volume (your uploaded files) survives service deletion.",
+                  "default": false,
                   "hidden": {
                     "value": "s3",
                     "path": "objectStorage/provider"

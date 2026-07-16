@@ -1,4 +1,4 @@
-{{- if and .Values.security.admin.seed .Values.database.schema.bootstrap }}
+{{- if and .Values.security.admin.seed .Values.database.schema.bootstrap (not .Values.global.suspend) }}
 {{/*
 Sets the TDT application admin account's password to the chosen value on every
 deploy, so login tracks the (Onyxia project) password rather than the upstream

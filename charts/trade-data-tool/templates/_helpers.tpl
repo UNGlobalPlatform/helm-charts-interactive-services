@@ -151,6 +151,16 @@ share the same database and object store anyway.
 {{- $_ := set $cfg "Dapr" (dict "EnforceDapr" false) }}
 {{- $_ := set (get $cfg "FileService") "ImportDomainBucket" .Values.objectStorage.buckets.domain }}
 {{- $_ := set (get $cfg "FileService") "ImportMetadataBucket" .Values.objectStorage.buckets.metadata }}
+{{- /* Upload rules. The images bake NO FileService section, so these have no
+       fallback: AllowedExt unset => AppSettings.AllowedExt() returns null =>
+       .Split(',') throws NRE the moment a file is picked (UploadFile.razor:116);
+       MaxFileSize unset => Convert.ToInt64(null) => 0 => every file "too large".
+       Emitted as strings to match how ASP.NET reads them. MaxFileSize goes via
+       int64: YAML numbers land as float64, and toString alone renders 314572900
+       as "3.145729e+08", which Convert.ToInt64 throws on. */}}
+{{- $_ := set (get $cfg "FileService") "AllowedExt" .Values.uploads.allowedExtensions }}
+{{- $_ := set (get $cfg "FileService") "ImportFileAllowedExt" .Values.uploads.importAllowedExtensions }}
+{{- $_ := set (get $cfg "FileService") "MaxFileSize" (.Values.uploads.maxFileSizeBytes | int64 | toString) }}
 {{- if eq .Values.objectStorage.provider "minio" }}
 {{- $minioHost := printf "%s:9000" (include "tdt.minioSvcName" .) }}
 {{- $_ := set $cfg "MinioConfig" (dict

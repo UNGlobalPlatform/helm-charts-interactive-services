@@ -1,0 +1,51 @@
+suite: upload rules (the web images bake no FileService section, so these have no fallback)
+templates:
+  - secrets.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  # AppSettings.AllowedExt() returns null when the key is absent, and every
+  # caller does .Split(',') on it unguarded -> NullReferenceException as soon as
+  # the user picks a file (UploadFile.razor:116, EditFile.razor:79).
+  - it: AllowedExt is present so the upload pages cannot NRE
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"AllowedExt": "txt,doc,docx,pdf,xlsx,jpg,csv"'
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"ImportFileAllowedExt": "xlsx,csv,txt"'
+  # Convert.ToInt64(null) is 0 (it does not throw), so an absent MaxFileSize
+  # silently rejects every upload as larger than the limit.
+  - it: MaxFileSize is present and non-zero so uploads are not all rejected
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"MaxFileSize": "314572900"'
+      - notMatchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"MaxFileSize": "0"'
+  - it: upload rules are configurable and stay strings
+    set:
+      uploads:
+        allowedExtensions: "csv"
+        importAllowedExtensions: "csv"
+        maxFileSizeBytes: 1048576
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"AllowedExt": "csv"'
+      # quoted, not a bare JSON number
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"MaxFileSize": "1048576"'

@@ -4,6 +4,10 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ include "tdt.minioSvcName" . }}
+  {{- if .Values.objectStorage.minio.persistence.retainOnDelete }}
+  annotations:
+    helm.sh/resource-policy: keep
+  {{- end }}
   labels:
     {{- include "tdt.labels" . | nindent 4 }}
     app.kubernetes.io/component: minio

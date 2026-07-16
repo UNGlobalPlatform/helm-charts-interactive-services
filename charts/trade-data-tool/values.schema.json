@@ -113,6 +113,16 @@
                     "value": "s3",
                     "path": "objectStorage/provider"
                   }
+                },
+                "retainOnDelete": {
+                  "type": "boolean",
+                  "title": "Keep files on deletion",
+                  "description": "When enabled, the MinIO volume (your uploaded files) survives service deletion.",
+                  "default": false,
+                  "hidden": {
+                    "value": "s3",
+                    "path": "objectStorage/provider"
+                  }
                 }
               }
             }

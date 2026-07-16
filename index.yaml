@@ -13605,6 +13605,31 @@ entries:
   zeppelin:
   - apiVersion: v2
     appVersion: 0.12.0
+    created: "2026-07-16T19:04:01.469274901Z"
+    dependencies:
+    - name: library-chart
+      repository: https://inseefrlab.github.io/helm-charts-interactive-services
+      version: 1.7.14
+    description: Apache Zeppelin, a web-based notebook for interactive data analytics
+      with SQL, Python and more.
+    digest: 026becb6c84839801462c819137cc32a036715f206498c1ab32b396e0d3c4e36
+    home: https://zeppelin.apache.org/
+    icon: https://zeppelin.apache.org/assets/themes/zeppelin/img/zeppelin_classic_logo.png
+    keywords:
+    - Zeppelin
+    - Notebook
+    - Python
+    - SQL
+    name: zeppelin
+    sources:
+    - https://github.com/apache/zeppelin
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services
+    type: application
+    urls:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/zeppelin-1.1.0/zeppelin-1.1.0.tgz
+    version: 1.1.0
+  - apiVersion: v2
+    appVersion: 0.12.0
     created: "2026-07-16T18:47:43.488480401Z"
     dependencies:
     - name: library-chart
@@ -13628,4 +13653,4 @@ entries:
     urls:
     - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/zeppelin-1.0.0/zeppelin-1.0.0.tgz
     version: 1.0.0
-generated: "2026-07-16T18:47:43.489080601Z"
+generated: "2026-07-16T19:04:01.470366248Z"

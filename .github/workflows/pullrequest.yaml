@@ -36,11 +36,6 @@ jobs:
           fi
 
       #https://github.com/helm/chart-testing/issues/192
-      - name: Build subchart dependencies
-        # trade-data-tool depends on ../zeppelin via file://; packaging it needs
-        # zeppelin's OWN dependency (library-chart) present in its charts/ dir.
-        run: helm dependency update charts/zeppelin
-
       - name: Run chart-testing (lint)
         if: steps.list-changed.outputs.changed == 'true'
         run: ct lint --target-branch ${{ github.event.repository.default_branch }} --validate-maintainers=false

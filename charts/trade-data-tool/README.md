@@ -10,6 +10,12 @@ Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web UI for proc
 
 * <https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataTools>
 
+## Requirements
+
+| Repository | Name | Version |
+|------------|------|---------|
+| file://../zeppelin | zeppelin | 1.3.0 |
+
 ## Values
 
 | Key | Type | Default | Description |

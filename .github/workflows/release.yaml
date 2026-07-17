@@ -69,7 +69,12 @@ jobs:
         # chart-releaser packages with --dependency-update, but packaging
         # trade-data-tool embeds ../zeppelin as-is — zeppelin's own
         # library-chart dependency must already sit in its charts/ dir.
-        run: helm dependency update charts/zeppelin
+        # dependency update writes a Chart.lock; cr package then runs
+        # `helm dependency build`, which with a lock present demands
+        # `helm repo add` definitions. Lockless build resolves URLs directly.
+        run: |
+          helm dependency update charts/zeppelin
+          rm -f charts/zeppelin/Chart.lock
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0

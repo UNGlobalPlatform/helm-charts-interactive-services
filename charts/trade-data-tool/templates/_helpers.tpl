@@ -149,6 +149,22 @@ share the same database and object store anyway.
 {{- $_ := set $cfg $name (dict "LocalUrl" $url "DaprURL" $url "DaprPort" "3500" "DaprHealthURL" "http://localhost:{0}/v1.0/healthz") }}
 {{- end }}
 {{- $_ := set $cfg "Dapr" (dict "EnforceDapr" false) }}
+{{- /* Rule engine (Zeppelin). APIURL must ALWAYS be a valid absolute URI:
+       ZeppelinService's ctor does new Uri(APIURL) and null/empty throws in DI,
+       500ing every RuleService endpoint (the UI then calls the whole Rule
+       Service "down"). Unconfigured -> a clearly-named placeholder, so only
+       the Zeppelin status degrades. WebURL feeds the "/#/notebook/<ruleId>"
+       deep links; "#" keeps the razor pages' TrimEnd from an NRE. */}}
+{{- $zep := .Values.zeppelin | default dict }}
+{{- $zepApi := $zep.apiUrl | default "http://zeppelin-not-configured.invalid" }}
+{{- $zepWeb := $zep.webUrl | default "#" }}
+{{- $_ := set $cfg "Zeppelin" (dict
+      "APIURL" $zepApi
+      "UserId" ($zep.username | default "onyxia")
+      "Password" ($zep.password | default .Values.security.admin.password)
+      "DefaultInterpreterGroup" ($zep.defaultInterpreterGroup | default "jdbc")) }}
+{{- $_ := set (get $cfg "RuleService") "WebURL" $zepWeb }}
+{{- $_ := set (get $cfg "RuleService") "DaprWebURL" $zepWeb }}
 {{- $_ := set (get $cfg "FileService") "ImportDomainBucket" .Values.objectStorage.buckets.domain }}
 {{- $_ := set (get $cfg "FileService") "ImportMetadataBucket" .Values.objectStorage.buckets.metadata }}
 {{- /* Upload rules. The images bake NO FileService section, so these have no

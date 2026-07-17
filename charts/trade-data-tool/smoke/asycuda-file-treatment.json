@@ -1,0 +1,77 @@
+{
+ "name": "tdt-smoke/Asycuda File Treatment",
+ "paragraphs": [
+  {
+   "title": "Initialisation (Number of Records)",
+   "text": "UPDATE `brz.asycuda` mydata \nSET mydata.SourceType = 1\nWHERE (IFNULL(mydata.SourceType, 0)= 0)\nAND mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Check Declarant",
+   "text": "UPDATE `brz.asycuda` mydata \r\nLEFT JOIN DECLARANT mycodes \r\nON mydata.AGENCE=mycodes.CODE\r\nSET mydata.DECLARANT = CASE WHEN mycodes.CODE IS NULL THEN 'UNKNOWN' ELSE mycodes.CODE END\r\nWHERE mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Build Product",
+   "text": "UPDATE `brz.asycuda` mydata \r\nSET mydata.PRODUCT = CONCAT_WS('', mydata.SH8, mydata.SHEXT)\r\nWHERE (IFNULL(mydata.SHEXT, '')='00')\r\nAND mydata.BatchId=${BatchId=0};\r\n\r\nUPDATE `brz.asycuda` mydata \r\nSET mydata.PRODUCT = CONCAT_WS('', SUBSTRING(mydata.SH8, 1, 7), SUBSTRING(mydata.SHEXT, 2, 1), '00') \r\nWHERE (mydata.SH8 Like '%0') AND (mydata.SHEXT Like '0_') AND (SUBSTRING(mydata.SHEXT, 2, 1)<>'0')\r\nAND mydata.BatchId=${BatchId=0};\r\n\r\nUPDATE `brz.asycuda` mydata \r\nSET mydata.PRODUCT = CONCAT_WS('', mydata.SH8, mydata.SHEXT) \r\nWHERE (mydata.PRODUCT is Null)\r\nAND mydata.BatchId=${BatchId=0};\r\n\r\nUPDATE `brz.asycuda` mydata \r\nLEFT JOIN HS10 mycodes \r\nON mydata.PRODUCT=mycodes.CODE\r\nSET mydata.PRODUCT = CONCAT_WS('', SUBSTRING(mydata.SH8, 1, 6), '0000') \r\nWHERE (mycodes.CODE is Null) \r\nAND mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Calculate values in USD and Euro",
+   "text": "UPDATE `brz.asycuda` mydata \r\nSET mydata.VALUSD = CASE WHEN IFNULL(RATEUSD, 0) = 0 THEN Null ELSE  VALD / RATEUSD END,\r\n    mydata.VALEURO = CASE WHEN IFNULL(RATEEUR, 0) = 0 THEN Null ELSE  VALD / RATEEUR END\r\nWHERE mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Calculate DDI Tax",
+   "text": "UPDATE `brz.asycuda` mydata \r\nSET mydata.DDI_VALTAX1 = \r\n            CASE WHEN IFNULL(TAXE1, '') = 'DDI' THEN IFNULL(VALTAX1, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE2, '') = 'DDI' THEN IFNULL(VALTAX2, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE3, '') = 'DDI' THEN IFNULL(VALTAX3, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE4, '') = 'DDI' THEN IFNULL(VALTAX4, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE5, '') = 'DDI' THEN IFNULL(VALTAX5, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE6, '') = 'DDI' THEN IFNULL(VALTAX6, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE7, '') = 'DDI' THEN IFNULL(VALTAX7, 0) ELSE  0 END\r\nWHERE ( (IFNULL(TAXE1, '') = 'DDI') OR (IFNULL(TAXE2, '') = 'DDI') OR (IFNULL(TAXE3, '') = 'DDI') OR (IFNULL(TAXE4, '') = 'DDI') \r\n        OR (IFNULL(TAXE5, '') = 'DDI') OR (IFNULL(TAXE6, '') = 'DDI') OR (IFNULL(TAXE7, '') = 'DDI')) \r\nAND mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Calculate DDE Tax",
+   "text": "UPDATE `brz.asycuda` mydata \r\nSET mydata.DDE_VALTAX2 = \r\n            CASE WHEN IFNULL(TAXE1, '') = 'DDE' THEN IFNULL(VALTAX1, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE2, '') = 'DDE' THEN IFNULL(VALTAX2, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE3, '') = 'DDE' THEN IFNULL(VALTAX3, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE4, '') = 'DDE' THEN IFNULL(VALTAX4, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE5, '') = 'DDE' THEN IFNULL(VALTAX5, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE6, '') = 'DDE' THEN IFNULL(VALTAX6, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE7, '') = 'DDE' THEN IFNULL(VALTAX7, 0) ELSE  0 END\r\nWHERE ( (IFNULL(TAXE1, '') = 'DDE') OR (IFNULL(TAXE2, '') = 'DDE') OR (IFNULL(TAXE3, '') = 'DDE') OR (IFNULL(TAXE4, '') = 'DDE') \r\n        OR (IFNULL(TAXE5, '') = 'DDE') OR (IFNULL(TAXE6, '') = 'DDE') OR (IFNULL(TAXE7, '') = 'DDE')) \r\nAND mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Calculate VAT Tax",
+   "text": "UPDATE `brz.asycuda` mydata \r\nSET mydata.TVA_VALTAX3 = \r\n            CASE WHEN IFNULL(TAXE1, '') = 'TVA' THEN IFNULL(VALTAX1, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE2, '') = 'TVA' THEN IFNULL(VALTAX2, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE3, '') = 'TVA' THEN IFNULL(VALTAX3, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE4, '') = 'TVA' THEN IFNULL(VALTAX4, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE5, '') = 'TVA' THEN IFNULL(VALTAX5, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE6, '') = 'TVA' THEN IFNULL(VALTAX6, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE7, '') = 'TVA' THEN IFNULL(VALTAX7, 0) ELSE  0 END\r\nWHERE ( (IFNULL(TAXE1, '') = 'TVA') OR (IFNULL(TAXE2, '') = 'TVA') OR (IFNULL(TAXE3, '') = 'TVA') OR (IFNULL(TAXE4, '') = 'TVA') \r\n        OR (IFNULL(TAXE5, '') = 'TVA') OR (IFNULL(TAXE6, '') = 'TVA') OR (IFNULL(TAXE7, '') = 'TVA')) \r\nAND mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Calculate DCI Tax",
+   "text": "UPDATE `brz.asycuda` mydata \r\nSET mydata.DCI_VALTAX4 = \r\n            CASE WHEN IFNULL(TAXE1, '') = 'DCI' THEN IFNULL(VALTAX1, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE2, '') = 'DCI' THEN IFNULL(VALTAX2, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE3, '') = 'DCI' THEN IFNULL(VALTAX3, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE4, '') = 'DCI' THEN IFNULL(VALTAX4, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE5, '') = 'DCI' THEN IFNULL(VALTAX5, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE6, '') = 'DCI' THEN IFNULL(VALTAX6, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE7, '') = 'DCI' THEN IFNULL(VALTAX7, 0) ELSE  0 END\r\nWHERE ( (IFNULL(TAXE1, '') = 'DCI') OR (IFNULL(TAXE2, '') = 'DCI') OR (IFNULL(TAXE3, '') = 'DCI') OR (IFNULL(TAXE4, '') = 'DCI') \r\n        OR (IFNULL(TAXE5, '') = 'DCI') OR (IFNULL(TAXE6, '') = 'DCI') OR (IFNULL(TAXE7, '') = 'DCI')) \r\nAND mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Calculate DAS Tax",
+   "text": "UPDATE `brz.asycuda` mydata \r\nSET mydata.DAS_VALTAX5 = \r\n            CASE WHEN IFNULL(TAXE1, '') = 'DAS' THEN IFNULL(VALTAX1, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE2, '') = 'DAS' THEN IFNULL(VALTAX2, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE3, '') = 'DAS' THEN IFNULL(VALTAX3, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE4, '') = 'DAS' THEN IFNULL(VALTAX4, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE5, '') = 'DAS' THEN IFNULL(VALTAX5, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE6, '') = 'DAS' THEN IFNULL(VALTAX6, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE7, '') = 'DAS' THEN IFNULL(VALTAX7, 0) ELSE  0 END\r\nWHERE ( (IFNULL(TAXE1, '') = 'DAS') OR (IFNULL(TAXE2, '') = 'DAS') OR (IFNULL(TAXE3, '') = 'DAS') OR (IFNULL(TAXE4, '') = 'DAS') \r\n        OR (IFNULL(TAXE5, '') = 'DAS') OR (IFNULL(TAXE6, '') = 'DAS') OR (IFNULL(TAXE7, '') = 'DAS')) \r\nAND mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Calculate RIN Tax",
+   "text": "UPDATE `brz.asycuda` mydata \r\nSET mydata.RIN_VALTAX6 = \r\n            CASE WHEN IFNULL(TAXE1, '') = 'RIN' THEN IFNULL(VALTAX1, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE2, '') = 'RIN' THEN IFNULL(VALTAX2, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE3, '') = 'RIN' THEN IFNULL(VALTAX3, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE4, '') = 'RIN' THEN IFNULL(VALTAX4, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE5, '') = 'RIN' THEN IFNULL(VALTAX5, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE6, '') = 'RIN' THEN IFNULL(VALTAX6, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE7, '') = 'RIN' THEN IFNULL(VALTAX7, 0) ELSE  0 END\r\nWHERE ( (IFNULL(TAXE1, '') = 'RIN') OR (IFNULL(TAXE2, '') = 'RIN') OR (IFNULL(TAXE3, '') = 'RIN') OR (IFNULL(TAXE4, '') = 'RIN') \r\n        OR (IFNULL(TAXE5, '') = 'RIN') OR (IFNULL(TAXE6, '') = 'RIN') OR (IFNULL(TAXE7, '') = 'RIN')) \r\nAND mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Calculate FSR Tax",
+   "text": "UPDATE `brz.asycuda` mydata \r\nSET mydata.FSR_VALTAX7 = \r\n            CASE WHEN IFNULL(TAXE1, '') = 'FSR' THEN IFNULL(VALTAX1, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE2, '') = 'FSR' THEN IFNULL(VALTAX2, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE3, '') = 'FSR' THEN IFNULL(VALTAX3, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE4, '') = 'FSR' THEN IFNULL(VALTAX4, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE5, '') = 'FSR' THEN IFNULL(VALTAX5, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE6, '') = 'FSR' THEN IFNULL(VALTAX6, 0) ELSE  0 END\r\n            + CASE WHEN IFNULL(TAXE7, '') = 'FSR' THEN IFNULL(VALTAX7, 0) ELSE  0 END\r\nWHERE ( (IFNULL(TAXE1, '') = 'FSR') OR (IFNULL(TAXE2, '') = 'FSR') OR (IFNULL(TAXE3, '') = 'FSR') OR (IFNULL(TAXE4, '') = 'FSR') \r\n        OR (IFNULL(TAXE5, '') = 'FSR') OR (IFNULL(TAXE6, '') = 'FSR') OR (IFNULL(TAXE7, '') = 'FSR')) \r\nAND mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Calculate OTHER taxes",
+   "text": "UPDATE `brz.asycuda` mydata \r\nSET mydata.OTH_TAXES =  IFNULL(VALTAX1, 0) + IFNULL(VALTAX2, 0) + IFNULL(VALTAX3, 0) + IFNULL(VALTAX4, 0)\r\n                        + IFNULL(VALTAX5, 0) + IFNULL(VALTAX6, 0) + IFNULL(VALTAX7, 0)\r\n                        - IFNULL(DDI_VALTAX1, 0) - IFNULL(DDE_VALTAX2, 0) - IFNULL(TVA_VALTAX3, 0) - IFNULL(DCI_VALTAX4, 0)\r\n                        - IFNULL(DAS_VALTAX5, 0) - IFNULL(RIN_VALTAX6, 0) - IFNULL(FSR_VALTAX7, 0)\r\nWHERE mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Get Import Partner from Country of Origin",
+   "text": "UPDATE `brz.asycuda` mydata \r\nSET mydata.PARTNER = mydata.PAYSORIGIN\r\nWHERE   (mydata.TYPDEC  In ('IM4', 'IM5', 'IM6', 'IM7', 'IM9', 'DSI4')) \r\n        AND (IFNULL(mydata.PARTNER, 'CD')='CD') \r\nAND mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Get Import Partner from Country of Consignment",
+   "text": "UPDATE `brz.asycuda` mydata \r\nSET mydata.PARTNER = mydata.PAYSLDFO\r\nWHERE   (mydata.TYPDEC  In ('IM4', 'IM5', 'IM6', 'IM7', 'IM9', 'DSI4')) \r\n        AND (IFNULL(mydata.PARTNER, 'CD')='CD') \r\nAND mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Get Export Partner from Country of Destination",
+   "text": "UPDATE `brz.asycuda` mydata \r\nSET mydata.PARTNER = mydata.PAYSDEST\r\nWHERE   (mydata.TYPDEC  In ('EX1', 'EX2', 'EX3', 'DSE1')) \r\n        AND (IFNULL(mydata.PARTNER, 'CD')='CD') \r\nAND mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Get Other Partner from Country of Origin",
+   "text": "UPDATE `brz.asycuda` mydata \r\nSET mydata.PARTNER = mydata.PAYSORIGIN\r\nWHERE   (mydata.TYPDEC In ('DP9', 'TR8', 'DE0')) \r\n        AND (IFNULL(mydata.PARTNER, 'CD')='CD') \r\nAND mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Get Other Partner from Country of the Exporter",
+   "text": "UPDATE `brz.asycuda` mydata \r\nSET mydata.PARTNER = mydata.PAYSEXP\r\nWHERE   (mydata.TYPDEC In ('DP9', 'TR8', 'DE0')) \r\n        AND (IFNULL(mydata.PARTNER, 'CD')='CD') \r\nAND mydata.BatchId=${BatchId=0};"
+  },
+  {
+   "title": "Set Partner to Default otherwise",
+   "text": "UPDATE `brz.asycuda` mydata \r\nSET mydata.PARTNER = 'ZZ'\r\nWHERE (IFNULL(mydata.PARTNER, 'CD')='CD') \r\nAND mydata.BatchId=${BatchId=0};"
+  }
+ ]
+}

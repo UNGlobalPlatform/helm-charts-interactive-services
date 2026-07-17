@@ -1,0 +1,13 @@
+{
+ "name": "tdt-smoke/Asycuda Validation",
+ "paragraphs": [
+  {
+   "title": "Check CIF FOB",
+   "text": "INSERT INTO `prc.customError`\n(\n    `RECORD_ID`,\n    `BatchId`,\n    `errordescription`\n    \n)\nSELECT RECORD_ID,BatchId,'Wrong CIF FOB conversion' \nFROM `brz.asycuda` \nWHERE ((IFNULL(FOB, 0) + IFNULL(FRET, 0) + IFNULL(ASSURANCE, 0) + IFNULL(AUTRECHARG, 0))<>IFNULL(VALD, 0))\nAND BatchId=${BatchId=0};"
+  },
+  {
+   "title": "",
+   "text": "SELECT IFNULL(FOB, 0) + IFNULL(FRET, 0) + IFNULL(ASSURANCE, 0) + IFNULL(AUTRECHARG, 0),IFNULL(VALD, 0),RECORD_ID,BatchId,'Wrong CIF FOB conversion' \nFROM `brz.asycuda` \nWHERE ((IFNULL(FOB, 0) + IFNULL(FRET, 0) + IFNULL(ASSURANCE, 0) + IFNULL(AUTRECHARG, 0))<>IFNULL(VALD, 0))\nAND BatchId=1;"
+  }
+ ]
+}

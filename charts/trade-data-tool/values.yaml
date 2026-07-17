@@ -136,6 +136,30 @@ objectStorage:
     metadata: metadatafile
     system: system
 
+# The rule engine. TDT rules are SQL paragraphs in Apache Zeppelin notebooks:
+# RuleService drives Zeppelin's REST API (login, run paragraph, poll status)
+# and the web UI deep-links into Zeppelin ("/#/notebook/<ruleId>"). Launch the
+# platform's zeppelin chart beside this service and point these at it. When
+# apiUrl is left empty a syntactically valid placeholder is rendered instead —
+# ZeppelinService's constructor does new Uri(APIURL), and a null/empty value
+# throws during dependency injection, taking every RuleService endpoint down.
+zeppelin:
+  # In-cluster URL of the Zeppelin server, e.g. http://<zeppelin-release>:8080
+  apiUrl: ""
+  # Browser-facing URL of the same Zeppelin (its ingress hostname), used for
+  # the notebook deep links in the rules pages.
+  webUrl: ""
+  # Zeppelin shiro login. The zeppelin chart's single user is "onyxia"; its
+  # password defaults to the same project password as security.admin.password,
+  # so leaving password empty here means zero copy-pasting between launches.
+  username: onyxia
+  password: ""
+  # Interpreter group used when TDT creates notebooks (rules are SQL -> jdbc).
+  defaultInterpreterGroup: jdbc
+  # Maven coordinates of the MariaDB JDBC driver Zeppelin fetches on first use
+  # (the stock zeppelin image ships no MariaDB driver).
+  driverArtifact: "org.mariadb.jdbc:mariadb-java-client:3.4.1"
+
 security:
   jwt:
     # Symmetric signing key for UserService-issued JWTs; generated per release

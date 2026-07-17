@@ -272,6 +272,25 @@
         }
       }
     },
+    "zeppelin": {
+      "type": "object",
+      "title": "Rule engine (Zeppelin)",
+      "description": "TDT runs data rules as SQL notebooks in Apache Zeppelin. Launch the zeppelin service first, then paste its URLs here. Leave empty to run without a rule engine.",
+      "properties": {
+        "apiUrl": {
+          "type": "string",
+          "title": "Zeppelin internal URL",
+          "description": "http://<zeppelin-service-name>:8080 — the service name of your running zeppelin (e.g. http://zeppelin-311710:8080).",
+          "default": ""
+        },
+        "webUrl": {
+          "type": "string",
+          "title": "Zeppelin browser URL",
+          "description": "The https address you open Zeppelin with; used for notebook links in the rules pages.",
+          "default": ""
+        }
+      }
+    },
     "security": {
       "type": "object",
       "title": "Application login",

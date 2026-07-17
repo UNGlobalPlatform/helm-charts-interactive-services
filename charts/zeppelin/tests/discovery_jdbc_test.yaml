@@ -1,0 +1,95 @@
+suite: discovery publishing and jdbc auto-configuration
+templates:
+  - secret-discovery.yaml
+  - job-jdbc-config.yaml
+release:
+  name: myzep
+  namespace: user-sean
+tests:
+  # Other services (e.g. the Trade Data Tool rule engine) find this Zeppelin
+  # through the onyxia/discovery convention instead of paste-in URL fields.
+  - it: publishes a discoverable secret with the connection contract
+    templates: [secret-discovery.yaml]
+    set:
+      security:
+        password: "the-project-password"
+      ingress:
+        enabled: true
+        hostname: user-sean-abc-0.dev.officialstatistics.org
+    asserts:
+      - equal:
+          path: metadata.annotations["onyxia/discovery"]
+          value: zeppelin
+      - equal:
+          path: data["zeppelin-service"]
+          # b64("myzep-zeppelin")
+          value: bXl6ZXAtemVwcGVsaW4=
+      - equal:
+          path: data["zeppelin-web-url"]
+          # b64("https://user-sean-abc-0.dev.officialstatistics.org")
+          value: aHR0cHM6Ly91c2VyLXNlYW4tYWJjLTAuZGV2Lm9mZmljaWFsc3RhdGlzdGljcy5vcmc=
+  - it: discovery publishing can be disabled
+    templates: [secret-discovery.yaml]
+    set:
+      discovery:
+        publish: false
+    asserts:
+      - hasDocuments:
+          count: 0
+  # In unit tests `lookup` returns nothing, so with no explicit jdbc values
+  # there is no source — the job must not render (and must not error).
+  - it: no jdbc source renders no job
+    templates: [job-jdbc-config.yaml]
+    asserts:
+      - hasDocuments:
+          count: 0
+  # A parent chart bundling zeppelin injects the target explicitly (it cannot
+  # be discovered: a release can't look up a secret it is itself creating).
+  - it: explicit jdbc values render the config secret and job
+    templates: [job-jdbc-config.yaml]
+    set:
+      jdbc:
+        host: mytdt-trade-data-tool-db.svc
+        database: user_sean_mytdt
+        username: user_sean_mytdt
+        password: pw
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: stringData.MARIADB_HOST
+          value: mytdt-trade-data-tool-db.svc
+        documentSelector:
+          path: kind
+          value: Secret
+      - equal:
+          path: stringData.MARIADB_PORT
+          value: "3306"
+        documentSelector:
+          path: kind
+          value: Secret
+  - it: suspend renders no jdbc job (culler cycles must not churn)
+    templates: [job-jdbc-config.yaml]
+    set:
+      global:
+        suspend: true
+      jdbc:
+        host: somewhere
+        username: u
+        password: p
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: job pod carries no instance label (Onyxia readiness reads tasks[0])
+    templates: [job-jdbc-config.yaml]
+    set:
+      jdbc:
+        host: somewhere
+        username: u
+        password: p
+    documentSelector:
+      path: kind
+      value: Job
+    asserts:
+      - notExists:
+          path: spec.template.metadata.labels["app.kubernetes.io/instance"]

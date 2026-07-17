@@ -1,6 +1,6 @@
 # zeppelin
 
-![Version: 1.1.1](https://img.shields.io/badge/Version-1.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.12.0](https://img.shields.io/badge/AppVersion-0.12.0-informational?style=flat-square)
+![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.12.0](https://img.shields.io/badge/AppVersion-0.12.0-informational?style=flat-square)
 
 Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, Python and more.
 
@@ -29,6 +29,7 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | certificates | object | `{}` |  |
 | discovery.mariadb | bool | `true` |  |
 | discovery.postgresql | bool | `true` |  |
+| discovery.publish | bool | `true` |  |
 | environment.group | string | `"users"` |  |
 | environment.user | string | `"onyxia"` |  |
 | extraEnvVars | list | `[]` |  |
@@ -60,6 +61,13 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | init.personalInitArgs | string | `""` |  |
 | init.regionInit | string | `""` |  |
 | init.standardInitPath | string | `"/opt/onyxia-init.sh"` |  |
+| jdbc.configImage | string | `"python:3.12-slim"` |  |
+| jdbc.database | string | `""` |  |
+| jdbc.driverArtifact | string | `"org.mariadb.jdbc:mariadb-java-client:3.4.1"` |  |
+| jdbc.host | string | `""` |  |
+| jdbc.password | string | `""` |  |
+| jdbc.port | int | `3306` |  |
+| jdbc.username | string | `""` |  |
 | kubernetes.enabled | bool | `false` |  |
 | kubernetes.role | string | `"view"` |  |
 | mariadb.secretName | string | `""` |  |

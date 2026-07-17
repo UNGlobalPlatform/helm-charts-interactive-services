@@ -1,0 +1,114 @@
+{{- $src := dict }}
+{{- $srcJson := include "zeppelin.jdbcSource" . }}
+{{- if $srcJson }}{{- $src = fromJson $srcJson }}{{- end }}
+{{- if and $src.host (not .Values.global.suspend) }}
+{{/*
+Points this Zeppelin's jdbc interpreter at a MariaDB — either one discovered
+in the namespace (onyxia/discovery "mariadb", e.g. the catalog's mariadb
+chart or a Trade Data Tool release) or one injected explicitly via
+.Values.jdbc.* by a parent chart bundling this one. The stock Zeppelin image
+ships no MariaDB driver, so it is declared as a Maven dependency and fetched
+on first use. Idempotent; re-runs on every upgrade.
+*/}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "library-chart.fullname" . }}-jdbc-config
+  labels:
+    {{- include "library-chart.labels" . | nindent 4 }}
+stringData:
+  ZEPPELIN_API_URL: http://{{ include "library-chart.fullname" . }}:{{ .Values.networking.service.port }}
+  ZEPPELIN_USER: {{ .Values.environment.user | quote }}
+  ZEPPELIN_PASSWORD: {{ .Values.security.password | quote }}
+  MARIADB_HOST: {{ $src.host | quote }}
+  MARIADB_PORT: {{ $src.port | quote }}
+  MARIADB_DATABASE: {{ $src.database | quote }}
+  MARIADB_USER: {{ $src.username | quote }}
+  MARIADB_PASSWORD: {{ $src.password | quote }}
+  DRIVER_ARTIFACT: {{ (.Values.jdbc).driverArtifact | default "org.mariadb.jdbc:mariadb-java-client:3.4.1" | quote }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "library-chart.fullname" . }}-jdbc-config-{{ .Release.Revision }}
+  labels:
+    {{- include "library-chart.labels" . | nindent 4 }}
+spec:
+  backoffLimit: 4
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        # Deliberately NOT the library-chart labels: a completed Job pod
+        # carrying app.kubernetes.io/instance is read by Onyxia's readiness
+        # check as a never-ready task, wedging the service at "starting".
+        app.kubernetes.io/component: jdbc-config
+    spec:
+      restartPolicy: OnFailure
+      automountServiceAccountToken: false
+      containers:
+        - name: jdbc-config
+          image: {{ (.Values.jdbc).configImage | default "python:3.12-slim" }}
+          envFrom:
+            - secretRef:
+                name: {{ include "library-chart.fullname" . }}-jdbc-config
+          command: ["python3", "-c"]
+          args:
+            - |
+              import json, os, time, urllib.request, urllib.parse, http.cookiejar, sys
+
+              api = os.environ["ZEPPELIN_API_URL"].rstrip("/")
+              cj = http.cookiejar.CookieJar()
+              opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+
+              def call(method, path, data=None, form=False, timeout=30):
+                  body, headers = None, {}
+                  if data is not None:
+                      if form:
+                          body = urllib.parse.urlencode(data).encode()
+                          headers["Content-Type"] = "application/x-www-form-urlencoded"
+                      else:
+                          body = json.dumps(data).encode()
+                          headers["Content-Type"] = "application/json"
+                  req = urllib.request.Request(api + path, data=body, headers=headers, method=method)
+                  with opener.open(req, timeout=timeout) as r:
+                      return json.loads(r.read() or b"{}")
+
+              # Zeppelin may still be starting up in this same release.
+              for attempt in range(60):
+                  try:
+                      call("POST", "/api/login", {"userName": os.environ["ZEPPELIN_USER"],
+                                                  "password": os.environ["ZEPPELIN_PASSWORD"]}, form=True)
+                      break
+                  except Exception as e:
+                      print(f"waiting for zeppelin ({e}); attempt {attempt+1}/60", flush=True)
+                      time.sleep(10)
+              else:
+                  sys.exit("zeppelin never became reachable / login failed")
+
+              settings = call("GET", "/api/interpreter/setting")["body"]
+              jdbc = next(s for s in settings if s["group"] == "jdbc")
+              props = jdbc["properties"]
+
+              def setp(key, value):
+                  props.setdefault(key, {"name": key, "type": "string"})
+                  props[key]["value"] = value
+
+              db = os.environ.get("MARIADB_DATABASE", "")
+              url = "jdbc:mariadb://%s:%s/%s" % (os.environ["MARIADB_HOST"], os.environ["MARIADB_PORT"], db)
+              setp("default.driver", "org.mariadb.jdbc.Driver")
+              setp("default.url", url)
+              setp("default.user", os.environ["MARIADB_USER"])
+              setp("default.password", os.environ["MARIADB_PASSWORD"])
+
+              call("PUT", "/api/interpreter/setting/" + jdbc["id"], {
+                  "properties": props,
+                  "option": jdbc["option"],
+                  "dependencies": [{"groupArtifactVersion": os.environ["DRIVER_ARTIFACT"],
+                                    "exclusions": []}],
+              }, timeout=120)
+              print("jdbc interpreter configured for %s" % url)
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { cpu: 250m, memory: 256Mi }
+{{- end }}

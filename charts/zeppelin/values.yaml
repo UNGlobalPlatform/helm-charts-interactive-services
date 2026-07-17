@@ -81,6 +81,23 @@ git:
 discovery:
   postgresql: true
   mariadb: true
+  # Publish an onyxia/discovery "zeppelin" secret so other services (e.g. the
+  # Trade Data Tool rule engine) can find this Zeppelin without copy-pasting.
+  publish: true
+
+# JDBC target for the %jdbc interpreter. Leave empty: a MariaDB discovered in
+# the namespace (onyxia/discovery "mariadb") is wired automatically. A parent
+# chart bundling zeppelin sets these explicitly — it knows its own database at
+# render time, and a release can never look up a secret it is itself creating.
+jdbc:
+  host: ""
+  port: 3306
+  database: ""
+  username: ""
+  password: ""
+  # Maven coordinates of the MariaDB driver (the stock image ships none).
+  driverArtifact: "org.mariadb.jdbc:mariadb-java-client:3.4.1"
+  configImage: "python:3.12-slim"
 
 postgresql:
   secretName: ""

@@ -8409,6 +8409,26 @@ entries:
   trade-data-tool:
   - apiVersion: v2
     appVersion: 1.1.0
+    created: "2026-07-17T18:35:36.267308025Z"
+    description: Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web
+      UI for processing trade datasets. Provisions its database serverlessly on the
+      platform's shared MariaDB cluster and stores files in bundled MinIO or S3.
+    digest: d29852fe93abaae5dc1a9a5a124237a4f759c8183a845fd94c3d0762ca8b954c
+    home: https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataTools
+    icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/library.png
+    keywords:
+    - TradeDataTool
+    - TDT
+    - Statistics
+    name: trade-data-tool
+    sources:
+    - https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataTools
+    type: application
+    urls:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/trade-data-tool-0.1.10/trade-data-tool-0.1.10.tgz
+    version: 0.1.10
+  - apiVersion: v2
+    appVersion: 1.1.0
     created: "2026-07-16T16:39:02.237764552Z"
     description: Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web
       UI for processing trade datasets. Provisions its database serverlessly on the
@@ -13653,4 +13673,4 @@ entries:
     urls:
     - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/zeppelin-1.0.0/zeppelin-1.0.0.tgz
     version: 1.0.0
-generated: "2026-07-16T19:04:01.470366248Z"
+generated: "2026-07-17T18:35:36.269174196Z"

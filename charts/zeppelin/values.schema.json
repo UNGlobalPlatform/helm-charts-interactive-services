@@ -617,9 +617,9 @@
           "type": "string",
           "default": "changeme",
           "render": "password",
+          "description": "Sign-in password for Zeppelin (shiro). Defaults to your stable project password so it matches across relaunches and integrating services (e.g. the Trade Data Tool rule engine). overwriteSchemaWith is deliberately omitted: the platform's ide/password.json replaces this whole field and would re-inject a per-launch one-time password, overriding the value below.",
           "x-onyxia": {
-            "overwriteDefaultWith": "{{service.oneTimePassword}}",
-            "overwriteSchemaWith": "ide/password.json"
+            "overwriteDefaultWith": "{{project.password}}"
           }
         },
         "networkPolicy": {

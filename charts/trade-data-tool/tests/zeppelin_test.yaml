@@ -1,0 +1,130 @@
+suite: Zeppelin rule-engine wiring (RuleService dies without it)
+templates:
+  - secrets.yaml
+  - zeppelin-config-job.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  # The jdbc interpreter must be pointed at the tenant database with the
+  # MariaDB driver as a Maven dependency (the stock 0.12 image ships no
+  # MariaDB driver — upstream solved this with a custom image; we solve it
+  # with Zeppelin's own dependency mechanism). TDT holds every ingredient,
+  # so a post-install job PUTs the interpreter setting via Zeppelin's API.
+  - it: a zeppelin apiUrl renders the interpreter-config job
+    templates: [zeppelin-config-job.yaml]
+    set:
+      zeppelin:
+        apiUrl: "http://zeppelin-311710:8080"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: kind
+          value: Job
+      - matchRegex:
+          path: spec.template.spec.containers[0].env[?(@.name=="TDT_DB_NAME")].value
+          pattern: user_sean_mytdt
+  - it: no apiUrl renders no job
+    templates: [zeppelin-config-job.yaml]
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: suspend renders no job (culler cycles must not churn)
+    templates: [zeppelin-config-job.yaml]
+    set:
+      global:
+        suspend: true
+      zeppelin:
+        apiUrl: "http://zeppelin-311710:8080"
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: job pods carry no instance label (Onyxia readiness looks at tasks[0])
+    templates: [zeppelin-config-job.yaml]
+    set:
+      zeppelin:
+        apiUrl: "http://zeppelin-311710:8080"
+    asserts:
+      - notExists:
+          path: spec.template.metadata.labels["app.kubernetes.io/instance"]
+  # ZeppelinService's constructor runs new Uri(config["Zeppelin:APIURL"]).
+  # If the key is absent (or empty) the Uri ctor THROWS during dependency
+  # injection, which kills every RuleService endpoint with a 500 — the UI
+  # then shows the whole Rule Service as "down". So the chart must always
+  # render a syntactically valid APIURL, even when no Zeppelin is attached.
+  - it: unconfigured Zeppelin still renders a valid placeholder APIURL
+    templates: [secrets.yaml]
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"APIURL": "http://zeppelin-not-configured.invalid"'
+      # deep links degrade to an inert anchor, not a null (TrimEnd on null
+      # would NRE on the rules pages)
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"WebURL": "#"'
+  - it: configured Zeppelin lands in Zeppelin block and RuleService WebURL
+    templates: [secrets.yaml]
+    set:
+      zeppelin:
+        apiUrl: "http://zeppelin-311710:8080"
+        webUrl: "https://user-sean-abc123-0.dev.officialstatistics.org"
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"APIURL": "http://zeppelin-311710:8080"'
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"UserId": "onyxia"'
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"DefaultInterpreterGroup": "jdbc"'
+      # the web reads RuleService:WebURL (and DaprWebURL when dapr-health
+      # returns true) for the "/#/notebook/{ruleId}" deep links
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"WebURL": "https://user-sean-abc123-0.dev.officialstatistics.org"'
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"DaprWebURL": "https://user-sean-abc123-0.dev.officialstatistics.org"'
+  # Zeppelin's shiro login and TDT both default to the user's project
+  # password; when no explicit zeppelin password is given, reuse the admin
+  # one so the pairing works with zero copying.
+  - it: zeppelin password falls back to the admin (project) password
+    templates: [secrets.yaml]
+    set:
+      security:
+        admin:
+          password: "the-project-password"
+      zeppelin:
+        apiUrl: "http://zeppelin-311710:8080"
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"Zeppelin": \{[^}]*"Password": "the-project-password"'
+  - it: explicit zeppelin password wins over the fallback
+    templates: [secrets.yaml]
+    set:
+      security:
+        admin:
+          password: "the-project-password"
+      zeppelin:
+        apiUrl: "http://zeppelin-311710:8080"
+        password: "a-specific-zeppelin-password"
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"Zeppelin": \{[^}]*"Password": "a-specific-zeppelin-password"'

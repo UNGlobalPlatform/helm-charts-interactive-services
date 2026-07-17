@@ -1,0 +1,65 @@
+{{- if .Values.zeppelin.apiUrl }}
+{{/*
+`helm test <release>` verdict for the rule engine: runs the developers' real
+Asycuda rule notebooks (adapted to the single-database schema) through
+Zeppelin's REST API against this release's database, asserting both execution
+(every paragraph FINISHED) and effect (declarants resolved, products built,
+partners set, exactly the bad row raising a CIF/FOB error). See smoke/.
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "tdt.fullname" . }}-zeppelin-smoke
+  labels:
+    {{- include "tdt.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation
+data:
+  zeppelin_smoke.py: |-
+{{ .Files.Get "smoke/zeppelin_smoke.py" | indent 4 }}
+  asycuda-file-treatment.json: |-
+{{ .Files.Get "smoke/asycuda-file-treatment.json" | indent 4 }}
+  asycuda-validation.json: |-
+{{ .Files.Get "smoke/asycuda-validation.json" | indent 4 }}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "tdt.fullname" . }}-zeppelin-smoke
+  labels:
+    {{- include "tdt.labels" . | nindent 4 }}
+    app.kubernetes.io/component: zeppelin-smoke
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  restartPolicy: Never
+  automountServiceAccountToken: false
+  containers:
+    - name: smoke
+      image: {{ .Values.security.admin.seedImage | default "python:3.12-slim" }}
+      command: ["python3", "/smoke/zeppelin_smoke.py"]
+      env:
+        - name: ZEPPELIN_API_URL
+          value: {{ .Values.zeppelin.apiUrl | quote }}
+        - name: ZEPPELIN_USER
+          value: {{ .Values.zeppelin.username | default "onyxia" | quote }}
+        - name: ZEPPELIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "tdt.fullname" . }}-zeppelin
+              key: password
+        - name: NOTEBOOK_DIR
+          value: /smoke
+      volumeMounts:
+        - name: smoke
+          mountPath: /smoke
+      resources:
+        requests: { cpu: 50m, memory: 128Mi }
+        limits: { cpu: 500m, memory: 256Mi }
+  volumes:
+    - name: smoke
+      configMap:
+        name: {{ include "tdt.fullname" . }}-zeppelin-smoke
+{{- end }}

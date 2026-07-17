@@ -1,0 +1,32 @@
+suite: non-root images (v2) — port 8080 and /health probes
+templates:
+  - deployments.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  - it: every container listens on 8080 (non-root images bind an unprivileged port)
+    documentSelector:
+      path: kind
+      value: Deployment
+      matchMany: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 8080
+  - it: services are Ready only when /health answers (not merely when TCP accepts)
+    documentSelector:
+      path: spec.template.metadata.labels["app.kubernetes.io/component"]
+      value: dataservice
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+          value: /health
+  - it: the web UI still gates readiness on a real page response
+    documentSelector:
+      path: spec.template.metadata.labels["app.kubernetes.io/component"]
+      value: web
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+          value: /

@@ -38,7 +38,7 @@ spec:
           imagePullPolicy: {{ $ctx.Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8080
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: Production
@@ -67,8 +67,11 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
           {{- else }}
+          # Every service serves /health (DbHealthCheck since v2.0.0): probe the
+          # real edge, not the TCP socket — a service whose DB access is broken
+          # must not be Ready.
           readinessProbe:
-            tcpSocket: { port: http }
+            httpGet: { path: /health, port: http }
             initialDelaySeconds: 10
             periodSeconds: 15
           {{- end }}

@@ -93,3 +93,25 @@ tests:
     asserts:
       - notExists:
           path: spec.template.metadata.labels["app.kubernetes.io/instance"]
+  # A parent chart hands over its database via a tpl-rendered secret name —
+  # the only channel for render-time-derived values (subchart values are
+  # static YAML).
+  - it: existingSecret renders the job consuming the parent secret
+    templates: [job-jdbc-config.yaml]
+    set:
+      jdbc:
+        existingSecret: "{{ .Release.Name }}-jdbc-target"
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[1].secretRef.name
+          value: myzep-jdbc-target
+        documentSelector:
+          path: kind
+          value: Job
+      - notExists:
+          path: stringData.MARIADB_HOST
+        documentSelector:
+          path: kind
+          value: Secret

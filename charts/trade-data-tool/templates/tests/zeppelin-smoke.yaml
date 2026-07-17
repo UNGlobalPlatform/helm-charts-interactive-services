@@ -1,4 +1,5 @@
-{{- if .Values.zeppelin.apiUrl }}
+{{- $zepResolved := include "tdt.zeppelinResolved" . | fromJson }}
+{{- if ne $zepResolved.source "none" }}
 {{/*
 `helm test <release>` verdict for the rule engine: runs the developers' real
 Asycuda rule notebooks (adapted to the single-database schema) through
@@ -42,9 +43,9 @@ spec:
       command: ["python3", "/smoke/zeppelin_smoke.py"]
       env:
         - name: ZEPPELIN_API_URL
-          value: {{ .Values.zeppelin.apiUrl | quote }}
+          value: {{ $zepResolved.apiUrl | quote }}
         - name: ZEPPELIN_USER
-          value: {{ .Values.zeppelin.username | default "onyxia" | quote }}
+          value: {{ $zepResolved.username | quote }}
         - name: ZEPPELIN_PASSWORD
           valueFrom:
             secretKeyRef:

@@ -19,7 +19,7 @@
     "database": {
       "type": "object",
       "title": "Database",
-      "description": "Provisioned on the platform's shared MariaDB — no database pods.",
+      "description": "Provisioned on the platform's shared MariaDB \u2014 no database pods.",
       "properties": {
         "auth": {
           "type": "object",
@@ -44,7 +44,11 @@
               "title": "Connection tier",
               "description": "Maximum simultaneous database connections.",
               "default": "medium",
-              "enum": ["small", "medium", "large"]
+              "enum": [
+                "small",
+                "medium",
+                "large"
+              ]
             }
           }
         },
@@ -70,7 +74,10 @@
           "title": "Provider",
           "description": "MinIO deployed with this service (standard), or S3 with your platform credentials.",
           "default": "minio",
-          "enum": ["minio", "s3"]
+          "enum": [
+            "minio",
+            "s3"
+          ]
         },
         "minio": {
           "type": "object",
@@ -108,7 +115,12 @@
                   "type": "string",
                   "title": "MinIO volume size",
                   "default": "10Gi",
-                  "enum": ["10Gi", "20Gi", "50Gi", "100Gi"],
+                  "enum": [
+                    "10Gi",
+                    "20Gi",
+                    "50Gi",
+                    "100Gi"
+                  ],
                   "hidden": {
                     "value": "s3",
                     "path": "objectStorage/provider"
@@ -272,25 +284,6 @@
         }
       }
     },
-    "zeppelin": {
-      "type": "object",
-      "title": "Rule engine (Zeppelin)",
-      "description": "TDT runs data rules as SQL notebooks in Apache Zeppelin. Launch the zeppelin service first, then paste its URLs here. Leave empty to run without a rule engine.",
-      "properties": {
-        "apiUrl": {
-          "type": "string",
-          "title": "Zeppelin internal URL",
-          "description": "http://<zeppelin-service-name>:8080 — the service name of your running zeppelin (e.g. http://zeppelin-311710:8080).",
-          "default": ""
-        },
-        "webUrl": {
-          "type": "string",
-          "title": "Zeppelin browser URL",
-          "description": "The https address you open Zeppelin with; used for notebook links in the rules pages.",
-          "default": ""
-        }
-      }
-    },
     "security": {
       "type": "object",
       "title": "Application login",
@@ -355,6 +348,53 @@
           "x-onyxia": {
             "hidden": true,
             "overwriteDefaultWith": "{{user.lang}}"
+          }
+        }
+      }
+    },
+    "zeppelin": {
+      "type": "object",
+      "title": "Rule engine (Zeppelin)",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Include the Zeppelin rule engine",
+          "description": "Deploys a Zeppelin with this service (recommended \u2014 data rules run as SQL notebooks). Disable only to use a separately launched Zeppelin, which is found automatically.",
+          "default": true
+        },
+        "security": {
+          "type": "object",
+          "properties": {
+            "password": {
+              "type": "string",
+              "default": "changeme",
+              "render": "password",
+              "x-onyxia": {
+                "hidden": true,
+                "overwriteDefaultWith": "{{project.password}}"
+              }
+            }
+          }
+        },
+        "ingress": {
+          "type": "object",
+          "properties": {
+            "hostname": {
+              "type": "string",
+              "default": "chart-example-zeppelin.local",
+              "x-onyxia": {
+                "hidden": true,
+                "overwriteDefaultWith": "{{project.id}}-tdt-zeppelin-{{k8s.randomSubdomain}}.{{k8s.domain}}"
+              }
+            },
+            "ingressClassName": {
+              "type": "string",
+              "default": "nginx",
+              "x-onyxia": {
+                "hidden": true,
+                "overwriteDefaultWith": "{{k8s.ingressClassName}}"
+              }
+            }
           }
         }
       }

@@ -113,6 +113,7 @@ jobs:
           echo "Changed chart folders:"
           echo "${{ matrix.charts }}"
           helm plugin install https://github.com/helm-unittest/helm-unittest.git
+          helm dependency update charts/zeppelin
           helm dependency update charts/${{ matrix.charts }}
           # Charts with their own tests/ run those; the shared root suites
           # target the library-chart IDE layout (statefulset.yaml, ...).

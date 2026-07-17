@@ -1,6 +1,10 @@
-{{- if and .Values.zeppelin.apiUrl (not .Values.global.suspend) }}
+{{- $zepResolved := include "tdt.zeppelinResolved" . | fromJson }}
+{{- if and (not .Values.zeppelin.enabled) (ne $zepResolved.source "none") (not .Values.global.suspend) }}
 {{/*
-Points the attached Zeppelin's jdbc interpreter at this release's database.
+External mode only (bundled mode is handled by the subchart's own jdbc
+bootstrap via the -jdbc-target secret): points the DISCOVERED (or manually
+configured) Zeppelin's jdbc interpreter at this release's database. TDT is
+the later-launched service here, so it is the one that can see both sides.
 TDT's rules are SQL paragraphs run through that interpreter, and the stock
 Zeppelin 0.12 image ships no MariaDB driver — upstream solved this by baking
 a jar into a custom image; we declare it as a Maven dependency instead and
@@ -32,9 +36,9 @@ spec:
           image: {{ .Values.security.admin.seedImage | default "python:3.12-slim" }}
           env:
             - name: ZEPPELIN_API_URL
-              value: {{ .Values.zeppelin.apiUrl | quote }}
+              value: {{ $zepResolved.apiUrl | quote }}
             - name: ZEPPELIN_USER
-              value: {{ .Values.zeppelin.username | default "onyxia" | quote }}
+              value: {{ $zepResolved.username | quote }}
             - name: ZEPPELIN_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -52,7 +56,7 @@ spec:
                   name: {{ include "tdt.fullname" . }}-db
                   key: password
             - name: MARIADB_DRIVER_ARTIFACT
-              value: {{ .Values.zeppelin.driverArtifact | default "org.mariadb.jdbc:mariadb-java-client:3.4.1" | quote }}
+              value: {{ .Values.ruleEngine.driverArtifact | default "org.mariadb.jdbc:mariadb-java-client:3.4.1" | quote }}
           command: ["python3", "-c"]
           args:
             - |

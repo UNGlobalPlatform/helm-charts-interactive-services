@@ -117,6 +117,63 @@ namespace+name+db password so it survives helm upgrade).
 {{- end }}
 {{- end }}
 
+
+{{/*
+Resolve the rule-engine Zeppelin, as JSON {source, apiUrl, webUrl, username,
+password}. Three sources:
+- bundled (zeppelin.enabled): coordinates derived from the subchart — service
+  <release>-zeppelin on its service port, login from the coalesced subchart
+  values (Onyxia fills zeppelin.security.password with the project password).
+- manual override (ruleEngine.external.apiUrl set): for non-discovery
+  environments and helm-CLI use.
+- discovered: first onyxia/discovery "zeppelin" secret in the namespace
+  (published by the standalone zeppelin chart). lookup is render-time, so a
+  Zeppelin launched after this release is picked up on the next upgrade.
+- none: a syntactically VALID placeholder APIURL is still required —
+  ZeppelinService's ctor does new Uri(APIURL) and null/empty throws during DI,
+  500ing every RuleService endpoint.
+*/}}
+{{- define "tdt.zeppelinResolved" -}}
+{{- if .Values.zeppelin.enabled }}
+{{- $svc := printf "%s-zeppelin" .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- $port := (((.Values.zeppelin.networking).service).port | default 8080) }}
+{{- $host := ((.Values.zeppelin.ingress).hostname | default "") }}
+{{- dict "source" "bundled"
+         "apiUrl" (printf "http://%s:%v" $svc $port)
+         "webUrl" (ternary (printf "https://%s" $host) "#" (ne $host ""))
+         "username" ((.Values.zeppelin.environment).user | default "onyxia")
+         "password" ((.Values.zeppelin.security).password | default .Values.security.admin.password) | toJson }}
+{{- else if .Values.ruleEngine.external.apiUrl }}
+{{- dict "source" "external"
+         "apiUrl" .Values.ruleEngine.external.apiUrl
+         "webUrl" (.Values.ruleEngine.external.webUrl | default "#")
+         "username" (.Values.ruleEngine.external.username | default "onyxia")
+         "password" (.Values.ruleEngine.external.password | default .Values.security.admin.password) | toJson }}
+{{- else }}
+{{- $found := dict }}
+{{- range $s := (lookup "v1" "Secret" .Release.Namespace "").items }}
+{{- if and (not $found.apiUrl) (eq (index ($s.metadata.annotations | default dict) "onyxia/discovery" | default "") "zeppelin") }}
+{{- $d := $s.data }}
+{{- $svc := index $d "zeppelin-service" | default "" | b64dec }}
+{{- $port := include "tdt.b64OrRaw" (index $d "zeppelin-port" | default "ODA4MA==") }}
+{{- $found = dict "source" "discovered"
+       "apiUrl" (printf "http://%s:%s" $svc $port)
+       "webUrl" (index $d "zeppelin-web-url" | default ("#" | b64enc) | b64dec)
+       "username" (index $d "zeppelin-username" | default ("onyxia" | b64enc) | b64dec)
+       "password" (index $d "password" | default "" | b64dec) }}
+{{- end }}
+{{- end }}
+{{- if $found.apiUrl }}{{ $found | toJson }}{{- else }}{{ dict "source" "none" "apiUrl" "http://zeppelin-not-configured.invalid" "webUrl" "#" "username" "onyxia" "password" "" | toJson }}{{- end }}
+{{- end }}
+{{- end }}
+
+{{/* Digits-as-is means raw; anything else is base64 (see the zeppelin chart's
+     discoveryDecode — same defence against unencoded ports). */}}
+{{- define "tdt.b64OrRaw" -}}
+{{- $raw := . | toString -}}
+{{- if regexMatch "^[0-9]+$" $raw }}{{ $raw }}{{ else }}{{ $raw | b64dec }}{{ end -}}
+{{- end }}
+
 {{/*
 The shared appsettings.Production.json. ASP.NET merges this over each image's
 baked-in appsettings.json, so only overrides need to appear here. One file
@@ -155,16 +212,14 @@ share the same database and object store anyway.
        Service "down"). Unconfigured -> a clearly-named placeholder, so only
        the Zeppelin status degrades. WebURL feeds the "/#/notebook/<ruleId>"
        deep links; "#" keeps the razor pages' TrimEnd from an NRE. */}}
-{{- $zep := .Values.zeppelin | default dict }}
-{{- $zepApi := $zep.apiUrl | default "http://zeppelin-not-configured.invalid" }}
-{{- $zepWeb := $zep.webUrl | default "#" }}
+{{- $zep := include "tdt.zeppelinResolved" . | fromJson }}
 {{- $_ := set $cfg "Zeppelin" (dict
-      "APIURL" $zepApi
-      "UserId" ($zep.username | default "onyxia")
-      "Password" ($zep.password | default .Values.security.admin.password)
-      "DefaultInterpreterGroup" ($zep.defaultInterpreterGroup | default "jdbc")) }}
-{{- $_ := set (get $cfg "RuleService") "WebURL" $zepWeb }}
-{{- $_ := set (get $cfg "RuleService") "DaprWebURL" $zepWeb }}
+      "APIURL" $zep.apiUrl
+      "UserId" $zep.username
+      "Password" $zep.password
+      "DefaultInterpreterGroup" (.Values.ruleEngine.defaultInterpreterGroup | default "jdbc")) }}
+{{- $_ := set (get $cfg "RuleService") "WebURL" $zep.webUrl }}
+{{- $_ := set (get $cfg "RuleService") "DaprWebURL" $zep.webUrl }}
 {{- $_ := set (get $cfg "FileService") "ImportDomainBucket" .Values.objectStorage.buckets.domain }}
 {{- $_ := set (get $cfg "FileService") "ImportMetadataBucket" .Values.objectStorage.buckets.metadata }}
 {{- /* Upload rules. The images bake NO FileService section, so these have no

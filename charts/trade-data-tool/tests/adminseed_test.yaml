@@ -45,12 +45,12 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
-  - it: seed on adds the admin secret (db + admin + appsettings + minio = 4)
+  - it: seed on adds the admin secret (db + zeppelin + admin + appsettings + minio = 5)
     templates: [secrets.yaml]
     asserts:
       - hasDocuments:
-          count: 4
-  - it: disabling seed drops the admin secret (db + appsettings + minio = 3)
+          count: 5
+  - it: disabling seed drops the admin secret (db + zeppelin + appsettings + minio = 4)
     templates: [secrets.yaml]
     set:
       security:
@@ -58,7 +58,7 @@ tests:
           seed: false
     asserts:
       - hasDocuments:
-          count: 3
+          count: 4
   - it: the seed container declares cpu and memory limits (namespace ResourceQuota)
     templates: [admin-seed-job.yaml]
     asserts:

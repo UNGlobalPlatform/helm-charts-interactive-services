@@ -1,6 +1,6 @@
 # zeppelin
 
-![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.12.0](https://img.shields.io/badge/AppVersion-0.12.0-informational?style=flat-square)
+![Version: 1.3.0](https://img.shields.io/badge/Version-1.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.12.0](https://img.shields.io/badge/AppVersion-0.12.0-informational?style=flat-square)
 
 Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, Python and more.
 
@@ -64,6 +64,7 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | jdbc.configImage | string | `"python:3.12-slim"` |  |
 | jdbc.database | string | `""` |  |
 | jdbc.driverArtifact | string | `"org.mariadb.jdbc:mariadb-java-client:3.4.1"` |  |
+| jdbc.existingSecret | string | `""` |  |
 | jdbc.host | string | `""` |  |
 | jdbc.password | string | `""` |  |
 | jdbc.port | int | `3306` |  |

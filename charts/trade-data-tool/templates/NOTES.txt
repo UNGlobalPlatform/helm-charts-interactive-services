@@ -30,3 +30,18 @@
   {{ .Values.objectStorage.buckets.metadata }}, {{ .Values.objectStorage.buckets.system }} —
   your credentials must be allowed to create/use them.
 {{- end }}
+{{- $zepNotes := include "tdt.zeppelinResolved" . | fromJson }}
+{{- if eq $zepNotes.source "bundled" }}
+- Rule engine: a Zeppelin is bundled with this release. Open it at
+  https://{{ (.Values.zeppelin.ingress).hostname }} (user `{{ $zepNotes.username }}`,
+  same password as above). Rules run as SQL notebooks against this release's database.
+{{- else if eq $zepNotes.source "discovered" }}
+- Rule engine: using the Zeppelin discovered in your project ({{ $zepNotes.apiUrl }});
+  its jdbc interpreter has been pointed at this release's database.
+{{- else if eq $zepNotes.source "external" }}
+- Rule engine: using the externally configured Zeppelin ({{ $zepNotes.apiUrl }}).
+{{- else }}
+- ⚠️ Rule engine: no Zeppelin bundled or found. Rules pages will show the
+  engine as down. Launch a `zeppelin` service, then relaunch/save this service
+  to connect automatically.
+{{- end }}

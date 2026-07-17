@@ -65,6 +65,12 @@ jobs:
             git push
           fi
 
+      - name: Build subchart dependencies
+        # chart-releaser packages with --dependency-update, but packaging
+        # trade-data-tool embeds ../zeppelin as-is — zeppelin's own
+        # library-chart dependency must already sit in its charts/ dir.
+        run: helm dependency update charts/zeppelin
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
         with:

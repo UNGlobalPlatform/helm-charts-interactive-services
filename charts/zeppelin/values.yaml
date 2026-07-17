@@ -90,6 +90,12 @@ discovery:
 # chart bundling zeppelin sets these explicitly — it knows its own database at
 # render time, and a release can never look up a secret it is itself creating.
 jdbc:
+  # Name of an existing Secret holding the MARIADB_* connection keys; rendered
+  # through tpl, so a parent chart bundling zeppelin can pass
+  # '{{ .Release.Name }}-jdbc-target' and create that Secret itself with its
+  # render-time-derived database coordinates. Takes precedence over host/
+  # discovery below.
+  existingSecret: ""
   host: ""
   port: 3306
   database: ""

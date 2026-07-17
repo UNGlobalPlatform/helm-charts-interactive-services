@@ -66,6 +66,9 @@ database:
   lifecycle:
     # When true, helm uninstall keeps the database and user on the cluster.
     retainOnDelete: false
+  # Publish this release's database as an onyxia/discovery "mariadb" secret so
+  # discovery-aware services (e.g. a standalone Zeppelin) can connect to it.
+  discoverable: true
   schema:
     # Load the TDT schema (tables + stored procedures) on install/upgrade.
     bootstrap: true
@@ -137,28 +140,56 @@ objectStorage:
     system: system
 
 # The rule engine. TDT rules are SQL paragraphs in Apache Zeppelin notebooks:
-# RuleService drives Zeppelin's REST API (login, run paragraph, poll status)
-# and the web UI deep-links into Zeppelin ("/#/notebook/<ruleId>"). Launch the
-# platform's zeppelin chart beside this service and point these at it. When
-# apiUrl is left empty a syntactically valid placeholder is rendered instead —
-# ZeppelinService's constructor does new Uri(APIURL), and a null/empty value
-# throws during dependency injection, taking every RuleService endpoint down.
-zeppelin:
-  # In-cluster URL of the Zeppelin server, e.g. http://<zeppelin-release>:8080
-  apiUrl: ""
-  # Browser-facing URL of the same Zeppelin (its ingress hostname), used for
-  # the notebook deep links in the rules pages.
-  webUrl: ""
-  # Zeppelin shiro login. The zeppelin chart's single user is "onyxia"; its
-  # password defaults to the same project password as security.admin.password,
-  # so leaving password empty here means zero copy-pasting between launches.
-  username: onyxia
-  password: ""
+# RuleService drives Zeppelin's REST API (login, run paragraph, poll status),
+# CoreService's Silver pipeline runs rule paragraphs, and the web UI
+# deep-links into Zeppelin ("/#/notebook/<ruleId>"). A Zeppelin is BUNDLED
+# with this chart by default (zeppelin.enabled below) — the suite is not
+# complete without one. With bundling disabled, an existing Zeppelin in the
+# namespace is found through its onyxia/discovery secret at install time
+# (relaunch/upgrade this service after launching Zeppelin to re-discover);
+# the fields here are a manual override for non-discovery environments.
+ruleEngine:
+  external:
+    apiUrl: ""
+    webUrl: ""
+    username: ""
+    password: ""
   # Interpreter group used when TDT creates notebooks (rules are SQL -> jdbc).
   defaultInterpreterGroup: jdbc
-  # Maven coordinates of the MariaDB JDBC driver Zeppelin fetches on first use
-  # (the stock zeppelin image ships no MariaDB driver).
-  driverArtifact: "org.mariadb.jdbc:mariadb-java-client:3.4.1"
+
+# Values for the bundled Zeppelin subchart (charts/zeppelin). Everything a
+# launch needs is derived or filled by Onyxia; nothing to paste anywhere.
+zeppelin:
+  # Bundle a Zeppelin with this release (recommended — the rule engine is an
+  # integral part of TDT). Disable to use an existing Zeppelin via discovery.
+  enabled: true
+  jdbc:
+    # Hands this release's database to the subchart's jdbc bootstrap. The
+    # name is tpl-rendered inside the subchart; TDT creates the secret (see
+    # secret-jdbc-target.yaml) with its render-time-derived coordinates —
+    # subchart values are static YAML, so this is the only channel.
+    existingSecret: "{{ .Release.Name }}-jdbc-target"
+  security:
+    # Onyxia fills this with the project password (same as the TDT admin
+    # login), keeping RuleService's Zeppelin login zero-copy.
+    password: "changeme"
+  ingress:
+    enabled: true
+    hostname: chart-example-zeppelin.local
+    ingressClassName: nginx
+    useCertManager: true
+    certManagerClusterIssuer: letsencrypt-prod
+  route:
+    enabled: false
+  # The zeppelin chart's own defaults (4 CPU / 16Gi limits) are sized for
+  # heavy notebook work; the TDT rule engine only runs jdbc paragraphs.
+  resources:
+    requests:
+      cpu: 250m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
 
 security:
   jwt:

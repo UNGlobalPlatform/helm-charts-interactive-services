@@ -1,0 +1,25 @@
+suite: defaultInterpreterGroup — preselected interpreter for new notebooks
+templates:
+  - statefulset.yaml
+  # Not tested directly: statefulset.yaml computes checksum annotations by
+  # including this file, so helm-unittest must parse it too.
+  - secret-shiro.yaml
+tests:
+  - it: unset by default (image default, spark, applies)
+    templates: [statefulset.yaml]
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: ZEPPELIN_INTERPRETER_GROUP_DEFAULT
+          any: true
+  - it: setting it exports zeppelin.interpreter.group.default
+    templates: [statefulset.yaml]
+    set:
+      defaultInterpreterGroup: jdbc
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: ZEPPELIN_INTERPRETER_GROUP_DEFAULT
+            value: jdbc

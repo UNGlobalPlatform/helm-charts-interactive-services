@@ -35,6 +35,12 @@ init:
 #     value: "bar"
 extraEnvVars: []
 
+# Interpreter group preselected for new notebooks in the UI
+# (zeppelin.interpreter.group.default; Zeppelin's stock default is spark).
+# Empty keeps the image default. A parent chart bundling this one sets it to
+# match its workload — e.g. trade-data-tool sets jdbc, since its rules are SQL.
+defaultInterpreterGroup: ""
+
 environment:
   user: onyxia
   group: users

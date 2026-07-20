@@ -58,7 +58,7 @@
             "retainOnDelete": {
               "type": "boolean",
               "title": "Keep data on deletion",
-              "description": "When enabled, the database and user survive service deletion.",
+              "description": "When enabled, the database survives deletion of this service. Insurance against accidental deletion: recovering it into a new launch requires a platform administrator.",
               "default": false
             }
           }
@@ -129,7 +129,7 @@
                 "retainOnDelete": {
                   "type": "boolean",
                   "title": "Keep files on deletion",
-                  "description": "When enabled, the MinIO volume (your uploaded files) survives service deletion.",
+                  "description": "When enabled, your uploaded files survive deletion of this service. Insurance against accidental deletion: recovering them into a new launch requires a platform administrator.",
                   "default": false,
                   "hidden": {
                     "value": "s3",
@@ -396,7 +396,7 @@
             "retainOnDelete": {
               "type": "boolean",
               "title": "Keep rule notebooks on deletion",
-              "description": "When enabled, the Zeppelin notebook volume (your data rules) survives service deletion.",
+              "description": "When enabled, your rule notebooks survive deletion of this service. Insurance against accidental deletion: recovering them into a new launch requires a platform administrator.",
               "default": false,
               "hidden": {
                 "value": false,

@@ -173,6 +173,11 @@ zeppelin:
     # Onyxia fills this with the project password (same as the TDT admin
     # login), keeping RuleService's Zeppelin login zero-copy.
     password: "changeme"
+  # New notebooks created by hand in the Zeppelin UI default to %jdbc — TDT
+  # rules are SQL, and Zeppelin's stock default is spark. Keep in sync with
+  # ruleEngine.defaultInterpreterGroup above (a subchart can't read the
+  # parent's values, so the value is repeated here).
+  defaultInterpreterGroup: jdbc
   persistence:
     # Rule notebooks and interpreter state live on this volume. It MUST stay
     # enabled: the platform culler suspends services after ~12h (pods deleted,

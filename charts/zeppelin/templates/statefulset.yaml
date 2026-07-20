@@ -167,6 +167,10 @@ spec:
             # restart.
             - name: ZEPPELIN_CONFIG_FS_DIR
               value: /opt/zeppelin/conf-storage
+            {{- if .Values.defaultInterpreterGroup }}
+            - name: ZEPPELIN_INTERPRETER_GROUP_DEFAULT
+              value: {{ .Values.defaultInterpreterGroup | quote }}
+            {{- end }}
             {{- if .Values.init.regionInit }}
             - name: REGION_INIT_SCRIPT
               value: {{ .Values.init.regionInit }}

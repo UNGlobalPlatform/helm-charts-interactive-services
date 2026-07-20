@@ -1,15 +1,15 @@
-# zeppelin
+# jupyter-pytorch
 
-![Version: 1.4.0](https://img.shields.io/badge/Version-1.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.12.0](https://img.shields.io/badge/AppVersion-0.12.0-informational?style=flat-square)
+![Version: 2.3.60](https://img.shields.io/badge/Version-2.3.60-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, Python and more.
+The JupyterLab IDE with Python and the deep-learning framework PyTorch.
 
-**Homepage:** <https://zeppelin.apache.org/>
+**Homepage:** <https://jupyter.org/>
 
 ## Source Code
 
-* <https://github.com/apache/zeppelin>
-* <https://github.com/UNGlobalPlatform/helm-charts-interactive-services>
+* <https://github.com/InseeFrLab/images-datascience>
+* <https://github.com/InseeFrLab/helm-charts-interactive-services>
 
 ## Requirements
 
@@ -27,9 +27,14 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
 | certificates | object | `{}` |  |
-| discovery.mariadb | bool | `true` |  |
+| chromadb.secretName | string | `""` |  |
+| coresite.secretName | string | `""` |  |
+| discovery.chromadb | bool | `true` |  |
+| discovery.hive | bool | `true` |  |
+| discovery.metaflow | bool | `true` |  |
+| discovery.milvus | bool | `true` |  |
+| discovery.mlflow | bool | `true` |  |
 | discovery.postgresql | bool | `true` |  |
-| discovery.publish | bool | `true` |  |
 | environment.group | string | `"users"` |  |
 | environment.user | string | `"onyxia"` |  |
 | extraEnvVars | list | `[]` |  |
@@ -44,6 +49,7 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | git.sshKnownHosts | string | `""` |  |
 | git.token | string | `""` |  |
 | global.suspend | bool | `false` |  |
+| hive.secretName | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | list | `[]` |  |
 | ingress.certManagerClusterIssuer | string | `""` |  |
@@ -61,22 +67,16 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | init.personalInitArgs | string | `""` |  |
 | init.regionInit | string | `""` |  |
 | init.standardInitPath | string | `"/opt/onyxia-init.sh"` |  |
-| jdbc.configImage | string | `"python:3.12-slim"` |  |
-| jdbc.database | string | `""` |  |
-| jdbc.driverArtifact | string | `"org.mariadb.jdbc:mariadb-java-client:3.4.1"` |  |
-| jdbc.existingSecret | string | `""` |  |
-| jdbc.host | string | `""` |  |
-| jdbc.password | string | `""` |  |
-| jdbc.port | int | `3306` |  |
-| jdbc.username | string | `""` |  |
 | kubernetes.enabled | bool | `false` |  |
 | kubernetes.role | string | `"view"` |  |
-| mariadb.secretName | string | `""` |  |
 | message.en | string | `""` |  |
 | message.fr | string | `""` |  |
+| metaflow.secretName | string | `""` |  |
+| milvus.secretName | string | `""` |  |
+| mlflow.secretName | string | `""` |  |
 | nameOverride | string | `""` |  |
 | networking.clusterIP | string | `"None"` |  |
-| networking.service.port | int | `8080` |  |
+| networking.service.port | int | `8888` |  |
 | networking.sparkui.port | int | `4040` |  |
 | networking.type | string | `"ClusterIP"` |  |
 | networking.user.enabled | bool | `false` |  |
@@ -86,17 +86,19 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | openshiftSCC.enabled | bool | `false` |  |
 | openshiftSCC.scc | string | `""` |  |
 | persistence.accessMode | string | `"ReadWriteOnce"` |  |
-| persistence.enabled | bool | `true` |  |
-| persistence.retainOnDelete | bool | `false` |  |
+| persistence.enabled | bool | `false` |  |
 | persistence.size | string | `"10Gi"` |  |
 | podAnnotations | object | `{}` |  |
-| podSecurityContext.fsGroup | int | `1000` |  |
+| podSecurityContext.fsGroup | int | `100` |  |
 | postgresql.secretName | string | `""` |  |
 | proxy.enabled | bool | `false` |  |
 | proxy.httpProxy | string | `""` |  |
 | proxy.httpsProxy | string | `""` |  |
 | proxy.noProxy | string | `""` |  |
 | replicaCount | int | `1` |  |
+| repository.condaRepository | string | `""` |  |
+| repository.configMapName | string | `""` |  |
+| repository.pipRepository | string | `""` |  |
 | resources.limits.cpu | string | `"4000m"` |  |
 | resources.limits.memory | string | `"16Gi"` |  |
 | resources.requests.cpu | string | `"1000m"` |  |
@@ -123,9 +125,9 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | security.password | string | `"changeme"` |  |
 | securityContext | object | `{}` |  |
 | service.image.custom.enabled | bool | `false` |  |
-| service.image.custom.version | string | `"apache/zeppelin:0.12.0"` |  |
+| service.image.custom.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-jupyter-pytorch:py3.11.14"` |  |
 | service.image.pullPolicy | string | `"IfNotPresent"` |  |
-| service.image.version | string | `"apache/zeppelin:0.12.0"` |  |
+| service.image.version | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-jupyter-pytorch:py3.11.14"` |  |
 | service.initContainer.image | string | `"inseefrlab/onyxia-base:latest"` |  |
 | service.initContainer.pullPolicy | string | `"IfNotPresent"` |  |
 | serviceAccount.annotations | object | `{}` |  |
@@ -142,6 +144,7 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | sparkConnect.keda.enabled | bool | `true` |  |
 | sparkConnect.logLevel | string | `"WARN"` |  |
 | sparkConnect.pysparkVersion | string | `"3.5.0"` |  |
+| sparkConnect.pythonImage | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-jupyter-python:py3.11.14"` |  |
 | sparkConnect.sedonaVersion | string | `"1.7.0"` |  |
 | sparkConnect.server.resources.limits.cpu | string | `"8"` |  |
 | sparkConnect.server.resources.limits.memory | string | `"24Gi"` |  |
@@ -154,6 +157,13 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | startupProbe.successThreshold | int | `1` |  |
 | startupProbe.timeoutSeconds | int | `2` |  |
 | tolerations | list | `[]` |  |
+| userPreferences.aiAssistant.apiBase | string | `""` |  |
+| userPreferences.aiAssistant.apiKey | string | `""` |  |
+| userPreferences.aiAssistant.embeddingsProvider | string | `""` |  |
+| userPreferences.aiAssistant.enabled | bool | `false` |  |
+| userPreferences.aiAssistant.modelProvider | string | `""` |  |
+| userPreferences.aiAssistant.secretName | string | `""` |  |
+| userPreferences.darkMode | bool | `false` |  |
 | userPreferences.language | string | `"en"` |  |
 | vault.directory | string | `""` |  |
 | vault.enabled | bool | `false` |  |

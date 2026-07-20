@@ -161,6 +161,12 @@ spec:
               value: "false"
             - name: ZEPPELIN_NOTEBOOK_DIR
               value: /opt/zeppelin/notebook
+            # Route ConfigStorage (interpreter.json, notebook-authorization.json,
+            # credentials.json) onto the home volume; its default is the conf
+            # dir, which lives on the container filesystem and is lost on every
+            # restart.
+            - name: ZEPPELIN_CONFIG_FS_DIR
+              value: /opt/zeppelin/conf-storage
             {{- if .Values.init.regionInit }}
             - name: REGION_INIT_SCRIPT
               value: {{ .Values.init.regionInit }}
@@ -239,6 +245,9 @@ spec:
               name: home
             - mountPath: /opt/zeppelin/local-repo
               subPath: local-repo
+              name: home
+            - mountPath: /opt/zeppelin/conf-storage
+              subPath: conf-storage
               name: home
             - name: shiro
               mountPath: /opt/zeppelin/conf/shiro.ini

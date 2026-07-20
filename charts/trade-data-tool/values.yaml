@@ -173,6 +173,18 @@ zeppelin:
     # Onyxia fills this with the project password (same as the TDT admin
     # login), keeping RuleService's Zeppelin login zero-copy.
     password: "changeme"
+  persistence:
+    # Rule notebooks and interpreter state live on this volume. It MUST stay
+    # enabled: the platform culler suspends services after ~12h (pods deleted,
+    # volumes kept), and without it every suspend cycle silently deletes the
+    # users' rules. Stated explicitly here even though 1.4.0's subchart
+    # default is also true.
+    enabled: true
+    size: 10Gi
+    # When true, helm uninstall keeps the notebook volume; a reinstall under
+    # the same release name adopts it back. Mirrors the database and MinIO
+    # retainOnDelete flags.
+    retainOnDelete: false
   ingress:
     enabled: true
     hostname: chart-example-zeppelin.local

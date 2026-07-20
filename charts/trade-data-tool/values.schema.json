@@ -376,6 +376,35 @@
             }
           }
         },
+        "persistence": {
+          "type": "object",
+          "properties": {
+            "size": {
+              "type": "string",
+              "title": "Rule notebook volume size",
+              "default": "10Gi",
+              "enum": [
+                "10Gi",
+                "20Gi",
+                "50Gi"
+              ],
+              "hidden": {
+                "value": false,
+                "path": "zeppelin/enabled"
+              }
+            },
+            "retainOnDelete": {
+              "type": "boolean",
+              "title": "Keep rule notebooks on deletion",
+              "description": "When enabled, the Zeppelin notebook volume (your data rules) survives service deletion.",
+              "default": false,
+              "hidden": {
+                "value": false,
+                "path": "zeppelin/enabled"
+              }
+            }
+          }
+        },
         "ingress": {
           "type": "object",
           "properties": {

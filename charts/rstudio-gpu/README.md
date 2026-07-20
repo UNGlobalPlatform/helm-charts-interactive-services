@@ -1,15 +1,15 @@
-# zeppelin
+# rstudio-gpu
 
-![Version: 1.4.1](https://img.shields.io/badge/Version-1.4.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.12.0](https://img.shields.io/badge/AppVersion-0.12.0-informational?style=flat-square)
+![Version: 2.3.49](https://img.shields.io/badge/Version-2.3.49-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, Python and more.
+The RStudio IDE with a collection of standard data science packages, with GPU support.
 
-**Homepage:** <https://zeppelin.apache.org/>
+**Homepage:** <https://www.rstudio.com/>
 
 ## Source Code
 
-* <https://github.com/apache/zeppelin>
-* <https://github.com/UNGlobalPlatform/helm-charts-interactive-services>
+* <https://github.com/InseeFrLab/images-datascience>
+* <https://github.com/InseeFrLab/helm-charts-interactive-services>
 
 ## Requirements
 
@@ -26,11 +26,7 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | autoscaling.maxReplicas | int | `100` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
-| certificates | object | `{}` |  |
-| defaultInterpreterGroup | string | `""` |  |
-| discovery.mariadb | bool | `true` |  |
 | discovery.postgresql | bool | `true` |  |
-| discovery.publish | bool | `true` |  |
 | environment.group | string | `"users"` |  |
 | environment.user | string | `"onyxia"` |  |
 | extraEnvVars | list | `[]` |  |
@@ -50,7 +46,6 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | ingress.certManagerClusterIssuer | string | `""` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hostname | string | `"chart-example.local"` |  |
-| ingress.ingressClassName | string | `""` |  |
 | ingress.path | string | `"/"` |  |
 | ingress.tls | bool | `true` |  |
 | ingress.tlsSecretName | string | `""` |  |
@@ -62,22 +57,13 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | init.personalInitArgs | string | `""` |  |
 | init.regionInit | string | `""` |  |
 | init.standardInitPath | string | `"/opt/onyxia-init.sh"` |  |
-| jdbc.configImage | string | `"python:3.12-slim"` |  |
-| jdbc.database | string | `""` |  |
-| jdbc.driverArtifact | string | `"org.mariadb.jdbc:mariadb-java-client:3.4.1"` |  |
-| jdbc.existingSecret | string | `""` |  |
-| jdbc.host | string | `""` |  |
-| jdbc.password | string | `""` |  |
-| jdbc.port | int | `3306` |  |
-| jdbc.username | string | `""` |  |
-| kubernetes.enabled | bool | `false` |  |
+| kubernetes.enabled | bool | `true` |  |
 | kubernetes.role | string | `"view"` |  |
-| mariadb.secretName | string | `""` |  |
 | message.en | string | `""` |  |
 | message.fr | string | `""` |  |
 | nameOverride | string | `""` |  |
 | networking.clusterIP | string | `"None"` |  |
-| networking.service.port | int | `8080` |  |
+| networking.service.port | int | `8787` |  |
 | networking.sparkui.port | int | `4040` |  |
 | networking.type | string | `"ClusterIP"` |  |
 | networking.user.enabled | bool | `false` |  |
@@ -88,16 +74,18 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | openshiftSCC.scc | string | `""` |  |
 | persistence.accessMode | string | `"ReadWriteOnce"` |  |
 | persistence.enabled | bool | `true` |  |
-| persistence.retainOnDelete | bool | `false` |  |
 | persistence.size | string | `"10Gi"` |  |
 | podAnnotations | object | `{}` |  |
-| podSecurityContext.fsGroup | int | `1000` |  |
+| podSecurityContext.fsGroup | int | `100` |  |
 | postgresql.secretName | string | `""` |  |
 | proxy.enabled | bool | `false` |  |
 | proxy.httpProxy | string | `""` |  |
 | proxy.httpsProxy | string | `""` |  |
 | proxy.noProxy | string | `""` |  |
 | replicaCount | int | `1` |  |
+| repository.configMapName | string | `""` |  |
+| repository.packageManagerUrl | string | `""` |  |
+| repository.rRepository | string | `""` |  |
 | resources.limits.cpu | string | `"4000m"` |  |
 | resources.limits.memory | string | `"16Gi"` |  |
 | resources.requests.cpu | string | `"1000m"` |  |
@@ -124,9 +112,9 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | security.password | string | `"changeme"` |  |
 | securityContext | object | `{}` |  |
 | service.image.custom.enabled | bool | `false` |  |
-| service.image.custom.version | string | `"apache/zeppelin:0.12.0"` |  |
+| service.image.custom.version | string | `"inseefrlab/onyxia-rstudio:r4.5.1-gpu"` |  |
 | service.image.pullPolicy | string | `"IfNotPresent"` |  |
-| service.image.version | string | `"apache/zeppelin:0.12.0"` |  |
+| service.image.version | string | `"inseefrlab/onyxia-rstudio:r4.5.1-gpu"` |  |
 | service.initContainer.image | string | `"inseefrlab/onyxia-base:latest"` |  |
 | service.initContainer.pullPolicy | string | `"IfNotPresent"` |  |
 | serviceAccount.annotations | object | `{}` |  |
@@ -137,11 +125,10 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | sparkConnect.executor.cores | string | `"2"` |  |
 | sparkConnect.executor.maxExecutors | string | `"25"` |  |
 | sparkConnect.executor.memory | string | `"4g"` |  |
-| sparkConnect.executor.memoryOverhead | string | `"3g"` |  |
+| sparkConnect.executor.memoryOverhead | string | `"1g"` |  |
 | sparkConnect.h3Version | string | `"4.4.2"` |  |
 | sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.9.0-python311"` |  |
 | sparkConnect.keda.enabled | bool | `true` |  |
-| sparkConnect.logLevel | string | `"WARN"` |  |
 | sparkConnect.pysparkVersion | string | `"3.5.0"` |  |
 | sparkConnect.sedonaVersion | string | `"1.7.0"` |  |
 | sparkConnect.server.resources.limits.cpu | string | `"8"` |  |
@@ -155,6 +142,7 @@ Apache Zeppelin, a web-based notebook for interactive data analytics with SQL, P
 | startupProbe.successThreshold | int | `1` |  |
 | startupProbe.timeoutSeconds | int | `2` |  |
 | tolerations | list | `[]` |  |
+| userPreferences.darkMode | bool | `false` |  |
 | userPreferences.language | string | `"en"` |  |
 | vault.directory | string | `""` |  |
 | vault.enabled | bool | `false` |  |

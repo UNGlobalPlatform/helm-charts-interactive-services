@@ -201,7 +201,16 @@ resources:
     memory: "16Gi"
 
 persistence:
-  enabled: false
+  # Notebooks, interpreter settings, note permissions and credentials all live
+  # on this volume; without it every pod restart (including a platform
+  # suspend/resume cycle) silently discards the user's work. Enabled here in
+  # values so the default holds on every install path — the Onyxia schema
+  # default only applies to direct catalog launches, not when this chart is
+  # bundled as a subchart (e.g. inside trade-data-tool).
+  enabled: true
+  # When true, helm uninstall keeps the volume (and the notebooks on it); a
+  # reinstall under the same release name adopts it back.
+  retainOnDelete: false
   ## database data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning

@@ -1,0 +1,68 @@
+suite: persistence — notebooks and config state survive restarts by default
+templates:
+  - pvc.yaml
+  - statefulset.yaml
+  # Not tested directly: statefulset.yaml computes checksum annotations by
+  # including this file, so helm-unittest must parse it too.
+  - secret-shiro.yaml
+tests:
+  - it: creates a PVC by default (no accidental notebook loss)
+    templates: [pvc.yaml]
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: kind
+          value: PersistentVolumeClaim
+      - equal:
+          path: spec.resources.requests.storage
+          value: 10Gi
+      - notExists:
+          path: metadata.annotations
+  - it: mounts the home volume as a PVC by default
+    templates: [statefulset.yaml]
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0].name
+          value: home
+      - exists:
+          path: spec.template.spec.volumes[0].persistentVolumeClaim
+  - it: routes ConfigStorage onto the home volume
+    templates: [statefulset.yaml]
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: ZEPPELIN_CONFIG_FS_DIR
+            value: /opt/zeppelin/conf-storage
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            mountPath: /opt/zeppelin/conf-storage
+            subPath: conf-storage
+            name: home
+  - it: retainOnDelete adds the helm keep policy
+    templates: [pvc.yaml]
+    set:
+      persistence:
+        retainOnDelete: true
+    asserts:
+      - equal:
+          path: metadata.annotations["helm.sh/resource-policy"]
+          value: keep
+  - it: persistence can still be disabled (falls back to emptyDir)
+    templates: [statefulset.yaml]
+    set:
+      persistence:
+        enabled: false
+    asserts:
+      - exists:
+          path: spec.template.spec.volumes[0].emptyDir
+  - it: disabling persistence renders no PVC
+    templates: [pvc.yaml]
+    set:
+      persistence:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0

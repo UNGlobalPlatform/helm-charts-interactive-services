@@ -8409,6 +8409,31 @@ entries:
   trade-data-tool:
   - apiVersion: v2
     appVersion: 2.1.0
+    created: "2026-07-20T19:52:31.665442385Z"
+    dependencies:
+    - condition: zeppelin.enabled
+      name: zeppelin
+      repository: file://../zeppelin
+      version: 1.4.1
+    description: Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web
+      UI for processing trade datasets. Provisions its database serverlessly on the
+      platform's shared MariaDB cluster and stores files in bundled MinIO or S3.
+    digest: b74b9f038a8c101897a16838a69c7549574c6acb816b6431f3f45e7a25a46a29
+    home: https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataTools
+    icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/library.png
+    keywords:
+    - TradeDataTool
+    - TDT
+    - Statistics
+    name: trade-data-tool
+    sources:
+    - https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataTools
+    type: application
+    urls:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/trade-data-tool-0.3.2/trade-data-tool-0.3.2.tgz
+    version: 0.3.2
+  - apiVersion: v2
+    appVersion: 2.1.0
     created: "2026-07-20T19:05:52.284763107Z"
     dependencies:
     - condition: zeppelin.enabled
@@ -13695,6 +13720,31 @@ entries:
   zeppelin:
   - apiVersion: v2
     appVersion: 0.12.0
+    created: "2026-07-20T19:52:31.839998074Z"
+    dependencies:
+    - name: library-chart
+      repository: https://inseefrlab.github.io/helm-charts-interactive-services
+      version: 1.7.14
+    description: Apache Zeppelin, a web-based notebook for interactive data analytics
+      with SQL, Python and more.
+    digest: e3ad25b4a6c9bde562c9d470c92f2f409d72a32c8aa9ce058d1686d719cbde13
+    home: https://zeppelin.apache.org/
+    icon: https://zeppelin.apache.org/assets/themes/zeppelin/img/zeppelin_classic_logo.png
+    keywords:
+    - Zeppelin
+    - Notebook
+    - Python
+    - SQL
+    name: zeppelin
+    sources:
+    - https://github.com/apache/zeppelin
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services
+    type: application
+    urls:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/zeppelin-1.4.1/zeppelin-1.4.1.tgz
+    version: 1.4.1
+  - apiVersion: v2
+    appVersion: 0.12.0
     created: "2026-07-20T19:05:52.41381047Z"
     dependencies:
     - name: library-chart
@@ -13843,4 +13893,4 @@ entries:
     urls:
     - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/zeppelin-1.0.0/zeppelin-1.0.0.tgz
     version: 1.0.0
-generated: "2026-07-20T19:05:52.415234281Z"
+generated: "2026-07-20T19:52:31.840894017Z"

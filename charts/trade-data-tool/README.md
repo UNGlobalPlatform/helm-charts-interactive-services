@@ -1,6 +1,6 @@
 # trade-data-tool
 
-![Version: 0.4.1](https://img.shields.io/badge/Version-0.4.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.3.1](https://img.shields.io/badge/AppVersion-2.3.1-informational?style=flat-square)
+![Version: 0.4.2](https://img.shields.io/badge/Version-0.4.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.3.2](https://img.shields.io/badge/AppVersion-2.3.2-informational?style=flat-square)
 
 Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web UI for processing trade datasets. Provisions its database serverlessly on the platform's shared MariaDB cluster and stores files in bundled MinIO or S3.
 
@@ -33,7 +33,7 @@ Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web UI for proc
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.pullSecretName | string | `""` |  |
 | image.registry | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/tdt"` |  |
-| image.tag | string | `"v2.3.1"` |  |
+| image.tag | string | `"v2.3.2"` |  |
 | ingress.certManagerClusterIssuer | string | `"letsencrypt-prod"` |  |
 | ingress.enabled | bool | `true` |  |
 | ingress.hostname | string | `"chart-example.local"` |  |

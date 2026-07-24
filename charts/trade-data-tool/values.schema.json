@@ -229,7 +229,7 @@
               "render": "slider",
               "title": "CPU request",
               "sliderMin": 50,
-              "sliderMax": 2000,
+              "sliderMax": 1000,
               "sliderStep": 50,
               "sliderUnit": "m",
               "x-onyxia": {
@@ -242,7 +242,7 @@
               "render": "slider",
               "title": "Memory request",
               "sliderMin": 256,
-              "sliderMax": 8192,
+              "sliderMax": 2048,
               "sliderStep": 256,
               "sliderUnit": "Mi",
               "x-onyxia": {
@@ -260,7 +260,7 @@
               "render": "slider",
               "title": "CPU limit",
               "sliderMin": 100,
-              "sliderMax": 4000,
+              "sliderMax": 1500,
               "sliderStep": 100,
               "sliderUnit": "m",
               "x-onyxia": {
@@ -273,7 +273,7 @@
               "render": "slider",
               "title": "Memory limit",
               "sliderMin": 512,
-              "sliderMax": 16384,
+              "sliderMax": 4096,
               "sliderStep": 512,
               "sliderUnit": "Mi",
               "x-onyxia": {

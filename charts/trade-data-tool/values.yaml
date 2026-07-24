@@ -7,7 +7,7 @@ global:
 image:
   registry: 142496269814.dkr.ecr.us-west-2.amazonaws.com/tdt
   # One tag for every service image (built together from the same commit).
-  tag: "v2.3.2"
+  tag: "v2.4.0"
   pullPolicy: IfNotPresent
   # Name of an existing docker-registry Secret in the release namespace, if the
   # registry is private.

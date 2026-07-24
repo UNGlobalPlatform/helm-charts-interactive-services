@@ -8409,6 +8409,31 @@ entries:
   trade-data-tool:
   - apiVersion: v2
     appVersion: 2.4.0
+    created: "2026-07-24T20:36:49.301776044Z"
+    dependencies:
+    - condition: zeppelin.enabled
+      name: zeppelin
+      repository: file://../zeppelin
+      version: 1.4.1
+    description: Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web
+      UI for processing trade datasets. Provisions its database serverlessly on the
+      platform's shared MariaDB cluster and stores files in bundled MinIO or S3.
+    digest: 2522b22e006e5d665779d9dbf9f5832b000133b9a7d413ff59ecacf85c48aa0b
+    home: https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataTools
+    icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/library.png
+    keywords:
+    - TradeDataTool
+    - TDT
+    - Statistics
+    name: trade-data-tool
+    sources:
+    - https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataTools
+    type: application
+    urls:
+    - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/trade-data-tool-0.5.3/trade-data-tool-0.5.3.tgz
+    version: 0.5.3
+  - apiVersion: v2
+    appVersion: 2.4.0
     created: "2026-07-24T20:32:17.515230911Z"
     dependencies:
     - condition: zeppelin.enabled
@@ -14018,4 +14043,4 @@ entries:
     urls:
     - https://github.com/UNGlobalPlatform/helm-charts-interactive-services/releases/download/zeppelin-1.0.0/zeppelin-1.0.0.tgz
     version: 1.0.0
-generated: "2026-07-24T20:32:17.515924975Z"
+generated: "2026-07-24T20:36:49.302561012Z"

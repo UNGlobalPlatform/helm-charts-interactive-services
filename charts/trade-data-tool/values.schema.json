@@ -135,9 +135,9 @@
                   "title": "Keep files on deletion",
                   "description": "When enabled, your uploaded files survive deletion of this service. Insurance against accidental deletion: recovering them into a new launch requires a platform administrator.",
                   "default": false,
-                  "hidden": {
-                    "value": "s3",
-                    "path": "objectStorage/provider"
+                  "x-onyxia": {
+                    "hidden": true,
+                    "overwriteDefaultWith": "false"
                   }
                 }
               }
@@ -402,9 +402,9 @@
               "title": "Keep rule notebooks on deletion",
               "description": "When enabled, your rule notebooks survive deletion of this service. Insurance against accidental deletion: recovering them into a new launch requires a platform administrator.",
               "default": false,
-              "hidden": {
-                "value": false,
-                "path": "zeppelin/enabled"
+              "x-onyxia": {
+                "hidden": true,
+                "overwriteDefaultWith": "false"
               }
             }
           }

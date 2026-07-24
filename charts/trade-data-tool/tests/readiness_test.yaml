@@ -3,7 +3,7 @@ release:
   name: trade-data-tool-729632
   namespace: user-r2levukldq
 tests:
-  - it: the readiness marker is labelled as an Onyxia task and gates on the web URL
+  - it: the readiness marker is labelled as an Onyxia task and gates on every service
     templates: [readiness.yaml]
     asserts:
       - isKind:
@@ -15,9 +15,22 @@ tests:
       - equal:
           path: spec.template.metadata.labels["app.kubernetes.io/instance"]
           value: trade-data-tool-729632
-      # probe hits the web Service, not itself
+      # probe hits every backend's /health plus the web Service, not itself
       - matchRegex:
           path: spec.template.spec.containers[0].readinessProbe.exec.command[2]
+          pattern: "trade-data-tool-729632-web:7108/"
+      - matchRegex:
+          path: spec.template.spec.containers[0].readinessProbe.exec.command[2]
+          pattern: "trade-data-tool-729632-coreservice:6912/health"
+      - matchRegex:
+          path: spec.template.spec.containers[0].readinessProbe.exec.command[2]
+          pattern: "trade-data-tool-729632-userservice:6904/health"
+      # the init container waits for the same full set before the marker starts
+      - matchRegex:
+          path: spec.template.spec.initContainers[0].args[0]
+          pattern: "trade-data-tool-729632-ruleengineservice:8402/health"
+      - matchRegex:
+          path: spec.template.spec.initContainers[0].args[0]
           pattern: "trade-data-tool-729632-web:7108/"
   - it: the marker pod name sorts before every service pod (so it is tasks[0])
     templates: [readiness.yaml]

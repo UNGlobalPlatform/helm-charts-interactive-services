@@ -13,7 +13,7 @@ home: https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataT
 sources:
   - https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataTools
 type: application
-version: 0.5.1
+version: 0.5.2
 appVersion: "2.4.0"
 dependencies:
   - name: zeppelin

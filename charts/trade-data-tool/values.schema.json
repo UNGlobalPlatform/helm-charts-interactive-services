@@ -59,7 +59,11 @@
               "type": "boolean",
               "title": "Keep data on deletion",
               "description": "When enabled, the database survives deletion of this service. Insurance against accidental deletion: recovering it into a new launch requires a platform administrator.",
-              "default": false
+              "default": false,
+              "x-onyxia": {
+                "hidden": true,
+                "overwriteDefaultWith": "false"
+              }
             }
           }
         }

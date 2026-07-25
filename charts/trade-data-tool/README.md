@@ -1,6 +1,6 @@
 # trade-data-tool
 
-![Version: 0.5.4](https://img.shields.io/badge/Version-0.5.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.4.0](https://img.shields.io/badge/AppVersion-2.4.0-informational?style=flat-square)
+![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.4.0](https://img.shields.io/badge/AppVersion-2.4.0-informational?style=flat-square)
 
 Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web UI for processing trade datasets. Provisions its database serverlessly on the platform's shared MariaDB cluster and stores files in bundled MinIO or S3.
 
@@ -64,8 +64,8 @@ Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web UI for proc
 | objectStorage.s3.workingDirectoryPath | string | `""` |  |
 | readiness.enabled | bool | `true` |  |
 | readiness.image | string | `"busybox:1.36"` |  |
-| resources.limits.cpu | string | `"1000m"` |  |
-| resources.limits.memory | string | `"1024Mi"` |  |
+| resources.limits.cpu | string | `"500m"` |  |
+| resources.limits.memory | string | `"512Mi"` |  |
 | resources.requests.cpu | string | `"50m"` |  |
 | resources.requests.memory | string | `"256Mi"` |  |
 | ruleEngine.defaultInterpreterGroup | string | `"jdbc"` |  |
@@ -80,6 +80,10 @@ Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web UI for proc
 | security.jwt.key | string | `""` |  |
 | services.coreservice.image | string | `"core-service"` |  |
 | services.coreservice.port | int | `6912` |  |
+| services.coreservice.resources.limits.cpu | string | `"2000m"` |  |
+| services.coreservice.resources.limits.memory | string | `"1Gi"` |  |
+| services.coreservice.resources.requests.cpu | string | `"100m"` |  |
+| services.coreservice.resources.requests.memory | string | `"256Mi"` |  |
 | services.dataservice.image | string | `"data-service"` |  |
 | services.dataservice.port | int | `6901` |  |
 | services.domainservice.image | string | `"domain-service"` |  |
@@ -98,6 +102,10 @@ Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web UI for proc
 | userPreferences.language | string | `"en"` |  |
 | web.image | string | `"web-app"` |  |
 | web.port | int | `7108` |  |
+| web.resources.limits.cpu | string | `"500m"` |  |
+| web.resources.limits.memory | string | `"1Gi"` |  |
+| web.resources.requests.cpu | string | `"50m"` |  |
+| web.resources.requests.memory | string | `"256Mi"` |  |
 | zeppelin.defaultInterpreterGroup | string | `"jdbc"` |  |
 | zeppelin.enabled | bool | `true` |  |
 | zeppelin.ingress.certManagerClusterIssuer | string | `"letsencrypt-prod"` |  |

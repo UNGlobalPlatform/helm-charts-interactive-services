@@ -223,6 +223,7 @@
     "resources": {
       "type": "object",
       "title": "Resources per service",
+      "description": "Applies to each app service without its own resources block in values (coreservice and web carry rebalanced per-service defaults).",
       "properties": {
         "requests": {
           "type": "object",
@@ -260,7 +261,7 @@
           "properties": {
             "cpu": {
               "type": "string",
-              "default": "1000m",
+              "default": "500m",
               "render": "slider",
               "title": "CPU limit",
               "sliderMin": 100,
@@ -273,7 +274,7 @@
             },
             "memory": {
               "type": "string",
-              "default": "1024Mi",
+              "default": "512Mi",
               "render": "slider",
               "title": "Memory limit",
               "sliderMin": 512,

@@ -24,21 +24,19 @@ slider maxima so conservatively for 16 CPU / 64 GB namespaces.
 
 Proposed direction:
 
-1. **Per-service overrides** merged over the flat default:
+1. **Per-service overrides** merged over the flat default — **implemented
+   (2026-07-25, chart 0.6.0)**: `services.<key>.resources` (and
+   `web.resources`) replace `.Values.resources` for that deployment only
+   (whole-block override, no deep merge).
 
-   ```yaml
-   services:
-     coreservice:
-       resources:          # overrides .Values.resources for this deployment only
-         limits: { cpu: 2000m, memory: 1Gi }
-   ```
-
-2. **Rebalanced defaults** grounded in the measurements above:
-   - coreservice: the CPU budget (pipeline latency is directly bounded by
-     its limit — and vertical is the only lever; see the tradedatatools
-     ARCH-DEBT note of 2026-07-25 on the missing scale-out story);
-   - web: the memory headroom (largest observed footprint of the eight);
-   - the remaining six: lower defaults (e.g. 250m / 512Mi limits).
+2. **Rebalanced defaults** grounded in the measurements above —
+   **implemented (2026-07-25, chart 0.6.0)**: coreservice 100m/256Mi →
+   2000m/1Gi, web 50m/256Mi → 500m/1Gi, flat default (remaining six)
+   50m/256Mi → 500m/512Mi. The flat sliders now multiply ×6, not ×8, so a
+   fully maxed launch drops from the ~14.6 CPU / ~36.5 Gi of PR #47 to
+   ~14.1 CPU / ~30.5 Gi (6×1500m + coreservice 2000m + web 500m + Zeppelin
+   2000m + MinIO 500m + readiness 50m; memory 6×4096Mi + 1024 + 1024 + 4096
+   + 512 + 16 Mi) — the PR #47 slider maxima stay valid.
 
 3. **Schema follow-up**: instead of one "per service" slider ×8, expose a
    single "pipeline performance" control mapped to coreservice CPU, so users

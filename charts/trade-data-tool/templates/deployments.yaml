@@ -75,8 +75,10 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 15
           {{- end }}
+          # A service's own resources block (whole-block, no deep merge)
+          # overrides the flat default for that deployment only.
           resources:
-            {{- toYaml $ctx.Values.resources | nindent 12 }}
+            {{- toYaml ($s.resources | default $ctx.Values.resources) | nindent 12 }}
       volumes:
         - name: appsettings
           secret:

@@ -37,19 +37,40 @@ services:
   coreservice:
     port: 6912
     image: core-service
+    # The Silver pipeline is the suite's only real CPU consumer and was
+    # throttled at the shared 1000m limit (see DESIGN-NOTES.md); pipeline
+    # latency is directly bounded by this limit.
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: "2000m"
+        memory: 1Gi
 
 web:
   port: 7108
   image: web-app
+  # Largest observed memory footprint of the eight; keeps the 1Gi headroom
+  # the flat default no longer provides.
+  resources:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
 
 # Every container must declare cpu+memory limits (namespace ResourceQuota).
+# Applies to every app deployment that does not carry its own resources
+# block above; a per-service block replaces this whole block (no deep merge).
 resources:
   requests:
     cpu: 50m
     memory: 256Mi
   limits:
-    cpu: "1000m"
-    memory: 1024Mi
+    cpu: 500m
+    memory: 512Mi
 
 database:
   # The platform's shared MariaDB (mariadb-operator SQL-tier CRs, no pods).

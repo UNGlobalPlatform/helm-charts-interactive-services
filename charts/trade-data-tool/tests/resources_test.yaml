@@ -1,0 +1,65 @@
+suite: per-service resources overrides
+templates:
+  - deployments.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  - it: coreservice carries its own rebalanced block (2000m CPU limit, unthrottled pipeline)
+    documentSelector:
+      path: spec.template.metadata.labels["app.kubernetes.io/component"]
+      value: coreservice
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: 2000m
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: 1Gi
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: 100m
+  - it: web carries its own block (memory headroom kept at 1Gi)
+    documentSelector:
+      path: spec.template.metadata.labels["app.kubernetes.io/component"]
+      value: web
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: 500m
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: 1Gi
+  - it: a service without an override falls through to the flat default
+    documentSelector:
+      path: spec.template.metadata.labels["app.kubernetes.io/component"]
+      value: fileservice
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: 500m
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: 512Mi
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: 50m
+  - it: a per-service override replaces the whole block, not a deep merge
+    set:
+      services:
+        dataservice:
+          port: 6901
+          image: data-service
+          resources:
+            limits:
+              cpu: 750m
+              memory: 768Mi
+    documentSelector:
+      path: spec.template.metadata.labels["app.kubernetes.io/component"]
+      value: dataservice
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: 750m
+      - notExists:
+          path: spec.template.spec.containers[0].resources.requests

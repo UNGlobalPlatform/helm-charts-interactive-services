@@ -1,6 +1,6 @@
 # jupyter-python
 
-![Version: 2.3.60](https://img.shields.io/badge/Version-2.3.60-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.3.61](https://img.shields.io/badge/Version-2.3.61-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 The JupyterLab IDE with Python and a collection of standard data science packages.
 
@@ -139,9 +139,20 @@ The JupyterLab IDE with Python and a collection of standard data science package
 | sparkConnect.executor.maxExecutors | string | `"25"` |  |
 | sparkConnect.executor.memory | string | `"4g"` |  |
 | sparkConnect.executor.memoryOverhead | string | `"3g"` |  |
+| sparkConnect.executor.shuffleTrackingTimeout | string | `"1800s"` |  |
 | sparkConnect.h3Version | string | `"4.4.2"` |  |
 | sparkConnect.image | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/ais/spark/un-ais-etl:v0.9.0-python311"` |  |
 | sparkConnect.keda.enabled | bool | `true` |  |
+| sparkConnect.keda.scaleOnActivity.activator.idleTimeoutSeconds | int | `14400` |  |
+| sparkConnect.keda.scaleOnActivity.activator.image | string | `"haproxy:3.0-alpine"` |  |
+| sparkConnect.keda.scaleOnActivity.activator.resources.limits.cpu | string | `"100m"` |  |
+| sparkConnect.keda.scaleOnActivity.activator.resources.limits.memory | string | `"64Mi"` |  |
+| sparkConnect.keda.scaleOnActivity.activator.resources.requests.cpu | string | `"50m"` |  |
+| sparkConnect.keda.scaleOnActivity.activator.resources.requests.memory | string | `"32Mi"` |  |
+| sparkConnect.keda.scaleOnActivity.cooldownPeriod | int | `900` |  |
+| sparkConnect.keda.scaleOnActivity.enabled | bool | `false` |  |
+| sparkConnect.keda.scaleOnActivity.pollingInterval | int | `30` |  |
+| sparkConnect.keda.scaleOnActivity.prometheusServerAddress | string | `"http://prometheus-server.prometheus.svc.cluster.local"` |  |
 | sparkConnect.logLevel | string | `"WARN"` |  |
 | sparkConnect.pysparkVersion | string | `"3.5.0"` |  |
 | sparkConnect.pythonImage | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/onyxia-jupyter-python:py3.11.14"` |  |

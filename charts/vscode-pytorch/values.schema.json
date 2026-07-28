@@ -1083,15 +1083,15 @@
           }
         },
         "keda": {
-          "title": "KEDA autoscaling",
+          "title": "Autoscaling",
           "type": "object",
-          "x-onyxia": {
-            "hidden": true
-          },
           "properties": {
             "enabled": {
               "type": "boolean",
-              "default": true
+              "default": true,
+              "x-onyxia": {
+                "hidden": true
+              }
             },
             "scaleOnActivity": {
               "title": "Activity-based scaling (experimental)",

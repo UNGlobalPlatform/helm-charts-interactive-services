@@ -1,0 +1,56 @@
+{{- if and .Values.sparkConnect.enabled .Values.sparkConnect.keda.enabled ((.Values.sparkConnect.keda).scaleOnActivity).enabled }}
+{{- $fullName := include "library-chart.fullname" . -}}
+{{- $activator := .Values.sparkConnect.keda.scaleOnActivity.activator -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullName }}-spark-connect-activator
+  labels:
+    {{- include "library-chart.labels" . | nindent 4 }}
+    app.kubernetes.io/component: spark-connect-activator
+data:
+  haproxy.cfg: |
+    global
+      log stdout format raw local0 info
+      maxconn 1024
+
+    defaults
+      log global
+      mode tcp
+      option tcplog
+      timeout connect 5s
+      # Cut idle established connections so a dead kernel's half-open socket
+      # cannot hold the server up forever. A live pyspark client transparently
+      # re-opens its gRPC channel on next use.
+      timeout client {{ $activator.idleTimeoutSeconds }}s
+      timeout server {{ $activator.idleTimeoutSeconds }}s
+
+    # Resolve the backend Service at runtime so haproxy starts and recovers
+    # while the server is scaled to zero (no endpoints behind the Service).
+    resolvers kubedns
+      parse-resolv-conf
+      hold valid 10s
+
+    frontend grpc
+      bind :15002
+      default_backend spark-grpc
+
+    frontend sparkui
+      bind :4040
+      default_backend spark-sparkui
+
+    # KEDA scales the server on haproxy_frontend_current_sessions{proxy="grpc"}
+    # (established clients) + increase(haproxy_frontend_connections_total{proxy="grpc"})
+    # (connection attempts, the wake-up signal while the server is at zero).
+    frontend metrics
+      mode http
+      bind :8404
+      http-request use-service prometheus-exporter if { path /metrics }
+      http-request return status 200 content-type text/plain lf-string "ok" if { path /healthz }
+
+    backend spark-grpc
+      server spark {{ $fullName }}-spark-connect-backend:15002 resolvers kubedns init-addr none check inter 2s
+
+    backend spark-sparkui
+      server spark {{ $fullName }}-spark-connect-backend:4040 resolvers kubedns init-addr none
+{{- end }}

@@ -1,5 +1,6 @@
 {{- if and .Values.sparkConnect.enabled .Values.sparkConnect.keda.enabled (not .Values.global.suspend) }}
 {{- $fullName := include "library-chart.fullname" . -}}
+{{- $scaleOnActivity := (.Values.sparkConnect.keda).scaleOnActivity -}}
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
@@ -12,10 +13,29 @@ spec:
     name: {{ $fullName }}-spark-connect
   minReplicaCount: 0
   maxReplicaCount: 1
+{{- if ($scaleOnActivity).enabled }}
+  pollingInterval: {{ $scaleOnActivity.pollingInterval }}
+  cooldownPeriod: {{ $scaleOnActivity.cooldownPeriod }}
+  triggers:
+    # Scale on real client activity observed at the activator proxy:
+    # established gRPC sessions keep the server up; connection *attempts* are
+    # the wake-up signal while the server is at zero replicas (the pyspark
+    # connect client retries UNAVAILABLE with backoff for at least 10 minutes,
+    # which covers node provisioning + server startup).
+    - type: prometheus
+      metadata:
+        serverAddress: {{ $scaleOnActivity.prometheusServerAddress | quote }}
+        query: >-
+          sum(haproxy_frontend_current_sessions{namespace="{{ .Release.Namespace }}",pod=~"{{ $fullName }}-spark-connect-activator-.*",proxy="grpc"})
+          + sum(increase(haproxy_frontend_connections_total{namespace="{{ .Release.Namespace }}",pod=~"{{ $fullName }}-spark-connect-activator-.*",proxy="grpc"}[2m]))
+        threshold: "1"
+        activationThreshold: "0"
+{{- else }}
   cooldownPeriod: 300
   triggers:
     - type: kubernetes-workload
       metadata:
         podSelector: 'app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/name={{ .Chart.Name }}'
         value: "1"
+{{- end }}
 {{- end }}

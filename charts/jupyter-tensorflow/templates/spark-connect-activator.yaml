@@ -1,0 +1,68 @@
+{{- if and .Values.sparkConnect.enabled .Values.sparkConnect.keda.enabled ((.Values.sparkConnect.keda).scaleOnActivity).enabled }}
+{{- $fullName := include "library-chart.fullname" . -}}
+{{- $activator := .Values.sparkConnect.keda.scaleOnActivity.activator -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-spark-connect-activator
+  labels:
+    {{- include "library-chart.labels" . | nindent 4 }}
+    app.kubernetes.io/component: spark-connect-activator
+spec:
+  {{- if .Values.global.suspend }}
+  replicas: 0
+  {{- else }}
+  replicas: 1
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: spark-connect-activator
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/spark-connect-activator-config.yaml") . | sha256sum }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8404"
+        prometheus.io/path: "/metrics"
+      labels:
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: spark-connect-activator
+    spec:
+      containers:
+        - name: haproxy
+          image: {{ $activator.image | quote }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 15002
+              name: grpc
+              protocol: TCP
+            - containerPort: 4040
+              name: spark-ui
+              protocol: TCP
+            - containerPort: 8404
+              name: metrics
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: grpc
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+            periodSeconds: 30
+            failureThreshold: 3
+            timeoutSeconds: 5
+          resources:
+            {{- toYaml $activator.resources | nindent 12 }}
+          volumeMounts:
+            - name: haproxy-config
+              mountPath: /usr/local/etc/haproxy
+              readOnly: true
+      volumes:
+        - name: haproxy-config
+          configMap:
+            name: {{ $fullName }}-spark-connect-activator
+{{- end }}

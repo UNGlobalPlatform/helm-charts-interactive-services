@@ -1,5 +1,6 @@
 {{- if .Values.sparkConnect.enabled }}
 {{- $fullName := include "library-chart.fullname" . -}}
+{{- $activity := and .Values.sparkConnect.keda.enabled ((.Values.sparkConnect.keda).scaleOnActivity).enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -20,5 +21,36 @@ spec:
       name: spark-ui
   selector:
     app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- if $activity }}
+    # Activity-based scaling: clients reach the always-on activator proxy,
+    # which forwards to the server via the -backend Service below. The DNS
+    # name the IDE's SPARK_REMOTE points at stays unchanged.
+    app.kubernetes.io/component: spark-connect-activator
+    {{- else }}
     app.kubernetes.io/component: spark-connect
+    {{- end }}
+{{- if $activity }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-spark-connect-backend
+  labels:
+    {{- include "library-chart.labels" . | nindent 4 }}
+    app.kubernetes.io/component: spark-connect
+spec:
+  type: ClusterIP
+  ports:
+    - port: 15002
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+    - port: 4040
+      targetPort: spark-ui
+      protocol: TCP
+      name: spark-ui
+  selector:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: spark-connect
+{{- end }}
 {{- end }}

@@ -67,6 +67,12 @@ stringData:
     spark.dynamicAllocation.maxExecutors {{ .Values.sparkConnect.executor.maxExecutors }}
     spark.dynamicAllocation.executorIdleTimeout 120s
     spark.dynamicAllocation.shuffleTracking.enabled true
+    # shuffleTracking's default timeout is infinity, which exempts executors
+    # holding shuffle data from executorIdleTimeout for the life of the session
+    # (observed 2026-07-28: 22 executors idle 10h after the client disconnected).
+    # Reclaimed shuffle blocks are recomputed, or read back via the decommission
+    # fallback storage configured below.
+    spark.dynamicAllocation.shuffleTracking.timeout {{ .Values.sparkConnect.executor.shuffleTrackingTimeout }}
     spark.executor.memory {{ .Values.sparkConnect.executor.memory }}
     spark.executor.memoryOverhead {{ .Values.sparkConnect.executor.memoryOverhead }}
     spark.kubernetes.executor.request.cores {{ .Values.sparkConnect.executor.cores }}

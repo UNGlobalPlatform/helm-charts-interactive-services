@@ -1092,6 +1092,56 @@
             "enabled": {
               "type": "boolean",
               "default": true
+            },
+            "scaleOnActivity": {
+              "title": "Activity-based scaling (experimental)",
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "title": "Scale to zero when idle (experimental)",
+                  "description": "Server starts on first Spark command (first cell may wait a few minutes) and stops after 15 minutes with no client connected",
+                  "type": "boolean",
+                  "default": false
+                },
+                "pollingInterval": {
+                  "type": "integer",
+                  "default": 30,
+                  "x-onyxia": {
+                    "hidden": true
+                  }
+                },
+                "cooldownPeriod": {
+                  "type": "integer",
+                  "default": 900,
+                  "x-onyxia": {
+                    "hidden": true
+                  }
+                },
+                "prometheusServerAddress": {
+                  "type": "string",
+                  "default": "http://prometheus-server.prometheus.svc.cluster.local",
+                  "x-onyxia": {
+                    "hidden": true
+                  }
+                },
+                "activator": {
+                  "type": "object",
+                  "properties": {
+                    "image": {
+                      "type": "string",
+                      "default": "haproxy:3.0-alpine"
+                    },
+                    "idleTimeoutSeconds": {
+                      "type": "integer",
+                      "default": 3600
+                    }
+                  },
+                  "x-onyxia": {
+                    "hidden": true
+                  }
+                }
+              },
+              "description": "Experimental: scale the Spark Connect server to zero when no client is connected, waking it on the first connection attempt"
             }
           }
         },
@@ -1167,6 +1217,14 @@
               "title": "Memory overhead per executor",
               "type": "string",
               "default": "3g",
+              "x-onyxia": {
+                "hidden": true
+              }
+            },
+            "shuffleTrackingTimeout": {
+              "title": "Idle timeout for executors holding shuffle data",
+              "type": "string",
+              "default": "1800s",
               "x-onyxia": {
                 "hidden": true
               }

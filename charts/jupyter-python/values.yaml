@@ -256,6 +256,21 @@ sparkConnect:
   aisBasepath: "s3a://ais-data-142496269814/exact-earth-data/transformed/prod/"
   keda:
     enabled: true
+    scaleOnActivity:
+      enabled: false
+      pollingInterval: 30
+      cooldownPeriod: 900
+      prometheusServerAddress: "http://prometheus-server.prometheus.svc.cluster.local"
+      activator:
+        image: "haproxy:3.0-alpine"
+        idleTimeoutSeconds: 3600
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "32Mi"
+          limits:
+            cpu: "100m"
+            memory: "64Mi"
   server:
     resources:
       requests:
@@ -269,6 +284,7 @@ sparkConnect:
     cores: "2"
     memory: "4g"
     memoryOverhead: "3g"
+    shuffleTrackingTimeout: "1800s"
   sparkui:
     hostname: ""
 

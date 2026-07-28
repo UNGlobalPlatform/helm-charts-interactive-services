@@ -266,7 +266,7 @@ sparkConnect:
       prometheusServerAddress: "http://prometheus-server.prometheus.svc.cluster.local"
       activator:
         image: "haproxy:3.0-alpine"
-        idleTimeoutSeconds: 3600
+        idleTimeoutSeconds: 14400
         resources:
           requests:
             cpu: "50m"

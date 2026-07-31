@@ -1110,7 +1110,7 @@
                   "title": "Scale to zero when idle (experimental)",
                   "description": "Server starts on first Spark command (first cell may wait a few minutes) and stops after 15 minutes with no client connected",
                   "type": "boolean",
-                  "default": false
+                  "default": true
                 },
                 "pollingInterval": {
                   "type": "integer",

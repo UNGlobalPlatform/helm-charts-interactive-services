@@ -766,7 +766,7 @@
             "hidden": true
           }
         },
-        "tlsSecretName":{
+        "tlsSecretName": {
           "type": "string",
           "default": "",
           "x-onyxia": {
@@ -883,7 +883,7 @@
       "properties": {
         "enabled": {
           "title": "Enable Spark Connect",
-          "description": "Deploys a Spark Connect server alongside your IDE for distributed computing with PySpark",
+          "description": "Deploys a Spark Connect server alongside your IDE for distributed computing with PySpark. Note: only one Spark Connect server is allowed per namespace. If another of your services already deployed one, this launch will fail - delete that service first or launch without Spark Connect.",
           "type": "boolean",
           "default": false
         },
@@ -954,15 +954,27 @@
                 "requests": {
                   "type": "object",
                   "properties": {
-                    "cpu": { "type": "string", "default": "8" },
-                    "memory": { "type": "string", "default": "20Gi" }
+                    "cpu": {
+                      "type": "string",
+                      "default": "8"
+                    },
+                    "memory": {
+                      "type": "string",
+                      "default": "20Gi"
+                    }
                   }
                 },
                 "limits": {
                   "type": "object",
                   "properties": {
-                    "cpu": { "type": "string", "default": "8" },
-                    "memory": { "type": "string", "default": "24Gi" }
+                    "cpu": {
+                      "type": "string",
+                      "default": "8"
+                    },
+                    "memory": {
+                      "type": "string",
+                      "default": "24Gi"
+                    }
                   }
                 }
               }

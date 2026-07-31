@@ -1,3 +1,22 @@
+{{- /*
+Singleton guard: only one Spark Connect server per namespace. This runs at
+render time, before helm creates any resource, so a blocked launch leaves no
+orphaned resources behind. The cluster-side Kyverno policy
+onyxia-limit-one-spark-connect remains the enforcement backstop for anything
+that bypasses chart rendering (kubectl, races). `lookup` returns an empty map
+during client-side `helm template`/lint, so the guard only fires on real
+installs. Deployments belonging to this release are skipped so upgrades and
+suspend/resume keep working.
+*/}}
+{{- range (lookup "apps/v1" "Deployment" .Release.Namespace "").items }}
+{{- $labels := .metadata.labels | default dict }}
+{{- $guardInstance := index $labels "app.kubernetes.io/instance" | default "" }}
+{{- $guardComponent := index $labels "app.kubernetes.io/component" | default "" }}
+{{- $guardChart := index $labels "app.kubernetes.io/name" | default "" }}
+{{- if and (ne $guardInstance $.Release.Name) (or (eq $guardComponent "spark-connect") (eq $guardChart "spark-connect")) }}
+{{- fail (printf "Only one Spark Connect server is allowed per namespace, and this namespace already has one (%s). Delete the service that owns it, or relaunch that service with Spark Connect disabled, before launching another service with Spark Connect enabled." .metadata.name) }}
+{{- end }}
+{{- end }}
 {{- $fullName := include "library-chart.fullname" . -}}
 apiVersion: apps/v1
 kind: Deployment

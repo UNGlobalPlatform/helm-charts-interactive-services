@@ -914,7 +914,7 @@
       "properties": {
         "enabled": {
           "title": "Enable Spark Connect",
-          "description": "Deploys a Spark Connect server alongside your IDE for distributed computing with PySpark",
+          "description": "Deploys a Spark Connect server alongside your IDE for distributed computing with PySpark. Note: only one Spark Connect server is allowed per namespace. If another of your services already deployed one, this launch will fail - delete that service first or launch without Spark Connect.",
           "type": "boolean",
           "default": false
         },

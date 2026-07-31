@@ -1,6 +1,6 @@
 # jupyter-python
 
-![Version: 2.3.63](https://img.shields.io/badge/Version-2.3.63-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.3.64](https://img.shields.io/badge/Version-2.3.64-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 The JupyterLab IDE with Python and a collection of standard data science packages.
 
@@ -150,7 +150,7 @@ The JupyterLab IDE with Python and a collection of standard data science package
 | sparkConnect.keda.scaleOnActivity.activator.resources.requests.cpu | string | `"50m"` |  |
 | sparkConnect.keda.scaleOnActivity.activator.resources.requests.memory | string | `"32Mi"` |  |
 | sparkConnect.keda.scaleOnActivity.cooldownPeriod | int | `900` |  |
-| sparkConnect.keda.scaleOnActivity.enabled | bool | `false` |  |
+| sparkConnect.keda.scaleOnActivity.enabled | bool | `true` |  |
 | sparkConnect.keda.scaleOnActivity.pollingInterval | int | `30` |  |
 | sparkConnect.keda.scaleOnActivity.prometheusServerAddress | string | `"http://prometheus-server.prometheus.svc.cluster.local"` |  |
 | sparkConnect.logLevel | string | `"WARN"` |  |

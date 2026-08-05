@@ -174,7 +174,7 @@ sparkConnect:
   keda:
     enabled: true
     scaleOnActivity:
-      enabled: true
+      enabled: false
       pollingInterval: 30
       cooldownPeriod: 900
       prometheusServerAddress: http://prometheus-server.prometheus.svc.cluster.local

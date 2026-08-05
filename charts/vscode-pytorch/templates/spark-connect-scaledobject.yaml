@@ -1,3 +1,9 @@
+{{- /* WARNING: scaleOnActivity has two known outage-grade defects (kill-at-launch:
+KEDA scales a fresh server 1->0 before Prometheus has scraped the new activator;
+kill-idle-session: server terminated after cooldown while the IDE still runs,
+destroying Spark session state). Caused the 2026-08-04 "Socket closed" outage
+when defaulted on. See the WARNING at sparkConnect.keda.scaleOnActivity in
+values.yaml before enabling it more widely. */ -}}
 {{- if and .Values.sparkConnect.enabled .Values.sparkConnect.keda.enabled (not .Values.global.suspend) }}
 {{- $fullName := include "library-chart.fullname" . -}}
 {{- $scaleOnActivity := (.Values.sparkConnect.keda).scaleOnActivity -}}

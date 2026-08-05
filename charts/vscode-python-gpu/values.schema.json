@@ -1108,9 +1108,9 @@
               "properties": {
                 "enabled": {
                   "title": "Scale to zero when idle (experimental)",
-                  "description": "Server starts on first Spark command (first cell may wait a few minutes) and stops after 15 minutes with no client connected",
+                  "description": "Server starts on first Spark command (first cell may wait a few minutes) and stops after 15 minutes with no client connected. Losing the connection also discards Spark session state (temp views, cached dataframes)",
                   "type": "boolean",
-                  "default": true
+                  "default": false
                 },
                 "pollingInterval": {
                   "type": "integer",

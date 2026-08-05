@@ -259,8 +259,24 @@ sparkConnect:
   aisBasepath: "s3a://ais-data-142496269814/exact-earth-data/transformed/prod/"
   keda:
     enabled: true
+    # WARNING - do NOT default scaleOnActivity.enabled to true. Defaulting it on
+    # (chart 2.4.41, 2026-07-31) caused a widespread "Socket closed" outage for
+    # Spark Connect users (2026-08-04). Two unfixed defects in the activator/KEDA
+    # design:
+    #   1. Kill-at-launch: KEDA scales a freshly installed server 1->0 within
+    #      seconds, because the Prometheus wake query has no samples for the new
+    #      activator pod yet and "no data" reads as "inactive". Every launch then
+    #      starts with minutes of gRPC UNAVAILABLE/"Socket closed" on the first
+    #      getOrCreate() while scrape (1m) + KEDA poll (30s) + node provisioning
+    #      + image pull complete.
+    #   2. Kill-idle-session: after cooldownPeriod with no connected gRPC client
+    #      the server is terminated even while the user's IDE is still running,
+    #      destroying all Spark session state (temp views, cached dataframes).
+    #   Until both are fixed (e.g. KEDA initialCooldownPeriod + an additional
+    #   kubernetes-workload trigger keyed on the IDE pod), this must stay opt-in.
+    #   Keep values.schema.json's default for this flag in sync with this file.
     scaleOnActivity:
-      enabled: true
+      enabled: false
       pollingInterval: 30
       cooldownPeriod: 900
       prometheusServerAddress: "http://prometheus-server.prometheus.svc.cluster.local"

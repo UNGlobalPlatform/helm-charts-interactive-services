@@ -57,6 +57,30 @@ tests:
       - notMatchRegex:
           path: stringData["appsettings.Production.json"]
           pattern: "tdtdomaindata|tdtmetadata|tdtfiles|tdtuser|tdtCore"
+  - it: appsettings selects Single topology on the tenant database (app >= 2.5.0)
+    templates: [secrets.yaml]
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"DatabaseTopology": \{\s*"DatabaseName": "user_sean_mytdt",\s*"Mode": "Single"\s*\}'
+  - it: GuidFormat=None only on the DomainDBConnection and DBConnection keys
+    templates: [secrets.yaml]
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"DomainDBConnection": "[^"]*Database=user_sean_mytdt;[^"]*;GuidFormat=None"'
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"DBConnection": "[^"]*;GuidFormat=None"'
+      - notMatchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"(Core|Metadata|Files|User|Log|Dataset)DBConnection": "[^"]*GuidFormat'
   - it: retainOnDelete flips cleanupPolicy to Skip
     templates: [database.yaml]
     set:

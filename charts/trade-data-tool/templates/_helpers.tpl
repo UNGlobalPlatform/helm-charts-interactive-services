@@ -197,10 +197,19 @@ share the same database and object store anyway.
 }}
 {{- $cfg := dict }}
 {{- /* Every connection-string key any service reads — all one database now. */}}
+{{- /* GuidFormat=None on the two keys the images set it on (CoreService
+       DomainDBConnection, DataService DBConnection): export reads CHAR(36) PublicId
+       columns as strings, and MySqlConnector's Guid auto-detection breaks Dapper's
+       Read<string>(). No service reads a Guid from the database. */}}
+{{- $guidNone := printf "%s;GuidFormat=None" $conn }}
 {{- $_ := set $cfg "ConnectionStrings" (dict
-      "CoreDBConnection" $conn "DomainDBConnection" $conn "MetadataDBConnection" $conn
-      "FilesDBConnection" $conn "UserDBConnection" $conn "DBConnection" $conn
+      "CoreDBConnection" $conn "DomainDBConnection" $guidNone "MetadataDBConnection" $conn
+      "FilesDBConnection" $conn "UserDBConnection" $conn "DBConnection" $guidNone
       "LogDBConnection" $conn "DatasetDBConnection" $conn) }}
+{{- /* App >= 2.5.0 resolves its schema through DatabaseTopology: Single mode keeps
+       every module in one database, named here after the tenant database (the
+       default would be "dbtradetool", which this release's user cannot see). */}}
+{{- $_ := set $cfg "DatabaseTopology" (dict "Mode" "Single" "DatabaseName" (include "tdt.dbName" .)) }}
 {{- /* Direct service URLs; Dapr bypassed (DaprURL == LocalUrl, EnforceDapr false). */}}
 {{- range $name, $url := $urls }}
 {{- $_ := set $cfg $name (dict "LocalUrl" $url "DaprURL" $url "DaprPort" "3500" "DaprHealthURL" "http://localhost:{0}/v1.0/healthz") }}

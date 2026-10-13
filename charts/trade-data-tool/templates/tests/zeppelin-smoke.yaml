@@ -39,7 +39,7 @@ spec:
   automountServiceAccountToken: false
   containers:
     - name: smoke
-      image: {{ .Values.security.admin.seedImage | default "python:3.12-slim" }}
+      image: {{ .Values.security.admin.seedImage | default "public.ecr.aws/docker/library/python:3.12-slim" }}
       command: ["python3", "/smoke/zeppelin_smoke.py"]
       env:
         - name: ZEPPELIN_API_URL

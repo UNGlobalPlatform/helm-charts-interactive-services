@@ -125,7 +125,7 @@ Chart 0.7.0 (app 3.0.0) is a **fresh install only**. App 3.0.0 uses a new databa
 | objectStorage.s3.sessionToken | string | `""` |  |
 | objectStorage.s3.workingDirectoryPath | string | `""` |  |
 | readiness.enabled | bool | `true` |  |
-| readiness.image | string | `"busybox:1.36"` |  |
+| readiness.image | string | `"public.ecr.aws/docker/library/busybox:1.36"` |  |
 | resources.limits.cpu | string | `"500m"` |  |
 | resources.limits.memory | string | `"512Mi"` |  |
 | resources.requests.cpu | string | `"50m"` |  |
@@ -138,6 +138,7 @@ Chart 0.7.0 (app 3.0.0) is a **fresh install only**. App 3.0.0 uses a new databa
 | security.admin.deactivateUsernames[0] | string | `"DAdmin"` |  |
 | security.admin.password | string | `"changeme"` |  |
 | security.admin.seed | bool | `true` |  |
+| security.admin.seedImage | string | `"public.ecr.aws/docker/library/python:3.12-slim"` |  |
 | security.admin.username | string | `"SAdmin"` |  |
 | security.jwt.key | string | `""` |  |
 | services.coreservice.image | string | `"core-service"` |  |
@@ -175,6 +176,7 @@ Chart 0.7.0 (app 3.0.0) is a **fresh install only**. App 3.0.0 uses a new databa
 | zeppelin.ingress.hostname | string | `"chart-example-zeppelin.local"` |  |
 | zeppelin.ingress.ingressClassName | string | `"nginx"` |  |
 | zeppelin.ingress.useCertManager | bool | `true` |  |
+| zeppelin.jdbc.configImage | string | `"public.ecr.aws/docker/library/python:3.12-slim"` |  |
 | zeppelin.jdbc.existingSecret | string | `"{{ .Release.Name }}-jdbc-target"` |  |
 | zeppelin.persistence.enabled | bool | `true` |  |
 | zeppelin.persistence.retainOnDelete | bool | `false` |  |

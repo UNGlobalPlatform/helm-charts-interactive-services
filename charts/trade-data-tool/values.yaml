@@ -190,6 +190,9 @@ zeppelin:
     # secret-jdbc-target.yaml) with its render-time-derived coordinates —
     # subchart values are static YAML, so this is the only channel.
     existingSecret: "{{ .Release.Name }}-jdbc-target"
+    # The subchart's jdbc-config Job image, from the ECR Public mirror (same
+    # digest as Docker Hub's python:3.12-slim). The subchart default is left alone.
+    configImage: public.ecr.aws/docker/library/python:3.12-slim
   security:
     # Onyxia fills this with the project password (same as the TDT admin
     # login), keeping RuleService's Zeppelin login zero-copy.
@@ -246,6 +249,9 @@ security:
     # Seeded accounts other than `username` to deactivate (IsActive=0).
     deactivateUsernames:
       - DAdmin
+    # Image for the admin-seed and zeppelin-config Jobs and the helm-test pod:
+    # the ECR Public mirror of the Docker Official python image (same digest).
+    seedImage: public.ecr.aws/docker/library/python:3.12-slim
 
 ingress:
   enabled: true
@@ -271,7 +277,9 @@ userPreferences:
 # (green only once the web UI actually serves HTTP). Disable for headless use.
 readiness:
   enabled: true
-  image: busybox:1.36
+  # AWS's ECR Public mirror of the Docker Official Image (same digest): Docker
+  # Hub's anonymous pull limit is shared by the whole cluster.
+  image: public.ecr.aws/docker/library/busybox:1.36
 
 # Extra appsettings merged into every service's configuration (escape hatch).
 extraAppSettings: {}

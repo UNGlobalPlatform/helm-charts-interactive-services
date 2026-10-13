@@ -1,0 +1,94 @@
+suite: NetworkPolicy (who may connect into the release's pods)
+templates:
+  - networkpolicy.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  - it: on by default, three policies, ingress only (egress untouched)
+    asserts:
+      - hasDocuments:
+          count: 3
+      - equal:
+          path: spec.policyTypes
+          value: [Ingress]
+      - notExists:
+          path: spec.egress
+  - it: backends (and the readiness marker) accept only this release's pods
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-backends
+    asserts:
+      - equal:
+          path: spec.podSelector.matchExpressions[0].values
+          value: [coreservice, dataservice, domainservice, fileservice, metadataservice, readiness, ruleengineservice, userservice]
+      - equal:
+          path: spec.ingress
+          value:
+            - from:
+                - podSelector:
+                    matchLabels:
+                      app.kubernetes.io/instance: mytdt
+  - it: web and MinIO also accept the ingress controller, on their public ports only
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-edge
+    asserts:
+      - equal:
+          path: spec.podSelector.matchExpressions[0].values
+          value: [web, minio]
+      - equal:
+          path: spec.ingress[1]
+          value:
+            from:
+              - namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: ingress-apisix
+            ports:
+              - port: http
+              - port: s3
+  - it: Zeppelin also accepts its jdbc-config Job (which carries no instance label)
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-zeppelin
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/name: zeppelin
+            app.kubernetes.io/instance: mytdt
+      - contains:
+          path: spec.ingress[0].from
+          content:
+            podSelector:
+              matchLabels:
+                app.kubernetes.io/component: jdbc-config
+      - equal:
+          path: spec.ingress[1].ports
+          value:
+            - port: 8080
+  - it: the ingress namespace is configurable
+    set:
+      networkPolicy:
+        ingressNamespace: ingress-nginx
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-edge
+    asserts:
+      - equal:
+          path: spec.ingress[1].from[0].namespaceSelector.matchLabels["kubernetes.io/metadata.name"]
+          value: ingress-nginx
+  - it: no bundled Zeppelin, no Zeppelin policy
+    set:
+      zeppelin:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 2
+  - it: can be turned off
+    set:
+      networkPolicy:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0

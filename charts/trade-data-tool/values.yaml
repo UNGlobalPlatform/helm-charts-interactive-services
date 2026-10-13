@@ -254,6 +254,15 @@ ingress:
   certManagerClusterIssuer: letsencrypt-prod
   useCertManager: true
 
+# Restricts who may connect INTO this release's pods (outbound traffic is not
+# restricted). The services accept only this release's own pods; the web UI,
+# MinIO and Zeppelin also accept the ingress controller. Anything else,
+# including other services in the same namespace, must use the public URLs.
+networkPolicy:
+  enabled: true
+  # Namespace of the ingress controller that serves the public hostnames.
+  ingressNamespace: ingress-apisix
+
 userPreferences:
   language: en
 

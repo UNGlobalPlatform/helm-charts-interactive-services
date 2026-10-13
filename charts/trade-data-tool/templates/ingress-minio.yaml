@@ -14,8 +14,14 @@ metadata:
     {{- if and .Values.ingress.tls .Values.ingress.useCertManager }}
     cert-manager.io/cluster-issuer: {{ .Values.ingress.certManagerClusterIssuer }}
     {{- end }}
-    # nginx-only knobs (ignored by other controllers): uploads are single PUTs
-    # up to uploads.maxFileSizeBytes, far beyond nginx's 1m default.
+    # Uploads are single presigned PUTs up to uploads.maxFileSizeBytes, and
+    # MinIO can take a while to answer after a large one. Each controller
+    # ignores the other's annotations, so both sets are set.
+    # APISIX (the platform's class): no body-size limit by default; the
+    # upstream timeouts otherwise fall back to 60s.
+    k8s.apisix.apache.org/upstream-read-timeout: "600s"
+    k8s.apisix.apache.org/upstream-send-timeout: "600s"
+    # ingress-nginx (helm CLI installs elsewhere): its default body limit is 1m.
     nginx.ingress.kubernetes.io/proxy-body-size: 5g
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"

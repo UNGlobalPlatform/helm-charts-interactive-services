@@ -10,6 +10,23 @@ tests:
   # MinioConfig:ApiUrl (MinioObjectStorageProvider.CreatePresignClient). If that
   # is the in-cluster Service name, the browser cannot resolve it and every
   # upload dies client-side with zero server logs.
+  - it: sets APISIX upstream timeouts (the platform class ignores nginx annotations)
+    templates: [ingress-minio.yaml]
+    set:
+      objectStorage:
+        minio:
+          ingress:
+            hostname: user-sean-tdt-minio-abc123.dev.officialstatistics.org
+    asserts:
+      - equal:
+          path: metadata.annotations["k8s.apisix.apache.org/upstream-read-timeout"]
+          value: 600s
+      - equal:
+          path: metadata.annotations["k8s.apisix.apache.org/upstream-send-timeout"]
+          value: 600s
+      - equal:
+          path: metadata.annotations["nginx.ingress.kubernetes.io/proxy-body-size"]
+          value: 5g
   - it: minio mode with a hostname renders an ingress to minio:9000
     templates: [ingress-minio.yaml]
     set:

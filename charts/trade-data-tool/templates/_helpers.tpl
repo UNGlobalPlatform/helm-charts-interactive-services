@@ -256,6 +256,9 @@ share the same database and object store anyway.
        BROWSER, so ApiUrl must be the external ingress host over TLS whenever
        one exists. EndPoint stays in-cluster plaintext — that's the data plane
        (CreateDataClient never uses SSL). */}}
+{{- /* AutoCreateBuckets: the image's base appsettings.json turns it off, and this
+       release's MinIO starts empty, so without it every upload to domainfile,
+       metadatafile or system throws "Bucket ... does not exist". */}}
 {{- $minioApiHost := "" }}
 {{- if and .Values.ingress.enabled .Values.objectStorage.minio.ingress.hostname }}
 {{- $minioApiHost = .Values.objectStorage.minio.ingress.hostname }}
@@ -266,7 +269,8 @@ share the same database and object store anyway.
       "ConsoleUrl" $minioHost
       "AccessKey" .Values.objectStorage.minio.rootUser
       "SecretKey" .Values.objectStorage.minio.rootPassword
-      "UseSSL" (ne $minioApiHost "") "ContentType" "application/octet-stream") }}
+      "UseSSL" (ne $minioApiHost "") "ContentType" "application/octet-stream"
+      "AutoCreateBuckets" true) }}
 {{- $_ := set $cfg "ObjectStorage" (dict "Provider" "minio") }}
 {{- else }}
 {{- $s3 := dict "Region" .Values.objectStorage.s3.region "ForcePathStyle" .Values.objectStorage.s3.forcePathStyle }}

@@ -236,10 +236,7 @@
               "sliderMin": 50,
               "sliderMax": 1000,
               "sliderStep": 50,
-              "sliderUnit": "m",
-              "x-onyxia": {
-                "overwriteDefaultWith": "{{region.resources.cpuRequest}}"
-              }
+              "sliderUnit": "m"
             },
             "memory": {
               "type": "string",
@@ -249,10 +246,7 @@
               "sliderMin": 256,
               "sliderMax": 2048,
               "sliderStep": 256,
-              "sliderUnit": "Mi",
-              "x-onyxia": {
-                "overwriteDefaultWith": "{{region.resources.memoryRequest}}"
-              }
+              "sliderUnit": "Mi"
             }
           }
         },
@@ -267,10 +261,7 @@
               "sliderMin": 100,
               "sliderMax": 1500,
               "sliderStep": 100,
-              "sliderUnit": "m",
-              "x-onyxia": {
-                "overwriteDefaultWith": "{{region.resources.cpuLimit}}"
-              }
+              "sliderUnit": "m"
             },
             "memory": {
               "type": "string",
@@ -280,10 +271,7 @@
               "sliderMin": 512,
               "sliderMax": 4096,
               "sliderStep": 512,
-              "sliderUnit": "Mi",
-              "x-onyxia": {
-                "overwriteDefaultWith": "{{region.resources.memoryLimit}}"
-              }
+              "sliderUnit": "Mi"
             }
           }
         }

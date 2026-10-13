@@ -230,13 +230,11 @@ share the same database and object store anyway.
        500ing every RuleService endpoint (the UI then calls the whole Rule
        Service "down"). Unconfigured -> a clearly-named placeholder, so only
        the Zeppelin status degrades. WebURL feeds the "/#/notebook/<ruleId>"
-       deep links; "#" keeps the razor pages' TrimEnd from an NRE. */}}
+       deep links; "#" keeps the razor pages' TrimEnd from an NRE. The login
+       and interpreter group are NOT appsettings since app 3.0.0: RuleService
+       reads them from stm.SystemConfig rows, which admin-seed-job.yaml writes. */}}
 {{- $zep := include "tdt.zeppelinResolved" . | fromJson }}
-{{- $_ := set $cfg "Zeppelin" (dict
-      "APIURL" $zep.apiUrl
-      "UserId" $zep.username
-      "Password" $zep.password
-      "DefaultInterpreterGroup" (.Values.ruleEngine.defaultInterpreterGroup | default "jdbc")) }}
+{{- $_ := set $cfg "Zeppelin" (dict "APIURL" $zep.apiUrl) }}
 {{- $_ := set (get $cfg "RuleService") "WebURL" $zep.webUrl }}
 {{- $_ := set (get $cfg "RuleService") "DaprWebURL" $zep.webUrl }}
 {{- $_ := set (get $cfg "FileService") "ImportDomainBucket" .Values.objectStorage.buckets.domain }}

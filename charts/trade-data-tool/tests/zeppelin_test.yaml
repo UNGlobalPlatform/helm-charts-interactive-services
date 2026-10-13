@@ -24,12 +24,11 @@ tests:
       - matchRegex:
           path: stringData["appsettings.Production.json"]
           pattern: '"APIURL": "http://mytdt-zeppelin:8080"'
-      - matchRegex:
+      # App 3.0.0 reads the login from stm.SystemConfig (admin-seed job);
+      # the old appsettings keys would only spread the password around.
+      - notMatchRegex:
           path: stringData["appsettings.Production.json"]
-          pattern: '"UserId": "onyxia"'
-      - matchRegex:
-          path: stringData["appsettings.Production.json"]
-          pattern: '"Zeppelin": \{[^}]*"Password": "the-project-password"'
+          pattern: '"UserId"|the-project-password'
       - matchRegex:
           path: stringData["appsettings.Production.json"]
           pattern: '"WebURL": "https://user-sean-tdt-zeppelin-abc.dev.officialstatistics.org"'

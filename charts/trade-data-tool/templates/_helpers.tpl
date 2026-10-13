@@ -117,6 +117,16 @@ namespace+name+db password so it survives helm upgrade).
 {{- end }}
 {{- end }}
 
+{{/*
+Secret holding this release's Connector:EncryptionKey (see
+secret-connector-key.yaml). Reaches CoreService and RuleService as the env var
+Connector__EncryptionKey, which outranks every appsettings file — including
+the image's base appsettings.json, which bakes a development key.
+*/}}
+{{- define "tdt.connectorKeySecretName" -}}
+{{- printf "%s-connector-key" (include "tdt.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
 
 {{/*
 Resolve the rule-engine Zeppelin, as JSON {source, apiUrl, webUrl, username,

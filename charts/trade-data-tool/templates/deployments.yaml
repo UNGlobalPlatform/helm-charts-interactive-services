@@ -42,6 +42,17 @@ spec:
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: Production
+            {{- if has $key (list "coreservice" "ruleengineservice") }}
+            # The only two readers of Connector:EncryptionKey: CoreService
+            # encrypts connector credentials, RuleService decrypts the
+            # rule-engine password. The env var outranks the development key
+            # baked into the image's base appsettings.json.
+            - name: Connector__EncryptionKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "tdt.connectorKeySecretName" $ctx }}
+                  key: key
+            {{- end }}
           {{- if and (eq $key "fileservice") (eq $ctx.Values.objectStorage.provider "s3") }}
           # FileService's S3 adapter reads STS credentials from the AWS_* env.
           envFrom:

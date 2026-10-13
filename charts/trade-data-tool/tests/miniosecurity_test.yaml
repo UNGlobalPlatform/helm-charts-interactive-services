@@ -1,0 +1,50 @@
+suite: bundled MinIO runs non-root (its S3 API is browser-reachable)
+templates:
+  - minio.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  - it: the pod runs as uid/gid 1000 with fsGroup on the data volume
+    documentSelector:
+      path: kind
+      value: Deployment
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext
+          value:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+            seccompProfile:
+              type: RuntimeDefault
+  - it: the container drops every capability and cannot escalate
+    documentSelector:
+      path: kind
+      value: Deployment
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext
+          value:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+  - it: HOME and the only writable non-data path are /tmp (MinIO's certs dir lives under $HOME)
+    documentSelector:
+      path: kind
+      value: Deployment
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name=="HOME")].value
+          value: /tmp
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts
+          value:
+            - { name: data, mountPath: /data }
+            - { name: tmp, mountPath: /tmp }
+      - equal:
+          path: spec.template.spec.volumes[?(@.name=="tmp")].emptyDir
+          value: {}

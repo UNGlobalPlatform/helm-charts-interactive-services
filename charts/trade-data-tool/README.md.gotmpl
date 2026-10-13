@@ -1,0 +1,79 @@
+{{ template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+## Before you start
+
+- **This version needs a new service.** Trade Data Tool 2.x services (chart 0.6.x) keep running and resume as they are, but they can't be upgraded to 3.0.0. Launch a new service and import your data again.
+- **Keep your data before you delete an old service.** Deleting a service permanently deletes its database (datasets, rules, configuration) and its rule notebooks. With the built-in file storage, your uploaded files are deleted too. With your own S3 storage they stay in your bucket, but a new service won't recognise them as datasets. Download any results you need, keep your source files, and import them again into the new service.
+- **Dates now default to day-first.** When you import a dataset file, a new *Date/Time Format* option defaults to **Day-month-year (31/12/2025)**. Previously, ambiguous dates such as 03/04/2025 were read month-first. Choose *Month-day-year* or *Year-month-day* if your files use those layouts. The old *Regional Format* option is now called *Decimal Format*.
+
+## What's new in 3.0.0
+
+Trade Data Tool 3.0.0 is based on upstream TDT 2.5.0.
+
+**Find and download data**
+- **Data Search** (formerly *Advance Search*): faster paging with Previous/Next, an estimated total with a *Show exact* button, sorting by indexed columns. Queries stop after 30 seconds and suggest *Download All*.
+- **Saved searches**: save a Data Search and reopen it later.
+- **Download All, then My Downloads** (new menu item): large downloads run in the background as compressed files you collect from *My Downloads*. Files are kept for 7 days.
+- **Quick downloads** (*Download Data*) are still limited to 100,000 rows and 30 columns, and now stop after 30 seconds. Use *Download All* for anything bigger.
+- **Tables**: choose and resize columns; your page size is remembered in this browser.
+- The *Bronze / Silver / Gold* data links have left the side menu. Open the data from a dataset's *View Data* action or the dashboard links instead.
+
+**Bring data in**
+- **JSON files** can be imported.
+- **Import mapping presets**: save and reuse column mappings.
+- **Move files** between buckets.
+
+**Run and monitor the pipeline**
+- **Pipeline Jobs** refreshes every 5 seconds, adds new statuses (Retry, Resetting, Deleting, Cancelled) and a *View Log* action, and asks for confirmation before cancelling.
+- **Retry from step**: re-run a failed batch from a chosen step. Zeppelin rule steps run again.
+- **Reset** and **Delete batch** now run in the background and survive a restart.
+- **Gold upgrade by year** and **Recalculate period summary**.
+- **Uninitialize dataset** (new, next to *Delete*) clears a Silver dataset so you can change its structure. **Read the dialog carefully**: it also deletes child Bronze datasets, and every dependent Gold dataset you don't tick to keep.
+
+**Data quality**
+- **Constraint stage**: a new pipeline step checks that values do, or do not, exist in a metadata table, with its own tab in the Error Wizard.
+- The **Error Wizard** acts on at most 10,000 records at a time; use *Download All* for the full list.
+
+**Metadata**
+- Metadata **categories**, default code/description attributes, adding columns to initialized metadata, an *Include in Search* flag, and faster paged metadata lists.
+
+**Sign-in and screens**
+- You're signed out after **60 minutes of inactivity**.
+- The app version is shown in the side menu.
+- Dataset actions are renamed: *View/Clone/Edit Structure*, plus *Alter Dataset* for initialized Silver datasets.
+
+## Lifecycle and data
+
+- **Suspension.** Onyxia suspends a service 13 hours after it was launched or last resumed, whether or not you are using it. Its pods stop; its database, files and rule notebooks are kept. Resume it from *My Services*.
+- **Work in progress.** If a pipeline batch is running when the service is suspended, it is recovered up to about 4.5 hours after you resume, and you can then *Retry* it.
+- **Automatic deletion.** A service left suspended for **30 days is deleted, with its data**: its database, its rule notebooks and, with the built-in file storage, your uploaded files. Resume it, or export what you need, before then.
+- **Deleting a service** deletes the same data straight away. With your own S3 storage, files stay in your bucket but are no longer attached to any Trade Data Tool service.
+- **S3 storage.** S3 access uses temporary credentials that expire about 11 hours after launch and are not renewed when the service resumes. Use the built-in file storage (MinIO, the default) for work that lasts longer than a day.
+- **First launch** can take several minutes while the database is set up. The service shows as running once the web UI answers.
+{{- /* PENDING TradeDataTools#116 (interrupted first install): wording follows the
+     chart agent's recommendation, not a ruling. Replace or cut once ruled. */}}
+- **If the first launch fails** partway through setting up the database, the service cannot repair itself. Delete it and launch a new one.
+- **Rule-engine settings.** The rule-engine connection settings in *System Configuration* are managed by the platform and reset each time the service is launched or resumed.
+- **Network access.** The services accept connections only from this service's own components and the platform's ingress. Other services in your project reach Trade Data Tool through its web addresses.
+
+## Upgrading
+
+Chart 0.7.0 (app 3.0.0) is a **fresh install only**. App 3.0.0 uses a new database layout and cannot take over a database created by chart 0.6.x (app 2.x).
+
+- From Onyxia, nothing changes for existing services: resuming re-runs the chart version they were launched with.
+- With the helm CLI, `helm upgrade` from 0.6.x to 0.7.0 is refused before anything is changed. Keep the release on 0.6.x, or uninstall it (this deletes its data, as above), install 0.7.0 and import the data again.
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}

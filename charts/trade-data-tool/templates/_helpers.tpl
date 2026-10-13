@@ -321,3 +321,20 @@ re-runs the release's own chart version.
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{/*
+What deleting this release destroys, as an English phrase ("its database, its
+rule notebooks and your uploaded files"). Shared by NOTES.txt for the
+delete and 30-day-uninstall warnings, so the copy follows the retain flags.
+*/}}
+{{- define "tdt.deletedOnUninstall" -}}
+{{- $items := list }}
+{{- if not .Values.database.lifecycle.retainOnDelete }}{{ $items = append $items "its database" }}{{ end }}
+{{- if and .Values.zeppelin.enabled (not ((.Values.zeppelin.persistence).retainOnDelete)) }}{{ $items = append $items "its rule notebooks" }}{{ end }}
+{{- if and (eq .Values.objectStorage.provider "minio") (not .Values.objectStorage.minio.persistence.retainOnDelete) }}{{ $items = append $items "your uploaded files" }}{{ end }}
+{{- if gt (len $items) 1 }}
+{{- printf "%s and %s" (initial $items | join ", ") (last $items) }}
+{{- else }}
+{{- join "" $items }}
+{{- end }}
+{{- end }}

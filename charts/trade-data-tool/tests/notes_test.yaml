@@ -1,0 +1,52 @@
+suite: post-launch notes (Onyxia shows NOTES.txt after every launch)
+templates:
+  - NOTES.txt
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  - it: states the suspension and 30-day deletion rules, naming what is lost
+    asserts:
+      - matchRegexRaw:
+          pattern: 'suspends this service 13 hours after it was launched or last resumed'
+      - matchRegexRaw:
+          pattern: 'suspended for 30 days is deleted automatically, with\s+its database, its rule notebooks and your uploaded files\.'
+      - matchRegexRaw:
+          pattern: 'Deleting this service permanently deletes its database, its rule notebooks and your uploaded files\.'
+      - matchRegexRaw:
+          pattern: "can't be upgraded to 3\\.0\\.0"
+  - it: in S3 mode, files outlive the service and the credential expiry is stated
+    set:
+      objectStorage:
+        provider: s3
+        s3:
+          accessKeyId: AK
+          secretAccessKey: SK
+    asserts:
+      - matchRegexRaw:
+          pattern: 'permanently deletes its database and its rule notebooks\.\n\s+Your files stay in your S3 bucket'
+      - matchRegexRaw:
+          pattern: "S3 access expires about 11 hours after launch and isn't renewed"
+  - it: retained data is not claimed as deleted
+    set:
+      database:
+        lifecycle:
+          retainOnDelete: true
+      zeppelin:
+        persistence:
+          retainOnDelete: true
+      objectStorage:
+        minio:
+          persistence:
+            retainOnDelete: true
+    asserts:
+      - notMatchRegexRaw:
+          pattern: 'permanently deletes|deleted automatically'
+  - it: says the rule-engine settings are platform-managed
+    asserts:
+      - matchRegexRaw:
+          pattern: 'rule-engine connection settings in \*System Configuration\* are managed by\s+the platform'
+  - it: links the full release notes in the chart README
+    asserts:
+      - matchRegexRaw:
+          pattern: 'charts/trade-data-tool/README\.md#whats-new-in-300'

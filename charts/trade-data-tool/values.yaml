@@ -201,10 +201,11 @@ zeppelin:
   defaultInterpreterGroup: jdbc
   persistence:
     # Rule notebooks and interpreter state live on this volume. It MUST stay
-    # enabled: the platform culler suspends services after ~12h (pods deleted,
-    # volumes kept), and without it every suspend cycle silently deletes the
-    # users' rules. Stated explicitly here even though 1.4.0's subchart
-    # default is also true.
+    # enabled: the platform culler suspends services 13h after their last
+    # launch or resume (pods deleted, volumes kept), and without it every
+    # suspend cycle silently deletes the users' rules. (Services suspended for
+    # more than 30 days are uninstalled, volumes included.) Stated explicitly
+    # here even though 1.4.0's subchart default is also true.
     enabled: true
     size: 10Gi
     # When true, helm uninstall keeps the notebook volume; a reinstall under

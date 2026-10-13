@@ -45,8 +45,8 @@ tests:
                   matchLabels:
                     kubernetes.io/metadata.name: ingress-apisix
             ports:
-              - port: http
-              - port: s3
+              - port: 8080
+              - port: 9000
   - it: Zeppelin also accepts its jdbc-config Job (which carries no instance label)
     documentSelector:
       path: metadata.name

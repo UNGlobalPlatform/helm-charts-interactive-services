@@ -1,0 +1,73 @@
+suite: no in-place upgrade from chart <= 0.6.x (app 2.x database)
+templates:
+  - deployments.yaml
+  - schema-job.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  - it: refuses to upgrade a release last rendered by chart 0.6.1
+    templates: [deployments.yaml]
+    release:
+      upgrade: true
+    kubernetesProvider:
+      scheme:
+        "apps/v1/Deployment":
+          gvr: { group: "apps", version: "v1", resource: "deployments" }
+          namespaced: true
+      objects:
+        - kind: Deployment
+          apiVersion: apps/v1
+          metadata:
+            name: mytdt-trade-data-tool-web
+            namespace: user-sean
+            labels: { helm.sh/chart: trade-data-tool-0.6.1 }
+    asserts:
+      - failedTemplate:
+          errorPattern: "installed with chart trade-data-tool 0.6.1 \\(app 2.x\\).*Nothing has been changed"
+  - it: upgrades a release already on 0.7.x (resume re-renders the same version)
+    templates: [deployments.yaml]
+    release:
+      upgrade: true
+    kubernetesProvider:
+      scheme:
+        "apps/v1/Deployment":
+          gvr: { group: "apps", version: "v1", resource: "deployments" }
+          namespaced: true
+      objects:
+        - kind: Deployment
+          apiVersion: apps/v1
+          metadata:
+            name: mytdt-trade-data-tool-web
+            namespace: user-sean
+            labels: { helm.sh/chart: trade-data-tool-0.7.0 }
+    asserts:
+      - notFailedTemplate: {}
+  - it: fails open when the cluster can't be seen (helm template, client dry-run)
+    templates: [deployments.yaml]
+    release:
+      upgrade: true
+    asserts:
+      - notFailedTemplate: {}
+  - it: a fresh install never consults the cluster
+    templates: [deployments.yaml]
+    kubernetesProvider:
+      scheme:
+        "apps/v1/Deployment":
+          gvr: { group: "apps", version: "v1", resource: "deployments" }
+          namespaced: true
+      objects:
+        - kind: Deployment
+          apiVersion: apps/v1
+          metadata:
+            name: mytdt-trade-data-tool-web
+            namespace: user-sean
+            labels: { helm.sh/chart: trade-data-tool-0.6.1 }
+    asserts:
+      - notFailedTemplate: {}
+  - it: the schema Job stops on a 2.x ledger before applying anything
+    templates: [schema-job.yaml]
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: "WHERE script='s1_tdtuser.sql'\\\"\\)\" != \"0\" \\]; then\\n\\s+echo \"This database was created by app 2.x"

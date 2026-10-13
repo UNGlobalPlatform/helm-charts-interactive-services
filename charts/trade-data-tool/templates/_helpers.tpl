@@ -299,3 +299,25 @@ share the same database and object store anyway.
 {{- $merged := mustMergeOverwrite $cfg (deepCopy .Values.extraAppSettings) }}
 {{- mustToPrettyJson $merged }}
 {{- end }}
+
+{{/*
+Refuse an in-place upgrade of a release created by chart <= 0.6.x (app 2.x).
+App 3.0.0's schema bundle refuses a non-empty database and every service
+refuses a database without its topology record, so such an upgrade would
+"succeed" and leave the instance crash-looping until a rollback. The web
+Deployment's helm.sh/chart label records the chart that last rendered it,
+and it survives suspend (replicas 0). Fails open when lookup sees nothing
+(helm template, client-side dry-run). Onyxia never upgrades in place: resume
+re-runs the release's own chart version.
+*/}}
+{{- define "tdt.upgradeGuard" -}}
+{{- if .Release.IsUpgrade }}
+{{- $web := lookup "apps/v1" "Deployment" .Release.Namespace (include "tdt.svcName" (dict "ctx" . "key" "web")) }}
+{{- $from := dig "metadata" "labels" "helm.sh/chart" "" $web | trimPrefix (printf "%s-" .Chart.Name) }}
+{{- if regexMatch "^[0-9]+\\.[0-9]+\\.[0-9]+" $from }}
+{{- if semverCompare "<0.7.0-0" $from }}
+{{- fail (printf "This release was installed with chart %s %s (app 2.x). Chart %s runs app %s, whose database layout is new: it cannot upgrade a 2.x database in place (the schema bootstrap would refuse it and every service would crash-loop). Nothing has been changed. Keep this release on %s, or uninstall it (with default settings this deletes its database, rule notebooks and bundled MinIO files), install %s fresh and re-import your data." .Chart.Name $from .Chart.Version .Chart.AppVersion $from .Chart.Version) }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

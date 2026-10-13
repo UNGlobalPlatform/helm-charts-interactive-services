@@ -53,6 +53,13 @@ spec:
               echo "waiting for database $TDT_DB_NAME on $TDT_DB_HOST ..."
               until run -e "SELECT 1" >/dev/null 2>&1; do sleep 5; done
               run -e "CREATE TABLE IF NOT EXISTS \`__tdt_schema_applied\` (script VARCHAR(255) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
+              # Backstop for the render-time upgrade guard (tdt.upgradeGuard): a
+              # database loaded by app 2.x (chart <= 0.6.x) has its first script,
+              # s1_tdtuser.sql, in the ledger. App 3.0.0 cannot upgrade it.
+              if [ "$(run -N -e "SELECT COUNT(*) FROM \`__tdt_schema_applied\` WHERE script='s1_tdtuser.sql'")" != "0" ]; then
+                echo "This database was created by app 2.x (chart <= 0.6.x). App 3.0.0 cannot upgrade it in place; nothing has been changed. Roll back to the previous chart version, or uninstall and install fresh."
+                exit 1
+              fi
               shopt -s nullglob
               for f in /docker-entrypoint-initdb.d/*.sql; do
                 n=$(basename "$f")

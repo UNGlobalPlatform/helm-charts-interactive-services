@@ -1,3 +1,4 @@
+{{- include "tdt.upgradeGuard" . }}
 {{- $ctx := . }}
 {{- $all := dict }}
 {{- range $key, $s := .Values.services }}{{- $_ := set $all $key $s }}{{- end }}

@@ -1,6 +1,6 @@
 {{- $deleted := include "tdt.deletedOnUninstall" . }}
 {{- $zepNotes := include "tdt.zeppelinResolved" . | fromJson -}}
-**Trade Data Tool {{ .Chart.AppVersion }}** is starting: 8 services + web UI{{ if eq .Values.objectStorage.provider "minio" }} + MinIO{{ end }}{{ if eq $zepNotes.source "bundled" }} + Zeppelin{{ end }}.
+**Trade Data Tool {{ .Chart.AppVersion }}** is starting: 7 services + web UI{{ if eq .Values.objectStorage.provider "minio" }} + MinIO{{ end }}{{ if eq $zepNotes.source "bundled" }} + Zeppelin{{ end }}.
 The first launch can take several minutes while the database is set up; the
 service shows as running once the web UI answers.
 {{- if .Values.ingress.enabled }}
@@ -11,7 +11,8 @@ service shows as running once the web UI answers.
   - Password: **`{{ .Values.security.admin.password }}`** (your project password)
 
   ⚠️ Treat this like any credential — don't paste it into code or share it.
-  It is (re)applied to the admin account on every deploy.
+  It is (re)applied to the admin account each time the service is launched,
+  resumed or reconfigured.
 {{- end }}
 
 **Before you start**
@@ -19,7 +20,7 @@ service shows as running once the web UI answers.
   whether or not you are using it. Resume it from *My Services*; your data is kept.
 {{- if $deleted }}
 - ⚠️ A service left suspended for 30 days is deleted automatically, with
-  {{ $deleted }}. Resume it, or export what you need, before then.
+  {{ $deleted }}. Resume it, or download what you need, before then.
 - ⚠️ Deleting this service permanently deletes {{ $deleted }}.
 {{- if eq .Values.objectStorage.provider "s3" }}
   Your files stay in your S3 bucket, but a new service won't recognise them as datasets.
@@ -30,8 +31,9 @@ service shows as running once the web UI answers.
   service resumes. Use MinIO (the default) for work that lasts longer than a day.
 {{- end }}
 - Existing Trade Data Tool 2.x services keep running and resume as they are;
-  they can't be upgraded to {{ .Chart.AppVersion }}. Keep an old service until you have
-  exported what you need, and import it into this one.
+  they can't be upgraded to {{ .Chart.AppVersion }}. Your datasets, metadata, rules and
+  users don't carry over: set them up again in this service, then import your files.
+  Keep the old service until you have downloaded what you need.
 
 **What's new in {{ .Chart.AppVersion }}** ([full notes](https://github.com/UNGlobalPlatform/helm-charts-interactive-services/blob/main/charts/trade-data-tool/README.md#whats-new-in-300))
 - **Dates default to day-first** when you import a file (new *Date/Time Format*
@@ -72,7 +74,8 @@ service shows as running once the web UI answers.
 {{- end }}
 {{- if ne $zepNotes.source "none" }}
   The rule-engine connection settings in *System Configuration* are managed by
-  the platform and reset each time the service is launched or resumed.
+  the platform. Don't edit them: changes have no effect and are overwritten each
+  time the service is launched, resumed or reconfigured.
 {{- end }}
 {{- if .Values.networkPolicy.enabled }}
 - Other services in your project can reach this one only through its web

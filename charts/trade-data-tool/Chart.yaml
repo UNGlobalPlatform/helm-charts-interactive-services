@@ -1,7 +1,7 @@
 apiVersion: v2
 name: trade-data-tool
 description: >-
-  Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web UI for
+  Trade Data Tool (UNSD) — seven .NET microservices and a Blazor web UI for
   processing trade datasets. Provisions its database serverlessly on the
   platform's shared MariaDB cluster and stores files in bundled MinIO or S3.
 icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/library.png

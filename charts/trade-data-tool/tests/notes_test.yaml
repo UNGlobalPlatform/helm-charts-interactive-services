@@ -50,3 +50,15 @@ tests:
     asserts:
       - matchRegexRaw:
           pattern: 'charts/trade-data-tool/README\.md#whats-new-in-300'
+  - it: counts the services right and says plainly that nothing carries over from 2.x
+    asserts:
+      - matchRegexRaw:
+          pattern: 'is starting: 7 services \+ web UI'
+      - matchRegexRaw:
+          pattern: "datasets, metadata, rules and\\s+users don't carry over: set them up again in this service"
+      - notMatchRegexRaw:
+          pattern: 'import it into this one'
+  - it: tells users not to edit the platform-managed rule-engine settings
+    asserts:
+      - matchRegexRaw:
+          pattern: "Don't edit them: changes have no effect and are overwritten each\\s+time the service is launched, resumed or reconfigured"

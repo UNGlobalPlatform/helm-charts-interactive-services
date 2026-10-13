@@ -2,14 +2,14 @@
 
 ![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
 
-Trade Data Tool (UNSD) — eight .NET microservices and a Blazor web UI for processing trade datasets. Provisions its database serverlessly on the platform's shared MariaDB cluster and stores files in bundled MinIO or S3.
+Trade Data Tool (UNSD) — seven .NET microservices and a Blazor web UI for processing trade datasets. Provisions its database serverlessly on the platform's shared MariaDB cluster and stores files in bundled MinIO or S3.
 
 **Homepage:** <https://code.officialstatistics.org/trade-data-tools/tdt-source/TradeDataTools>
 
 ## Before you start
 
-- **This version needs a new service.** Trade Data Tool 2.x services (chart 0.6.x) keep running and resume as they are, but they can't be upgraded to 3.0.0. Launch a new service and import your data again.
-- **Keep your data before you delete an old service.** Deleting a service permanently deletes its database (datasets, rules, configuration) and its rule notebooks. With the built-in file storage, your uploaded files are deleted too. With your own S3 storage they stay in your bucket, but a new service won't recognise them as datasets. Download any results you need, keep your source files, and import them again into the new service.
+- **This version needs a new service.** Trade Data Tool 2.x services (chart 0.6.x or earlier) keep running and resume as they are, but they can't be upgraded to 3.0.0. Your datasets, metadata, rules and users don't carry over: set them up again in the new service, then import your files.
+- **Keep your data before you delete an old service.** Deleting a service permanently deletes its database (datasets, rules, configuration) and its rule notebooks. With the built-in file storage, your uploaded files are deleted too. With your own S3 storage they stay in your bucket, but a new service won't recognise them as datasets. Keep the old service until you have downloaded what you need, and keep your source files.
 - **Dates now default to day-first.** When you import a dataset file, a new *Date/Time Format* option defaults to **Day-month-year (31/12/2025)**. Previously, ambiguous dates such as 03/04/2025 were read month-first. Choose *Month-day-year* or *Year-month-day* if your files use those layouts. The old *Regional Format* option is now called *Decimal Format*.
 
 ## What's new in 3.0.0
@@ -34,7 +34,7 @@ Trade Data Tool 3.0.0 is based on upstream TDT 2.5.0.
 - **Retry from step**: re-run a failed batch from a chosen step. Zeppelin rule steps run again.
 - **Reset** and **Delete batch** now run in the background and survive a restart.
 - **Gold upgrade by year** and **Recalculate period summary**.
-- **Uninitialize dataset** (new, next to *Delete*) clears a Silver dataset so you can change its structure. **Read the dialog carefully**: it also deletes child Bronze datasets, and every dependent Gold dataset you don't tick to keep.
+- **Uninitialize dataset** (new, next to *Delete*) clears a Silver dataset so you can change its structure. It also deletes the Silver's child Bronze datasets. Dependent Gold datasets are kept unless you untick them, and the dialog lists what will be deleted.
 
 **Data quality**
 - **Constraint stage**: a new pipeline step checks that values do, or do not, exist in a metadata table, with its own tab in the Error Wizard.
@@ -51,18 +51,18 @@ Trade Data Tool 3.0.0 is based on upstream TDT 2.5.0.
 ## Lifecycle and data
 
 - **Suspension.** Onyxia suspends a service 13 hours after it was launched or last resumed, whether or not you are using it. Its pods stop; its database, files and rule notebooks are kept. Resume it from *My Services*.
-- **Work in progress.** If a pipeline batch is running when the service is suspended, it is recovered up to about 4.5 hours after you resume, and you can then *Retry* it.
-- **Automatic deletion.** A service left suspended for **30 days is deleted, with its data**: its database, its rule notebooks and, with the built-in file storage, your uploaded files. Resume it, or export what you need, before then.
+- **Work in progress.** If a batch is importing or running pipeline steps when the service is suspended, it is recovered up to about 4.5 hours after you resume, and you can then *Retry* it.
+- **Automatic deletion.** A service left suspended for **30 days is deleted, with its data**: its database, its rule notebooks and, with the built-in file storage, your uploaded files. Resume it, or download what you need, before then.
 - **Deleting a service** deletes the same data straight away. With your own S3 storage, files stay in your bucket but are no longer attached to any Trade Data Tool service.
 - **S3 storage.** S3 access uses temporary credentials that expire about 11 hours after launch and are not renewed when the service resumes. Use the built-in file storage (MinIO, the default) for work that lasts longer than a day.
 - **First launch** can take several minutes while the database is set up. The service shows as running once the web UI answers.
 - **If the first launch fails** partway through setting up the database, the service cannot repair itself. Delete it and launch a new one.
-- **Rule-engine settings.** The rule-engine connection settings in *System Configuration* are managed by the platform and reset each time the service is launched or resumed.
+- **Rule-engine settings.** The rule-engine connection settings in *System Configuration* are managed by the platform. Don't edit them: changes have no effect and are overwritten each time the service is launched, resumed or reconfigured.
 - **Network access.** The services accept connections only from this service's own components and the platform's ingress. Other services in your project reach Trade Data Tool through its web addresses.
 
 ## Upgrading
 
-Chart 0.7.0 (app 3.0.0) is a **fresh install only**. App 3.0.0 uses a new database layout and cannot take over a database created by chart 0.6.x (app 2.x).
+Chart 0.7.0 (app 3.0.0) is a **fresh install only**. App 3.0.0 uses a new database layout and cannot take over a database created by chart 0.6.x or earlier (app 2.x).
 
 - From Onyxia, nothing changes for existing services: resuming re-runs the chart version they were launched with.
 - With the helm CLI, `helm upgrade` from 0.6.x to 0.7.0 is refused before anything is changed. Keep the release on 0.6.x, or uninstall it (this deletes its data, as above), install 0.7.0 and import the data again.

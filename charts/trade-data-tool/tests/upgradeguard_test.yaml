@@ -65,9 +65,12 @@ tests:
             labels: { helm.sh/chart: trade-data-tool-0.6.1 }
     asserts:
       - notFailedTemplate: {}
-  - it: the schema Job stops on a 2.x ledger before applying anything
+  - it: the schema Job stops on a 2.x ledger before writing anything
     templates: [schema-job.yaml]
     asserts:
       - matchRegex:
           path: spec.template.spec.containers[0].args[0]
-          pattern: "WHERE script='s1_tdtuser.sql'\\\"\\)\" != \"0\" \\]; then\\n\\s+echo \"This database was created by app 2.x"
+          pattern: 'if applied s1_tdtuser.sql; then\n\s+echo "This database was created by app 2.x[^\n]*nothing has been changed\.'
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'CREATE TABLE IF NOT EXISTS[\s\S]*if applied s1_tdtuser.sql'

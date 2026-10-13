@@ -10,13 +10,18 @@ tests:
       - matchRegex:
           path: spec.template.spec.containers[0].args[0]
           pattern: 'run\(\) \{ mariadb [^}]*-D "\$TDT_DB_NAME" "\$@"; \}'
-  - it: stops before creating anything when binlog is on without function-creator trust
+  - it: stops before creating anything (even the ledger) when binlog is on without function-creator trust
     asserts:
       - matchRegex:
           path: spec.template.spec.containers[0].args[0]
-          pattern: 'SELECT @@log_bin \+ 0 = 1 AND @@log_bin_trust_function_creators \+ 0 = 0"\)" = "1" \]; then\n\s+echo "The database server has binary logging on[^\n]*\n\s+exit 1\n\s+fi\n\s+echo "applying \$n"'
-  - it: the preflight sits after the skip, so a resume never depends on it
+          pattern: 'SELECT @@log_bin \+ 0 = 1 AND @@log_bin_trust_function_creators \+ 0 = 0"\)" = "1" \]; then\n\s+echo "The database server has binary logging on[^\n]*nothing has been changed\."\n\s+exit 1\n\s+fi\n\s+run -e "CREATE TABLE IF NOT EXISTS \\`__tdt_schema_applied\\`'
+  - it: the preflight runs only when a script is pending, so a resume never depends on it
     asserts:
       - matchRegex:
           path: spec.template.spec.containers[0].args[0]
-          pattern: 'continue; fi\n(\s+#[^\n]*\n)+\s+if \[ "\$\(run -N -e "SELECT @@log_bin'
+          pattern: 'if \[ \$\{#pending\[@\]\} -gt 0 \]; then\n(\s+#[^\n]*\n)+\s+if \[ "\$\(run -N -e "SELECT @@log_bin'
+  - it: the ledger is only read when it exists (a fresh database is left untouched until the checks pass)
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'applied\(\) \{ \[ "\$has_ledger" = "1" \] && '

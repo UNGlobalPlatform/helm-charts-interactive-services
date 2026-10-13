@@ -1,0 +1,22 @@
+suite: schema bootstrap Job (tenant connection, preflight)
+templates:
+  - schema-job.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  - it: every statement runs on the tenant database (-D), so DATABASE() is the tenant
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'run\(\) \{ mariadb [^}]*-D "\$TDT_DB_NAME" "\$@"; \}'
+  - it: stops before creating anything when binlog is on without function-creator trust
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'SELECT @@log_bin \+ 0 = 1 AND @@log_bin_trust_function_creators \+ 0 = 0"\)" = "1" \]; then\n\s+echo "The database server has binary logging on[^\n]*\n\s+exit 1\n\s+fi\n\s+echo "applying \$n"'
+  - it: the preflight sits after the skip, so a resume never depends on it
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'continue; fi\n(\s+#[^\n]*\n)+\s+if \[ "\$\(run -N -e "SELECT @@log_bin'

@@ -65,6 +65,15 @@ spec:
                 n=$(basename "$f")
                 done_already=$(run -N -e "SELECT COUNT(*) FROM \`__tdt_schema_applied\` WHERE script='${n//\'/}'")
                 if [ "$done_already" = "1" ]; then echo "skip $n (already applied)"; continue; fi
+                # With binary logging on, a tenant (no SUPER) can create functions and
+                # triggers only if log_bin_trust_function_creators is on; otherwise the
+                # bundle fails partway (ERROR 1419) and a half-loaded database can't be
+                # retried. Check before creating anything.
+                # (+ 0: the variables are booleans that read as ON/OFF in string context.)
+                if [ "$(run -N -e "SELECT @@log_bin + 0 = 1 AND @@log_bin_trust_function_creators + 0 = 0")" = "1" ]; then
+                  echo "The database server has binary logging on without log_bin_trust_function_creators. A platform administrator must enable that setting before TDT can install; nothing has been changed."
+                  exit 1
+                fi
                 echo "applying $n"
                 # Strip database selection (the connection owns the target db) and
                 # server-global statements (SET GLOBAL needs SUPER — server config

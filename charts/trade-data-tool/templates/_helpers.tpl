@@ -314,6 +314,9 @@ and it survives suspend (replicas 0). Fails open when lookup sees nothing
 (helm template, client-side dry-run). Onyxia never upgrades in place: resume
 re-runs the release's own chart version.
 */}}
+{{- /* Every template that can fail includes this first (deployments.yaml,
+       secrets.yaml, secret-connector-key.yaml): helm stops at the first failing
+       template, so the 0.6.x answer must win wherever rendering starts. */}}
 {{- define "tdt.upgradeGuard" -}}
 {{- if .Release.IsUpgrade }}
 {{- $web := lookup "apps/v1" "Deployment" .Release.Namespace (include "tdt.svcName" (dict "ctx" . "key" "web")) }}

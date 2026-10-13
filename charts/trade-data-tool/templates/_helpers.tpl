@@ -296,6 +296,10 @@ share the same database and object store anyway.
 {{- $jwtKey := include "tdt.jwtKey" . }}
 {{- $_ := set $cfg "Jwt" (dict "Key" $jwtKey "Issuer" "unsd.com" "Audience" "Your_Audience") }}
 {{- $_ := set $cfg "JWTSettings" (dict "Key" $jwtKey "ValidIssuer" "unsd.com" "Audience" "Your_Audience") }}
+{{- /* Every service reports ServiceInfo:Version (the web side menu, the About page,
+       each GetServiceInfo endpoint), and every image bakes upstream's build date
+       there. Report the release's app version instead; ServiceName stays per image. */}}
+{{- $_ := set $cfg "ServiceInfo" (dict "Version" .Chart.AppVersion) }}
 {{- $merged := mustMergeOverwrite $cfg (deepCopy .Values.extraAppSettings) }}
 {{- mustToPrettyJson $merged }}
 {{- end }}

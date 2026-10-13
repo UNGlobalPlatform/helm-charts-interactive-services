@@ -62,3 +62,7 @@ tests:
     asserts:
       - matchRegexRaw:
           pattern: "Don't edit them: they're overwritten each time the service is\\s+launched, resumed or reconfigured, and a wrong value can stop rules from\\s+running until then"
+  - it: makes no network-isolation claim until enforcement is verified live
+    asserts:
+      - notMatchRegexRaw:
+          pattern: 'only through its web'

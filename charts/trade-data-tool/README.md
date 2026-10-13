@@ -58,7 +58,6 @@ Trade Data Tool 3.0.0 is based on upstream TDT 2.5.0.
 - **First launch** can take several minutes while the database is set up. The service shows as running once the web UI answers.
 - **If the first launch fails** partway through setting up the database, the service cannot repair itself. Delete it and launch a new one.
 - **Rule-engine settings.** The rule-engine connection settings in *System Configuration* are managed by the platform. Don't edit them: they're overwritten each time the service is launched, resumed or reconfigured, and a wrong value can stop rules from running until then.
-- **Network access.** The services accept connections only from this service's own components and the platform's ingress. Other services in your project reach Trade Data Tool through its web addresses.
 
 ## Upgrading
 

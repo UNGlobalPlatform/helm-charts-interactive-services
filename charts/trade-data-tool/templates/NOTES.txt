@@ -74,8 +74,9 @@ service shows as running once the web UI answers.
 {{- end }}
 {{- if ne $zepNotes.source "none" }}
   The rule-engine connection settings in *System Configuration* are managed by
-  the platform. Don't edit them: changes have no effect and are overwritten each
-  time the service is launched, resumed or reconfigured.
+  the platform. Don't edit them: they're overwritten each time the service is
+  launched, resumed or reconfigured, and a wrong value can stop rules from
+  running until then.
 {{- end }}
 {{- if .Values.networkPolicy.enabled }}
 - Other services in your project can reach this one only through its web

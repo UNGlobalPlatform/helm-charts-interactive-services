@@ -61,4 +61,4 @@ tests:
   - it: tells users not to edit the platform-managed rule-engine settings
     asserts:
       - matchRegexRaw:
-          pattern: "Don't edit them: changes have no effect and are overwritten each\\s+time the service is launched, resumed or reconfigured"
+          pattern: "Don't edit them: they're overwritten each time the service is\\s+launched, resumed or reconfigured, and a wrong value can stop rules from\\s+running until then"

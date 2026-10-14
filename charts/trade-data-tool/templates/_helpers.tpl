@@ -231,7 +231,7 @@ share the same database and object store anyway.
        Service "down"). Unconfigured -> a clearly-named placeholder, so only
        the Zeppelin status degrades. WebURL feeds the "/#/notebook/<ruleId>"
        deep links; "#" keeps the razor pages' TrimEnd from an NRE. The login
-       and interpreter group are NOT appsettings since app 3.0.0: RuleService
+       and interpreter group are NOT appsettings since app 3.x: RuleService
        reads them from stm.SystemConfig rows, which admin-seed-job.yaml writes. */}}
 {{- $zep := include "tdt.zeppelinResolved" . | fromJson }}
 {{- $_ := set $cfg "Zeppelin" (dict "APIURL" $zep.apiUrl) }}
@@ -306,7 +306,7 @@ share the same database and object store anyway.
 
 {{/*
 Refuse an in-place upgrade of a release created by chart <= 0.6.x (app 2.x).
-App 3.0.0's schema bundle refuses a non-empty database and every service
+App 3.x's schema bundle refuses a non-empty database and every service
 refuses a database without its topology record, so such an upgrade would
 "succeed" and leave the instance crash-looping until a rollback. The web
 Deployment's helm.sh/chart label records the chart that last rendered it,

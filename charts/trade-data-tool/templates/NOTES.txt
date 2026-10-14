@@ -35,7 +35,7 @@ service shows as running once the web UI answers.
   users don't carry over: set them up again in this service, then import your files.
   Keep the old service until you have downloaded what you need.
 
-**What's new in {{ .Chart.AppVersion }}** ([full notes](https://github.com/UNGlobalPlatform/helm-charts-interactive-services/blob/main/charts/trade-data-tool/README.md#whats-new-in-300))
+**What's new in 3.0** ([full notes](https://github.com/UNGlobalPlatform/helm-charts-interactive-services/blob/main/charts/trade-data-tool/README.md#whats-new-in-30))
 - **Dates default to day-first** when you import a file (new *Date/Time Format*
   option; *Regional Format* is now *Decimal Format*).
 - **Data Search** (formerly *Advance Search*): faster paging, saved searches, and

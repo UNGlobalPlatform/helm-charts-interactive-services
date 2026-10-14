@@ -1,6 +1,6 @@
 # trade-data-tool
 
-![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
+![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.1](https://img.shields.io/badge/AppVersion-3.0.1-informational?style=flat-square)
 
 Trade Data Tool (UNSD) — seven .NET microservices and a Blazor web UI for processing trade datasets. Provisions its database serverlessly on the platform's shared MariaDB cluster and stores files in bundled MinIO or S3.
 
@@ -8,13 +8,13 @@ Trade Data Tool (UNSD) — seven .NET microservices and a Blazor web UI for proc
 
 ## Before you start
 
-- **This version needs a new service.** Trade Data Tool 2.x services (chart 0.6.x or earlier) keep running and resume as they are, but they can't be upgraded to 3.0.0. Your datasets, metadata, rules and users don't carry over: set them up again in the new service, then import your files.
+- **This version needs a new service.** Trade Data Tool 2.x services (chart 0.6.x or earlier) keep running and resume as they are, but they can't be upgraded to 3.0. Your datasets, metadata, rules and users don't carry over: set them up again in the new service, then import your files.
 - **Keep your data before you delete an old service.** Deleting a service permanently deletes its database (datasets, rules, configuration) and its rule notebooks. With the built-in file storage, your uploaded files are deleted too. With your own S3 storage they stay in your bucket, but a new service won't recognise them as datasets. Keep the old service until you have downloaded what you need, and keep your source files.
 - **Dates now default to day-first.** When you import a dataset file, a new *Date/Time Format* option defaults to **Day-month-year (31/12/2025)**. Previously, ambiguous dates such as 03/04/2025 were read month-first. Choose *Month-day-year* or *Year-month-day* if your files use those layouts. The old *Regional Format* option is now called *Decimal Format*.
 
-## What's new in 3.0.0
+## What's new in 3.0
 
-Trade Data Tool 3.0.0 is based on upstream TDT 2.5.0.
+Trade Data Tool 3.0 is based on upstream TDT 2.5.0. This chart ships 3.0.1.
 
 **Find and download data**
 - **Data Search** (formerly *Advance Search*): faster paging with Previous/Next, an estimated total with a *Show exact* button, sorting by indexed columns. Queries stop after 30 seconds and suggest *Download All*.
@@ -61,7 +61,7 @@ Trade Data Tool 3.0.0 is based on upstream TDT 2.5.0.
 
 ## Upgrading
 
-Chart 0.7.0 (app 3.0.0) is a **fresh install only**. App 3.0.0 uses a new database layout and cannot take over a database created by chart 0.6.x or earlier (app 2.x).
+Chart 0.7.0 (app 3.0.1) is a **fresh install only**. App 3.x uses a new database layout and cannot take over a database created by chart 0.6.x or earlier (app 2.x).
 
 - From Onyxia, nothing changes for existing services: resuming re-runs the chart version they were launched with.
 - With the helm CLI, `helm upgrade` from 0.6.x to 0.7.0 is refused before anything is changed. Keep the release on 0.6.x, or uninstall it (this deletes its data, as above), install 0.7.0 and import the data again.
@@ -93,7 +93,7 @@ Chart 0.7.0 (app 3.0.0) is a **fresh install only**. App 3.0.0 uses a new databa
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.pullSecretName | string | `""` |  |
 | image.registry | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/tdt"` |  |
-| image.tag | string | `"v3.0.0"` |  |
+| image.tag | string | `"v3.0.1"` |  |
 | ingress.certManagerClusterIssuer | string | `"letsencrypt-prod"` |  |
 | ingress.enabled | bool | `true` |  |
 | ingress.hostname | string | `"chart-example.local"` |  |

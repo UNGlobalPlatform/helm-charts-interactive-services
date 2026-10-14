@@ -58,9 +58,9 @@ spec:
               applied() { [ "$has_ledger" = "1" ] && [ "$(run -N -e "SELECT COUNT(*) FROM \`__tdt_schema_applied\` WHERE script='${1//\'/}'")" != "0" ]; }
               # Backstop for the render-time upgrade guard (tdt.upgradeGuard): a
               # database loaded by app 2.x (chart <= 0.6.x) has its first script,
-              # s1_tdtuser.sql, in the ledger. App 3.0.0 cannot upgrade it.
+              # s1_tdtuser.sql, in the ledger. App 3.x cannot upgrade it.
               if applied s1_tdtuser.sql; then
-                echo "This database was created by app 2.x (chart <= 0.6.x). App 3.0.0 cannot upgrade it in place; nothing has been changed. Roll back to the previous chart version, or uninstall and install fresh."
+                echo "This database was created by app 2.x (chart <= 0.6.x). App 3.x cannot upgrade it in place; nothing has been changed. Roll back to the previous chart version, or uninstall and install fresh."
                 exit 1
               fi
               shopt -s nullglob

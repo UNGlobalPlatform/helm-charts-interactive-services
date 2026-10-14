@@ -14,7 +14,7 @@ tests:
       - matchRegexRaw:
           pattern: 'Deleting this service permanently deletes its database, its rule notebooks and your uploaded files\.'
       - matchRegexRaw:
-          pattern: "can't be upgraded to 3\\.0\\.0"
+          pattern: "can't be upgraded to 3\\.0\\.1"
   - it: in S3 mode, files outlive the service and the credential expiry is stated
     set:
       objectStorage:
@@ -49,7 +49,7 @@ tests:
   - it: links the full release notes in the chart README
     asserts:
       - matchRegexRaw:
-          pattern: 'charts/trade-data-tool/README\.md#whats-new-in-300'
+          pattern: 'charts/trade-data-tool/README\.md#whats-new-in-30\)'
   - it: counts the services right and says plainly that nothing carries over from 2.x
     asserts:
       - matchRegexRaw:

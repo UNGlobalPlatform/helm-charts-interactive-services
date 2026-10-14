@@ -99,19 +99,6 @@
                 }
               }
             },
-            "rootPassword": {
-              "type": "string",
-              "title": "MinIO password",
-              "default": "changeme-minio",
-              "render": "password",
-              "hidden": {
-                "value": "s3",
-                "path": "objectStorage/provider"
-              },
-              "x-onyxia": {
-                "overwriteDefaultWith": "{{project.password}}"
-              }
-            },
             "persistence": {
               "type": "object",
               "properties": {

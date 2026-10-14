@@ -271,8 +271,6 @@ share the same database and object store anyway.
       "EndPoint" $minioHost
       "ApiUrl" (default $minioHost $minioApiHost)
       "ConsoleUrl" $minioHost
-      "AccessKey" .Values.objectStorage.minio.rootUser
-      "SecretKey" .Values.objectStorage.minio.rootPassword
       "UseSSL" (ne $minioApiHost "") "ContentType" "application/octet-stream"
       "AutoCreateBuckets" true) }}
 {{- $_ := set $cfg "ObjectStorage" (dict "Provider" "minio") }}

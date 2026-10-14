@@ -52,8 +52,8 @@ service shows as running once the web UI answers.
   ({{ include "tdt.dbHost" . }}) — no database pods were created for this service.
   Username: **{{ include "tdt.dbUserName" . }}**
 {{- if eq .Values.objectStorage.provider "minio" }}
-- Files are stored in this release's MinIO ({{ include "tdt.minioSvcName" . }}:9000,
-  user `{{ .Values.objectStorage.minio.rootUser }}`).
+- Files are stored in this release's MinIO ({{ include "tdt.minioSvcName" . }}:9000);
+  the Trade Data Tool manages it for you.
 {{- if not .Values.objectStorage.minio.image }}
   MinIO is AGPL-3.0 software; this image is built from its [source at
   7aac2a2c5b7c](https://github.com/minio/minio/tree/7aac2a2c5b7c882e68c1ce017d8256be2feea27f) with

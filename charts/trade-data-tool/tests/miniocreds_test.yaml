@@ -1,0 +1,92 @@
+suite: MinIO root credentials are generated per release, not the project password
+templates:
+  - secrets.yaml
+  - deployments.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  - it: a fresh install generates a 40-character random password
+    templates: [secrets.yaml]
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-minio
+    asserts:
+      - matchRegex:
+          path: data.MINIO_ROOT_PASSWORD
+          pattern: '^[A-Za-z0-9]{40}$'
+          decodeBase64: true
+      - equal:
+          path: data.MINIO_ROOT_USER
+          value: dGR0
+  - it: an existing password is reused byte-for-byte (stable across upgrades and resumes)
+    templates: [secrets.yaml]
+    release:
+      upgrade: true
+    kubernetesProvider:
+      scheme:
+        "v1/Secret":
+          gvr: { version: "v1", resource: "secrets" }
+          namespaced: true
+      objects:
+        - kind: Secret
+          apiVersion: v1
+          metadata: { name: mytdt-trade-data-tool-minio, namespace: user-sean }
+          data: { MINIO_ROOT_USER: dGR0, MINIO_ROOT_PASSWORD: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXowMTIzNDU2Nzg5QUJDRA== }
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-minio
+    asserts:
+      - equal:
+          path: data.MINIO_ROOT_PASSWORD
+          value: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXowMTIzNDU2Nzg5QUJDRA==
+  - it: the credentials never land in the shared appsettings file
+    templates: [secrets.yaml]
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - notMatchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: 'AccessKey|SecretKey'
+  - it: FileService, MinioConfig's only reader, gets them from the Secret
+    templates: [deployments.yaml]
+    documentSelector:
+      path: spec.template.metadata.labels["app.kubernetes.io/component"]
+      value: fileservice
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name=="MinioConfig__AccessKey")].valueFrom.secretKeyRef
+          value: { name: mytdt-trade-data-tool-minio, key: MINIO_ROOT_USER }
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name=="MinioConfig__SecretKey")].valueFrom.secretKeyRef
+          value: { name: mytdt-trade-data-tool-minio, key: MINIO_ROOT_PASSWORD }
+  - it: no other service gets them
+    templates: [deployments.yaml]
+    documentSelector:
+      path: spec.template.metadata.labels["app.kubernetes.io/component"]
+      value: web
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].env[?(@.name=="MinioConfig__SecretKey")]
+  - it: s3 mode has no MinIO credentials at all
+    templates: [deployments.yaml]
+    set:
+      objectStorage:
+        provider: s3
+        s3: { accessKeyId: AK, secretAccessKey: SK }
+    documentSelector:
+      path: spec.template.metadata.labels["app.kubernetes.io/component"]
+      value: fileservice
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].env[?(@.name=="MinioConfig__SecretKey")]
+  - it: a leftover rootPassword value fails loudly instead of being silently ignored
+    templates: [secrets.yaml]
+    set:
+      objectStorage:
+        minio:
+          rootPassword: hunter2
+    asserts:
+      - failedTemplate:
+          errorPattern: "objectStorage.minio.rootPassword is no longer used"

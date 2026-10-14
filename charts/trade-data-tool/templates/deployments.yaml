@@ -54,6 +54,17 @@ spec:
                   name: {{ include "tdt.connectorKeySecretName" $ctx }}
                   key: key
             {{- end }}
+            {{- if and (eq $key "fileservice") (eq $ctx.Values.objectStorage.provider "minio") }}
+            # MinIO's generated root credentials. FileService is the only reader of
+            # MinioConfig:AccessKey/SecretKey, so they stay out of the shared
+            # appsettings file.
+            - name: MinioConfig__AccessKey
+              valueFrom:
+                secretKeyRef: { name: {{ include "tdt.fullname" $ctx }}-minio, key: MINIO_ROOT_USER }
+            - name: MinioConfig__SecretKey
+              valueFrom:
+                secretKeyRef: { name: {{ include "tdt.fullname" $ctx }}-minio, key: MINIO_ROOT_PASSWORD }
+            {{- end }}
           {{- if and (eq $key "fileservice") (eq $ctx.Values.objectStorage.provider "s3") }}
           # FileService's S3 adapter reads STS credentials from the AWS_* env.
           envFrom:

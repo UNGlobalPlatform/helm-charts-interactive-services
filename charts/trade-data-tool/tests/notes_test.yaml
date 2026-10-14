@@ -66,3 +66,17 @@ tests:
     asserts:
       - notMatchRegexRaw:
           pattern: 'only through its web'
+  - it: our MinIO build carries its AGPL source note (upstream commit + our patch)
+    set:
+      objectStorage:
+        minio:
+          image: ""
+    asserts:
+      - matchRegexRaw:
+          pattern: 'MinIO is AGPL-3\.0 software; this image is built from its \[source at\s+7aac2a2c5b7c\]\(https://github\.com/minio/minio/tree/7aac2a2c5b7c882e68c1ce017d8256be2feea27f\)'
+      - matchRegexRaw:
+          pattern: '\[our patch\]\(https://github\.com/UNGlobalPlatform/helm-charts-interactive-services/tree/main/charts/trade-data-tool/third-party/minio\)'
+  - it: no source note when MinIO is overridden with another image, or in s3 mode
+    asserts:
+      - notMatchRegexRaw:
+          pattern: 'AGPL'

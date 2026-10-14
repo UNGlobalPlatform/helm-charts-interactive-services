@@ -121,6 +121,11 @@ objectStorage:
     # MinIO, <image.registry>/minio:<image.tag> (tdt/minio, published with the
     # app images from v3.1.0). Set to the old upstream image until that exists.
     image: minio/minio:RELEASE.2024-01-16T16-07-38Z
+    # Root credentials are the ONLY identity this MinIO may use. Never enable
+    # OIDC or LDAP login (MINIO_IDENTITY_OPENID_* / MINIO_IDENTITY_LDAP_* env,
+    # or `mc admin config set ... identity_openid|identity_ldap` through the
+    # admin API): MinIO's own OIDC and LDAP login code carries critical CVEs
+    # with no upstream fix (the project is archived). See TradeDataTools#181.
     rootUser: tdt
     rootPassword: "changeme-minio"
     ingress:

@@ -6,7 +6,7 @@ release:
   name: mytdt
   namespace: user-sean
 tests:
-  - it: a fresh install generates a 40-character random password
+  - it: a fresh install generates a random user (16 chars, MinIO-valid) and a 40-character password
     templates: [secrets.yaml]
     documentSelector:
       path: metadata.name
@@ -16,10 +16,11 @@ tests:
           path: data.MINIO_ROOT_PASSWORD
           pattern: '^[A-Za-z0-9]{40}$'
           decodeBase64: true
-      - equal:
+      - matchRegex:
           path: data.MINIO_ROOT_USER
-          value: dGR0
-  - it: an existing password is reused byte-for-byte (stable across upgrades and resumes)
+          pattern: '^tdt[a-z0-9]{13}$'
+          decodeBase64: true
+  - it: an existing user and password are reused byte-for-byte (stable across upgrades and resumes)
     templates: [secrets.yaml]
     release:
       upgrade: true
@@ -32,7 +33,7 @@ tests:
         - kind: Secret
           apiVersion: v1
           metadata: { name: mytdt-trade-data-tool-minio, namespace: user-sean }
-          data: { MINIO_ROOT_USER: dGR0, MINIO_ROOT_PASSWORD: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXowMTIzNDU2Nzg5QUJDRA== }
+          data: { MINIO_ROOT_USER: dGR0cmV1c2VkMTIzNDU2Nzg=, MINIO_ROOT_PASSWORD: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXowMTIzNDU2Nzg5QUJDRA== }
     documentSelector:
       path: metadata.name
       value: mytdt-trade-data-tool-minio
@@ -40,6 +41,9 @@ tests:
       - equal:
           path: data.MINIO_ROOT_PASSWORD
           value: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXowMTIzNDU2Nzg5QUJDRA==
+      - equal:
+          path: data.MINIO_ROOT_USER
+          value: dGR0cmV1c2VkMTIzNDU2Nzg=
   - it: the credentials never land in the shared appsettings file
     templates: [secrets.yaml]
     documentSelector:
@@ -89,4 +93,13 @@ tests:
           rootPassword: hunter2
     asserts:
       - failedTemplate:
-          errorPattern: "objectStorage.minio.rootPassword is no longer used"
+          errorPattern: "objectStorage.minio.rootUser/rootPassword are no longer used"
+  - it: a leftover rootUser value fails too (the access key must not be a shared default)
+    templates: [secrets.yaml]
+    set:
+      objectStorage:
+        minio:
+          rootUser: tdt
+    asserts:
+      - failedTemplate:
+          errorPattern: "objectStorage.minio.rootUser/rootPassword are no longer used"

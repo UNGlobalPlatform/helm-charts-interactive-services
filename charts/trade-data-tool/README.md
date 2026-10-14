@@ -119,7 +119,6 @@ Chart 0.7.0 (app 3.0.1) is a **fresh install only**. App 3.x uses a new database
 | objectStorage.minio.resources.limits.memory | string | `"512Mi"` |  |
 | objectStorage.minio.resources.requests.cpu | string | `"50m"` |  |
 | objectStorage.minio.resources.requests.memory | string | `"256Mi"` |  |
-| objectStorage.minio.rootUser | string | `"tdt"` |  |
 | objectStorage.provider | string | `"minio"` |  |
 | objectStorage.s3.accessKeyId | string | `""` |  |
 | objectStorage.s3.endpoint | string | `""` |  |

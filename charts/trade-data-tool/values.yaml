@@ -126,11 +126,10 @@ objectStorage:
     # or `mc admin config set ... identity_openid|identity_ldap` through the
     # admin API): MinIO's own OIDC and LDAP login code carries critical CVEs
     # with no upstream fix (the project is archived). See TradeDataTools#181.
-    # The root password is generated per release and kept in the
-    # <release>-trade-data-tool-minio Secret (MINIO_ROOT_PASSWORD); there is
-    # deliberately no value for it. Nobody outside the release needs it: TDT
-    # reaches MinIO only through FileService.
-    rootUser: tdt
+    # The root user and password are generated per release and kept in the
+    # <release>-trade-data-tool-minio Secret (MINIO_ROOT_USER/_PASSWORD); there
+    # are deliberately no values for them. Nobody outside the release needs
+    # them: TDT reaches MinIO only through FileService.
     ingress:
       # Browser-reachable hostname for MinIO's S3 API. The web UI uploads by
       # handing the browser a presigned URL built against MinioConfig:ApiUrl

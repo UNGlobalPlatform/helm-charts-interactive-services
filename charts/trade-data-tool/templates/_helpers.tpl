@@ -104,6 +104,10 @@ In-cluster API base URL for a component: http://<svc>:<port>/api/<Path>/
 {{- printf "%s-minio" (include "tdt.fullname" .) | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
+{{- define "tdt.minioDenySvcName" -}}
+{{- printf "%s-minio-deny" (include "tdt.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
 {{/*
 JWT signing key: explicit value or a per-release derivation that is stable
 across upgrades (release UID would be ideal but isn't available; derive from

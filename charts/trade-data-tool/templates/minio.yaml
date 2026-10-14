@@ -55,9 +55,16 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
         seccompProfile:
           type: RuntimeDefault
+      {{- with .Values.image.pullSecretName }}
+      imagePullSecrets:
+        - name: {{ . }}
+      {{- end }}
       containers:
         - name: minio
-          image: {{ .Values.objectStorage.minio.image }}
+          # Our source build, published with the app images under the same tag
+          # (tdt/minio, from v3.1.0); objectStorage.minio.image overrides it.
+          image: {{ .Values.objectStorage.minio.image | default (printf "%s/minio:%s" .Values.image.registry .Values.image.tag) }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           args: ["server", "/data", "--console-address", ":9001"]
           securityContext:
             allowPrivilegeEscalation: false

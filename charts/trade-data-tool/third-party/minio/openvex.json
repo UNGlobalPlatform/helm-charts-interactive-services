@@ -1,0 +1,99 @@
+{
+  "@context": "https://openvex.dev/ns/v0.2.0",
+  "@id": "urn:uuid:31fef0ea-4f1f-400a-bc00-19db00148a8e",
+  "author": "Trade Data Tool maintainers",
+  "timestamp": "2026-10-14T16:14:04Z",
+  "version": 1,
+  "tooling": "hand-written; checked with trivy --vex",
+  "statements": [
+    {
+      "vulnerability": {
+        "name": "CVE-2026-40344"
+      },
+      "products": [
+        {
+          "@id": "pkg:golang/github.com/minio/minio@v0.0.0-20260212201848-7aac2a2c5b7c%2Bdirty"
+        }
+      ],
+      "status": "not_affected",
+      "justification": "inline_mitigations_already_exist",
+      "impact_statement": "patches/0001 removes the unsigned-trailer upload mode (X-Amz-Content-Sha256: STREAMING-UNSIGNED-PAYLOAD-TRAILER) from the accepted S3 authentication types; such requests are refused with HTTP 400 InvalidRequest before authentication or any S3 handler runs."
+    },
+    {
+      "vulnerability": {
+        "name": "CVE-2026-41145"
+      },
+      "products": [
+        {
+          "@id": "pkg:golang/github.com/minio/minio@v0.0.0-20260212201848-7aac2a2c5b7c%2Bdirty"
+        }
+      ],
+      "status": "not_affected",
+      "justification": "inline_mitigations_already_exist",
+      "impact_statement": "patches/0001 removes the unsigned-trailer upload mode (X-Amz-Content-Sha256: STREAMING-UNSIGNED-PAYLOAD-TRAILER) from the accepted S3 authentication types; such requests are refused with HTTP 400 InvalidRequest before authentication or any S3 handler runs."
+    },
+    {
+      "vulnerability": {
+        "name": "CVE-2026-34204"
+      },
+      "products": [
+        {
+          "@id": "pkg:golang/github.com/minio/minio@v0.0.0-20260212201848-7aac2a2c5b7c%2Bdirty"
+        }
+      ],
+      "status": "affected",
+      "action_statement": "Exploitable only by an authenticated client allowed s3:PutObject. Give write credentials only to trusted services; there is no fix in the open-source code."
+    },
+    {
+      "vulnerability": {
+        "name": "CVE-2026-39414"
+      },
+      "products": [
+        {
+          "@id": "pkg:golang/github.com/minio/minio@v0.0.0-20260212201848-7aac2a2c5b7c%2Bdirty"
+        }
+      ],
+      "status": "affected",
+      "action_statement": "Exploitable only by an authenticated client using S3 Select, which Trade Data Tool does not use. Give credentials only to trusted services; there is no fix in the open-source code."
+    },
+    {
+      "vulnerability": {
+        "name": "CVE-2026-33322"
+      },
+      "products": [
+        {
+          "@id": "pkg:golang/github.com/minio/minio@v0.0.0-20260212201848-7aac2a2c5b7c%2Bdirty"
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_in_execute_path",
+      "impact_statement": "Requires OpenID Connect identity to be configured. The chart configures only the root credentials; do not enable OIDC on this MinIO."
+    },
+    {
+      "vulnerability": {
+        "name": "CVE-2026-33419"
+      },
+      "products": [
+        {
+          "@id": "pkg:golang/github.com/minio/minio@v0.0.0-20260212201848-7aac2a2c5b7c%2Bdirty"
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_in_execute_path",
+      "impact_statement": "Requires LDAP identity to be configured. The chart configures only the root credentials; do not enable LDAP on this MinIO."
+    },
+    {
+      "vulnerability": {
+        "name": "CVE-2026-42600"
+      },
+      "products": [
+        {
+          "@id": "pkg:golang/github.com/minio/minio@v0.0.0-20260212201848-7aac2a2c5b7c%2Bdirty"
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_in_execute_path",
+      "impact_statement": "The internode storage API (ReadMultiple) is registered only in distributed, multi-node mode. The chart runs a single node (minio server /data)."
+    }
+  ]
+}

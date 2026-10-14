@@ -77,10 +77,20 @@ spec:
               containerPort: 9000
             - name: console
               containerPort: 9001
+          # Both probes are httpGet, which the kubelet performs itself: the image
+          # (tdt/minio, distroless) has no shell or curl for an exec probe.
           readinessProbe:
             httpGet: { path: /minio/health/ready, port: s3 }
             initialDelaySeconds: 5
             periodSeconds: 10
+          # Restarts a hung server. Lenient (about 2 minutes of failures) so a
+          # slow start or a busy disk doesn't cause a restart loop.
+          livenessProbe:
+            httpGet: { path: /minio/health/live, port: s3 }
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 6
           volumeMounts:
             - name: data
               mountPath: /data

@@ -7,7 +7,7 @@ global:
 image:
   registry: 142496269814.dkr.ecr.us-west-2.amazonaws.com/tdt
   # One tag for every service image (built together from the same commit).
-  tag: "v3.0.1"
+  tag: "v3.1.0"
   pullPolicy: IfNotPresent
   # Name of an existing docker-registry Secret in the release namespace, if the
   # registry is private.
@@ -119,8 +119,8 @@ objectStorage:
   minio:
     # Full image reference override. Empty = this release's own source-built
     # MinIO, <image.registry>/minio:<image.tag> (tdt/minio, published with the
-    # app images from v3.1.0). Set to the old upstream image until that exists.
-    image: minio/minio:RELEASE.2024-01-16T16-07-38Z
+    # app images from v3.1.0).
+    image: ""
     # Root credentials are the ONLY identity this MinIO may use. Never enable
     # OIDC or LDAP login (MINIO_IDENTITY_OPENID_* / MINIO_IDENTITY_LDAP_* env,
     # or `mc admin config set ... identity_openid|identity_ldap` through the

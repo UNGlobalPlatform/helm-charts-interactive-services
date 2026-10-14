@@ -14,7 +14,7 @@ tests:
       - matchRegexRaw:
           pattern: 'Deleting this service permanently deletes its database, its rule notebooks and your uploaded files\.'
       - matchRegexRaw:
-          pattern: "can't be upgraded to 3\\.0\\.1"
+          pattern: "can't be upgraded to 3\\.1\\.0"
   - it: in S3 mode, files outlive the service and the credential expiry is stated
     set:
       objectStorage:
@@ -76,7 +76,23 @@ tests:
           pattern: 'MinIO is AGPL-3\.0 software; this image is built from its \[source at\s+7aac2a2c5b7c\]\(https://github\.com/minio/minio/tree/7aac2a2c5b7c882e68c1ce017d8256be2feea27f\)'
       - matchRegexRaw:
           pattern: '\[our patch\]\(https://github\.com/UNGlobalPlatform/helm-charts-interactive-services/tree/main/charts/trade-data-tool/third-party/minio\)'
-  - it: no source note when MinIO is overridden with another image, or in s3 mode
+  - it: the default (our tdt/minio build) carries the source note
+    asserts:
+      - matchRegexRaw:
+          pattern: 'MinIO is AGPL-3\.0 software'
+  - it: no source note when MinIO is overridden with another image
+    set:
+      objectStorage:
+        minio:
+          image: example.org/minio:custom
+    asserts:
+      - notMatchRegexRaw:
+          pattern: 'AGPL'
+  - it: no source note in s3 mode (no bundled MinIO)
+    set:
+      objectStorage:
+        provider: s3
+        s3: { accessKeyId: AK, secretAccessKey: SK }
     asserts:
       - notMatchRegexRaw:
           pattern: 'AGPL'

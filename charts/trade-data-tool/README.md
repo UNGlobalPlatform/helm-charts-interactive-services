@@ -1,6 +1,6 @@
 # trade-data-tool
 
-![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.1](https://img.shields.io/badge/AppVersion-3.0.1-informational?style=flat-square)
+![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.1.0](https://img.shields.io/badge/AppVersion-3.1.0-informational?style=flat-square)
 
 Trade Data Tool (UNSD) — seven .NET microservices and a Blazor web UI for processing trade datasets. Provisions its database serverlessly on the platform's shared MariaDB cluster and stores files in bundled MinIO or S3.
 
@@ -14,7 +14,7 @@ Trade Data Tool (UNSD) — seven .NET microservices and a Blazor web UI for proc
 
 ## What's new in 3.x
 
-Trade Data Tool 3.x is based on upstream TDT 2.5.0. This chart ships 3.0.1.
+Trade Data Tool 3.x is based on upstream TDT 2.5.0. This chart ships 3.1.0.
 
 **Find and download data**
 - **Data Search** (formerly *Advance Search*): faster paging with Previous/Next, an estimated total with a *Show exact* button, sorting by indexed columns. Queries stop after 30 seconds and suggest *Download All*.
@@ -61,7 +61,7 @@ Trade Data Tool 3.x is based on upstream TDT 2.5.0. This chart ships 3.0.1.
 
 ## Upgrading
 
-Chart 0.7.0 (app 3.0.1) is a **fresh install only**. App 3.x uses a new database layout and cannot take over a database created by chart 0.6.x or earlier (app 2.x).
+Chart 0.7.0 (app 3.1.0) is a **fresh install only**. App 3.x uses a new database layout and cannot take over a database created by chart 0.6.x or earlier (app 2.x).
 
 - From Onyxia, nothing changes for existing services: resuming re-runs the chart version they were launched with.
 - With the helm CLI, `helm upgrade` from 0.6.x to 0.7.0 is refused before anything is changed. Keep the release on 0.6.x, or uninstall it (this deletes its data, as above), install 0.7.0 and import the data again.
@@ -99,7 +99,7 @@ Chart 0.7.0 (app 3.0.1) is a **fresh install only**. App 3.x uses a new database
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.pullSecretName | string | `""` |  |
 | image.registry | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/tdt"` |  |
-| image.tag | string | `"v3.0.1"` |  |
+| image.tag | string | `"v3.1.0"` |  |
 | ingress.certManagerClusterIssuer | string | `"letsencrypt-prod"` |  |
 | ingress.enabled | bool | `true` |  |
 | ingress.hostname | string | `"chart-example.local"` |  |
@@ -111,7 +111,7 @@ Chart 0.7.0 (app 3.0.1) is a **fresh install only**. App 3.x uses a new database
 | objectStorage.buckets.domain | string | `"domainfile"` |  |
 | objectStorage.buckets.metadata | string | `"metadatafile"` |  |
 | objectStorage.buckets.system | string | `"system"` |  |
-| objectStorage.minio.image | string | `"minio/minio:RELEASE.2024-01-16T16-07-38Z"` |  |
+| objectStorage.minio.image | string | `""` |  |
 | objectStorage.minio.ingress.hostname | string | `""` |  |
 | objectStorage.minio.persistence.retainOnDelete | bool | `false` |  |
 | objectStorage.minio.persistence.size | string | `"10Gi"` |  |

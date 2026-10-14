@@ -70,6 +70,7 @@ Chart 0.7.0 (app 3.0.1) is a **fresh install only**. App 3.x uses a new database
 
 - **MinIO** (the built-in file storage) is licensed under the [GNU AGPL v3.0](https://www.gnu.org/licenses/agpl-3.0.html). By default this chart runs our MinIO image (`tdt/minio`), built from MinIO's source at commit [`7aac2a2c5b7c`](https://github.com/minio/minio/tree/7aac2a2c5b7c882e68c1ce017d8256be2feea27f) with updated Go dependencies and one small security patch. The patch, the dependency files and the build file are published in [`third-party/minio/`](https://github.com/UNGlobalPlatform/helm-charts-interactive-services/tree/main/charts/trade-data-tool/third-party/minio).
   - **Use root credentials only.** Never enable MinIO's OIDC or LDAP login, whether through `MINIO_IDENTITY_OPENID_*` / `MINIO_IDENTITY_LDAP_*` settings or `mc admin config set … identity_openid|identity_ldap`. MinIO's own OIDC and LDAP login code has known critical vulnerabilities with no upstream fix, because MinIO's open-source project is archived. The chart sets only the root credentials, so neither is enabled as shipped.
+  - **Credentials are generated per release** and kept in the `<release>-trade-data-tool-minio` Secret; nobody needs them, because TDT reaches MinIO only through its own services. If an administrator ever recreates that Secret, restart the MinIO and FileService deployments together: both read the credentials only at start.
 
 ## Source Code
 

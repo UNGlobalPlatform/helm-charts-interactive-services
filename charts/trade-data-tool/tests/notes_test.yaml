@@ -49,7 +49,7 @@ tests:
   - it: links the full release notes in the chart README
     asserts:
       - matchRegexRaw:
-          pattern: 'charts/trade-data-tool/README\.md#whats-new-in-30\)'
+          pattern: 'charts/trade-data-tool/README\.md#whats-new-in-3x\)'
   - it: counts the services right and says plainly that nothing carries over from 2.x
     asserts:
       - matchRegexRaw:

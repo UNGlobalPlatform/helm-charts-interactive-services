@@ -8,13 +8,13 @@ Trade Data Tool (UNSD) — seven .NET microservices and a Blazor web UI for proc
 
 ## Before you start
 
-- **This version needs a new service.** Trade Data Tool 2.x services (chart 0.6.x or earlier) keep running and resume as they are, but they can't be upgraded to 3.0. Your datasets, metadata, rules and users don't carry over: set them up again in the new service, then import your files.
+- **This version needs a new service.** Trade Data Tool 2.x services (chart 0.6.x or earlier) keep running and resume as they are, but they can't be upgraded to 3.x. Your datasets, metadata, rules and users don't carry over: set them up again in the new service, then import your files.
 - **Keep your data before you delete an old service.** Deleting a service permanently deletes its database (datasets, rules, configuration) and its rule notebooks. With the built-in file storage, your uploaded files are deleted too. With your own S3 storage they stay in your bucket, but a new service won't recognise them as datasets. Keep the old service until you have downloaded what you need, and keep your source files.
 - **Dates now default to day-first.** When you import a dataset file, a new *Date/Time Format* option defaults to **Day-month-year (31/12/2025)**. Previously, ambiguous dates such as 03/04/2025 were read month-first. Choose *Month-day-year* or *Year-month-day* if your files use those layouts. The old *Regional Format* option is now called *Decimal Format*.
 
-## What's new in 3.0
+## What's new in 3.x
 
-Trade Data Tool 3.0 is based on upstream TDT 2.5.0. This chart ships 3.0.1.
+Trade Data Tool 3.x is based on upstream TDT 2.5.0. This chart ships 3.0.1.
 
 **Find and download data**
 - **Data Search** (formerly *Advance Search*): faster paging with Previous/Next, an estimated total with a *Show exact* button, sorting by indexed columns. Queries stop after 30 seconds and suggest *Download All*.

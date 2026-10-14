@@ -135,6 +135,9 @@ objectStorage:
       # from outside the cluster. When empty, presigned URLs fall back to the
       # in-cluster endpoint (fine for headless/in-cluster use only). Onyxia
       # fills this next to the web hostname; rides the same wildcard cert.
+      # Its shape, {{project.id}}-tdt-minio-<digits>.<domain> (values.schema.json),
+      # is matched by a platform-side APISIX rule (TradeDataTools#191). Change
+      # the pattern only together with that rule, or new instances fall outside it.
       hostname: ""
     persistence:
       size: 10Gi

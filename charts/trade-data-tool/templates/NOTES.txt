@@ -83,8 +83,7 @@ service shows as running once the web UI answers.
   launched, resumed or reconfigured, and a wrong value can stop rules from
   running until then.
 {{- end }}
-{{- /* PENDING TradeDataTools#162/#151: no isolation claim until a live check shows
-     the cluster enforces NetworkPolicy (vpc-cni enableNetworkPolicy is unverified;
-     an unenforced policy is inert). Then restore, under networkPolicy.enabled:
-     "Other services in your project can reach this one only through its web
-     addresses above." */}}
+{{- if .Values.networkPolicy.enabled }}
+- Other services in your project can reach this one only through its web
+  addresses above.
+{{- end }}

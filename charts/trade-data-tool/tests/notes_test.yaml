@@ -62,7 +62,14 @@ tests:
     asserts:
       - matchRegexRaw:
           pattern: "Don't edit them: they're overwritten each time the service is\\s+launched, resumed or reconfigured, and a wrong value can stop rules from\\s+running until then"
-  - it: makes no network-isolation claim until enforcement is verified live
+  - it: states the network isolation the NetworkPolicy enforces
+    asserts:
+      - matchRegexRaw:
+          pattern: 'Other services in your project can reach this one only through its web\s+addresses above\.'
+  - it: makes no isolation claim when the NetworkPolicy is off
+    set:
+      networkPolicy:
+        enabled: false
     asserts:
       - notMatchRegexRaw:
           pattern: 'only through its web'

@@ -79,6 +79,11 @@ Chart {{ template "chart.version" . }} (app {{ template "chart.appVersion" . }})
 
 - **MinIO** (the built-in file storage) is licensed under the [GNU AGPL v3.0](https://www.gnu.org/licenses/agpl-3.0.html). By default this chart runs our MinIO image (`tdt/minio`), built from MinIO's source at commit [`7aac2a2c5b7c`](https://github.com/minio/minio/tree/7aac2a2c5b7c882e68c1ce017d8256be2feea27f) with updated Go dependencies and one small security patch. The patch, the dependency files and the build file are published in [`third-party/minio/`](https://github.com/UNGlobalPlatform/helm-charts-interactive-services/tree/main/charts/trade-data-tool/third-party/minio).
   - **Use root credentials only.** Never enable MinIO's OIDC or LDAP login, whether through `MINIO_IDENTITY_OPENID_*` / `MINIO_IDENTITY_LDAP_*` settings or `mc admin config set … identity_openid|identity_ldap`. MinIO's own OIDC and LDAP login code has known critical vulnerabilities with no upstream fix, because MinIO's open-source project is archived. The chart sets only the root credentials, so neither is enabled as shipped.
+{{- /* PENDING TradeDataTools#185 (Fix 2, MinIO root password): if Sean DECLINES Fix 2, users keep
+     MinIO credentials, so render this bullet (and verify the client setting first, e.g. AWS SDKs'
+     AWS_REQUEST_CHECKSUM_CALCULATION=when_required, INFERRED). If he CONFIRMS Fix 2, delete it.
+  - **Direct S3 clients.** Clients that use unsigned streaming uploads over HTTPS (recent AWS CLI/SDKs, `mc`) are refused; configure them to sign payloads.
+*/}}
 
 {{ template "chart.sourcesSection" . }}
 

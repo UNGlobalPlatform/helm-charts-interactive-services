@@ -76,12 +76,15 @@
         "provider": {
           "type": "string",
           "title": "Provider",
-          "description": "MinIO deployed with this service (standard), or S3 with your platform credentials. S3 access expires about 11 hours after launch and isn't renewed when the service resumes, so use MinIO for work that lasts longer than a day.",
+          "description": "Where uploaded files are stored. minio: a MinIO deployed with this service, the only option on the UN Global Platform. s3: an external S3 bucket, for helm CLI installs elsewhere (see the README).",
           "default": "minio",
           "enum": [
             "minio",
             "s3"
-          ]
+          ],
+          "x-onyxia": {
+            "hidden": true
+          }
         },
         "minio": {
           "type": "object",
@@ -111,11 +114,7 @@
                     "20Gi",
                     "50Gi",
                     "100Gi"
-                  ],
-                  "hidden": {
-                    "value": "s3",
-                    "path": "objectStorage/provider"
-                  }
+                  ]
                 },
                 "retainOnDelete": {
                   "type": "boolean",
@@ -127,80 +126,6 @@
                     "overwriteDefaultWith": "false"
                   }
                 }
-              }
-            }
-          }
-        },
-        "s3": {
-          "type": "object",
-          "properties": {
-            "region": {
-              "type": "string",
-              "title": "S3 region",
-              "default": "",
-              "hidden": {
-                "value": "minio",
-                "path": "objectStorage/provider"
-              },
-              "x-onyxia": {
-                "overwriteDefaultWith": "{{s3.AWS_DEFAULT_REGION}}"
-              }
-            },
-            "endpoint": {
-              "type": "string",
-              "title": "S3 endpoint (optional)",
-              "default": "",
-              "hidden": {
-                "value": "minio",
-                "path": "objectStorage/provider"
-              },
-              "x-onyxia": {
-                "overwriteDefaultWith": "{{s3.AWS_S3_ENDPOINT}}"
-              }
-            },
-            "accessKeyId": {
-              "type": "string",
-              "default": "",
-              "x-onyxia": {
-                "hidden": true,
-                "overwriteDefaultWith": "{{s3.AWS_ACCESS_KEY_ID}}"
-              }
-            },
-            "secretAccessKey": {
-              "type": "string",
-              "default": "",
-              "x-onyxia": {
-                "hidden": true,
-                "overwriteDefaultWith": "{{s3.AWS_SECRET_ACCESS_KEY}}"
-              }
-            },
-            "sessionToken": {
-              "type": "string",
-              "default": "",
-              "x-onyxia": {
-                "hidden": true,
-                "overwriteDefaultWith": "{{s3.AWS_SESSION_TOKEN}}"
-              }
-            },
-            "forcePathStyle": {
-              "type": "boolean",
-              "default": false,
-              "x-onyxia": {
-                "hidden": true,
-                "overwriteDefaultWith": "{{s3.pathStyleAccess}}"
-              }
-            },
-            "workingDirectoryPath": {
-              "type": "string",
-              "title": "Working directory",
-              "description": "Your S3 folder. Trade Data Tool keeps its files in a subfolder named after this service (for example trade-data-tool-123456), apart from your other files. Deleting the service leaves that subfolder in My Files.",
-              "default": "",
-              "hidden": {
-                "value": "minio",
-                "path": "objectStorage/provider"
-              },
-              "x-onyxia": {
-                "overwriteDefaultWith": "datalab-142496269814-user-bucket/{{project.id}}/"
               }
             }
           }

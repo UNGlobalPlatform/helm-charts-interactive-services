@@ -24,13 +24,14 @@ service shows as running once the web UI answers.
   {{ $deleted }}. Resume it, or download what you need, before then.
 - ⚠️ Deleting this service permanently deletes {{ $deleted }}.
 {{- if eq .Values.objectStorage.provider "s3" }}
-  Your files stay in the `{{ .Release.Name }}` folder in *My Files*, but a new
+  Your files stay in `{{ $s3loc.bucket }}/{{ $s3loc.prefix }}/` in your S3 storage, but a new
   service won't recognise them as datasets. Delete that folder when you no longer need it.
 {{- end }}
 {{- end }}
 {{- if eq .Values.objectStorage.provider "s3" }}
-- S3 access expires about 11 hours after launch and isn't renewed when the
-  service resumes. Use MinIO (the default) for work that lasts longer than a day.
+- S3 storage is for installs outside the UN Global Platform. Its credentials are
+  read once at start and never renewed: if they're temporary, file access stops
+  when they expire.
 {{- end }}
 - Existing Trade Data Tool 2.x services keep running and resume as they are;
   they can't be upgraded to {{ .Chart.AppVersion }}. Your datasets, metadata, rules and

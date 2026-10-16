@@ -99,22 +99,21 @@ database:
 
 # File upload rules read by the web UI (TDT.Web/Helper/AppSettings.cs). The
 # images bake no FileService section at all, so these MUST be set here: a null
-# AllowedExt throws NullReferenceException on the upload pages, and an unset
-# MaxFileSize converts to 0, which rejects every file as too large.
+# AllowedExt throws NullReferenceException on the upload pages. Import file
+# types and size limits are set in the app's System Configuration, not here.
 # Defaults match what the engineers actually deploy: base/TDT.Web/Deploy/
 # tdt-webui-secrets.yaml. (Not overlays/*/patches-secretes.yml — deployment.ps1
 # excludes that file, so its wider extension list is never applied and is stale.)
 uploads:
   # Extensions accepted by the File Service upload pages (comma-separated, no dots).
   allowedExtensions: "tsv,txt,csv"
-  # Extensions accepted by the Domain/Metadata import pages.
-  importAllowedExtensions: "xlsx,csv,txt"
-  # Largest accepted upload, in bytes (default ~300 MiB, matching the cloud deploy).
-  maxFileSizeBytes: 314572900
 
 objectStorage:
-  # minio: a small MinIO deployed with this release (default).
-  # s3: AWS S3 with the caller's credentials.
+  # minio: a small MinIO deployed with this release (default, and the only
+  #   option on the UN Global Platform; the Onyxia form doesn't offer a choice).
+  # s3: an external S3 bucket, for helm CLI installs elsewhere. NOT supported on
+  #   the UN Global Platform: its storage serves files only to services on the
+  #   platform, and S3 mode sends downloads straight from S3 to the browser.
   provider: minio
   minio:
     # Full image reference override. Empty = this release's own source-built
@@ -157,6 +156,8 @@ objectStorage:
       limits:
         cpu: 500m
         memory: 512Mi
+  # s3 mode only (helm CLI installs off the UN Global Platform); set these by
+  # hand. The credentials are read once at start and never renewed.
   s3:
     region: ""
     endpoint: ""
@@ -164,10 +165,9 @@ objectStorage:
     secretAccessKey: ""
     sessionToken: ""
     forcePathStyle: false
-    # Onyxia's working directory: "<shared-bucket>/<project folder>/" (see
-    # values.schema.json). The chart splits it into the real bucket and a base
+    # "<bucket>/<folder>/". The chart splits it into the real bucket and a base
     # prefix, and adds a subfolder named after the release: the files live under
-    # "<project folder>/<release>/" (tdt.s3Location).
+    # "<folder>/<release>/" (tdt.s3Location).
     workingDirectoryPath: ""
   buckets:
     domain: domainfile

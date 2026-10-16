@@ -12,6 +12,23 @@ tests:
     asserts:
       - hasDocuments:
           count: 3
+  - it: the default (every Onyxia launch) stores files in this release's MinIO
+    templates: [secrets.yaml]
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"ObjectStorage": \{\s*"Provider": "minio"\s*\}'
+  - it: s3 without credentials (e.g. an old saved Onyxia configuration) is refused as unsupported here
+    templates: [secrets.yaml]
+    set:
+      objectStorage:
+        provider: s3
+    asserts:
+      - failedTemplate:
+          errorPattern: "S3 storage isn't supported on the UN Global Platform: launch with the default file storage \\(MinIO\\)\\..*Nothing has been changed\\."
   - it: minio mode lets FileService create its buckets (a fresh MinIO is empty)
     templates: [secrets.yaml]
     documentSelector:
@@ -213,7 +230,7 @@ tests:
           workingDirectoryPath: "/"
     asserts:
       - failedTemplate:
-          errorPattern: "S3 storage needs a working directory\\. Set Working directory \\(objectStorage\\.s3\\.workingDirectoryPath\\).*Nothing has been changed\\."
+          errorPattern: "S3 storage needs a working directory: set objectStorage\\.s3\\.workingDirectoryPath to your S3 folder.*Nothing has been changed\\."
   - it: s3 mode deploys no MinIO
     templates: [minio.yaml]
     set:

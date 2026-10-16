@@ -1,6 +1,6 @@
 # trade-data-tool
 
-![Version: 0.7.1](https://img.shields.io/badge/Version-0.7.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.1.5](https://img.shields.io/badge/AppVersion-3.1.5-informational?style=flat-square)
+![Version: 0.7.1](https://img.shields.io/badge/Version-0.7.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.1.7](https://img.shields.io/badge/AppVersion-3.1.7-informational?style=flat-square)
 
 Trade Data Tool (UNSD) — seven .NET microservices and a Blazor web UI for processing trade datasets. Provisions its database serverlessly on the platform's shared MariaDB cluster and stores files in bundled MinIO or S3.
 
@@ -14,7 +14,7 @@ Trade Data Tool (UNSD) — seven .NET microservices and a Blazor web UI for proc
 
 ## What's new in 3.x
 
-Trade Data Tool 3.x is based on upstream TDT 2.5.0. This chart ships 3.1.5.
+Trade Data Tool 3.x is based on upstream TDT 2.5.0. This chart ships 3.1.7.
 
 **Find and download data**
 - **Data Search** (formerly *Advance Search*): faster paging with Previous/Next, an estimated total with a *Show exact* button, sorting by indexed columns. Queries stop after 30 seconds and suggest *Download All*.
@@ -101,7 +101,7 @@ App 3.x uses a new database layout and cannot take over a database created by ch
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.pullSecretName | string | `""` |  |
 | image.registry | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/tdt"` |  |
-| image.tag | string | `"v3.1.5"` |  |
+| image.tag | string | `"v3.1.7"` |  |
 | ingress.certManagerClusterIssuer | string | `"letsencrypt-prod"` |  |
 | ingress.enabled | bool | `true` |  |
 | ingress.hostname | string | `"chart-example.local"` |  |

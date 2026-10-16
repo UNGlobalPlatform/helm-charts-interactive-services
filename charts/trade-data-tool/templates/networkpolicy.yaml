@@ -1,0 +1,107 @@
+{{- if .Values.networkPolicy.enabled }}
+{{- /*
+Who may connect INTO this release's pods (outbound traffic is not restricted:
+the database, the image registry, Maven for the Zeppelin driver and the
+connectors all live outside the namespace).
+
+- Backends (the seven services and the readiness marker): only this
+  release's own pods, i.e. pods labelled app.kubernetes.io/instance=<release>.
+  That covers web -> backends, backend -> backend, the readiness marker and
+  the helm-test pods. Other services in the namespace and other tenants
+  cannot call the APIs directly.
+- Edge (web UI, MinIO's S3 API, Zeppelin): the same, plus the ingress
+  controller's namespace on the port its public hostname serves. Zeppelin
+  also accepts its interpreter-config Job (jdbc-config), which deliberately
+  carries no instance label (Onyxia reads every instance-labelled pod as a
+  task).
+
+Kubelet probes are unaffected (CNIs always admit the node). Loopback inside
+a pod, such as the Zeppelin interpreter talking to its server, never leaves
+the pod.
+*/}}
+{{- $backends := list "readiness" }}
+{{- range $key, $_ := .Values.services }}{{- $backends = append $backends $key }}{{- end }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "tdt.fullname" . }}-backends
+  labels:
+    {{- include "tdt.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ .Release.Name }}
+    matchExpressions:
+      - key: app.kubernetes.io/component
+        operator: In
+        values:
+          {{- toYaml (sortAlpha $backends) | nindent 10 }}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: {{ .Release.Name }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "tdt.fullname" . }}-edge
+  labels:
+    {{- include "tdt.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ .Release.Name }}
+    matchExpressions:
+      - key: app.kubernetes.io/component
+        operator: In
+        values: [web, minio]
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: {{ .Release.Name }}
+    # Public hostnames: the web UI (8080) and MinIO's S3 API (9000) for presigned
+    # uploads. Numeric, not named: vpc-cni resolves named ports from the selected
+    # pods' containerPorts and skips the rule until one is ready.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Values.networkPolicy.ingressNamespace }}
+      ports:
+        - port: 8080
+        - port: 9000
+{{- if .Values.zeppelin.enabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "tdt.fullname" . }}-zeppelin
+  labels:
+    {{- include "tdt.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: zeppelin
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: {{ .Release.Name }}
+        # The subchart's interpreter-config Job (no instance label, see above).
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: jdbc-config
+    # Public hostname: the notebook UI.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Values.networkPolicy.ingressNamespace }}
+      ports:
+        - port: {{ ((.Values.zeppelin.networking).service).port | default 8080 }}
+{{- end }}
+{{- end }}

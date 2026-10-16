@@ -42,12 +42,14 @@ repos:
   # Check yaml files except for Helm templates
   - id: check-yaml
     exclude: "/templates/"
-  # Check empty new line before EOF (ignore generated charts)
+  # Check empty new line before EOF (ignore generated charts, and third-party
+  # source copies, which must stay byte-identical to what is built)
   - id: end-of-file-fixer
-    exclude: "charts/(?!(library-chart|(jupyter-py(spark|thon)/.*)|(rstudio(-sparkr)?/.*)|(vscode-py(thon|spark)/.*)|(trade-data-tool/.*)|(zeppelin/.*)))"
-  # Check trailing whitespaces (ignore generated charts)
+    exclude: "charts/(?!(library-chart|(jupyter-py(spark|thon)/.*)|(rstudio(-sparkr)?/.*)|(vscode-py(thon|spark)/.*)|(trade-data-tool/.*)|(zeppelin/.*)))|charts/trade-data-tool/third-party/"
+  # Check trailing whitespaces (ignore generated charts and third-party copies;
+  # a patch's blank context lines are a single space)
   - id: trailing-whitespace
-    exclude: "charts/(?!(library-chart|(jupyter-py(spark|thon)/.*)|(rstudio(-sparkr)?/.*)|(vscode-py(thon|spark)/.*)|(trade-data-tool/.*)|(zeppelin/.*)))"
+    exclude: "charts/(?!(library-chart|(jupyter-py(spark|thon)/.*)|(rstudio(-sparkr)?/.*)|(vscode-py(thon|spark)/.*)|(trade-data-tool/.*)|(zeppelin/.*)))|charts/trade-data-tool/third-party/"
 
 # Warn the user if `library-chart` is updated and its new version simulatenously reused in other charts
 - repo: local

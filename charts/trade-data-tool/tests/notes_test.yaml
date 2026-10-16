@@ -1,0 +1,105 @@
+suite: post-launch notes (Onyxia shows NOTES.txt after every launch)
+templates:
+  - NOTES.txt
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  - it: states the suspension and 30-day deletion rules, naming what is lost
+    asserts:
+      - matchRegexRaw:
+          pattern: 'suspends this service 13 hours after it was launched or last resumed'
+      - matchRegexRaw:
+          pattern: 'suspended for 30 days is deleted automatically, with\s+its database, its rule notebooks and your uploaded files\.'
+      - matchRegexRaw:
+          pattern: 'Deleting this service permanently deletes its database, its rule notebooks and your uploaded files\.'
+      - matchRegexRaw:
+          pattern: "can't be upgraded to 3\\.1\\.3"
+  - it: in S3 mode, files outlive the service and the credential expiry is stated
+    set:
+      objectStorage:
+        provider: s3
+        s3:
+          accessKeyId: AK
+          secretAccessKey: SK
+    asserts:
+      - matchRegexRaw:
+          pattern: 'permanently deletes its database and its rule notebooks\.\n\s+Your files stay in your S3 bucket'
+      - matchRegexRaw:
+          pattern: "S3 access expires about 11 hours after launch and isn't renewed"
+  - it: retained data is not claimed as deleted
+    set:
+      database:
+        lifecycle:
+          retainOnDelete: true
+      zeppelin:
+        persistence:
+          retainOnDelete: true
+      objectStorage:
+        minio:
+          persistence:
+            retainOnDelete: true
+    asserts:
+      - notMatchRegexRaw:
+          pattern: 'permanently deletes|deleted automatically'
+  - it: says the rule-engine settings are platform-managed
+    asserts:
+      - matchRegexRaw:
+          pattern: 'rule-engine connection settings in \*System Configuration\* are managed by\s+the platform'
+  - it: links the full release notes in the chart README
+    asserts:
+      - matchRegexRaw:
+          pattern: 'charts/trade-data-tool/README\.md#whats-new-in-3x\)'
+  - it: counts the services right and says plainly that nothing carries over from 2.x
+    asserts:
+      - matchRegexRaw:
+          pattern: 'is starting: 7 services \+ web UI'
+      - matchRegexRaw:
+          pattern: "datasets, metadata, rules and\\s+users don't carry over: set them up again in this service"
+      - notMatchRegexRaw:
+          pattern: 'import it into this one'
+  - it: tells users not to edit the platform-managed rule-engine settings
+    asserts:
+      - matchRegexRaw:
+          pattern: "Don't edit them: they're overwritten each time the service is\\s+launched, resumed or reconfigured, and a wrong value can stop rules from\\s+running until then"
+  - it: states the network isolation the NetworkPolicy enforces
+    asserts:
+      - matchRegexRaw:
+          pattern: 'Other services in your project can reach this one only through its web\s+addresses above\.'
+  - it: makes no isolation claim when the NetworkPolicy is off
+    set:
+      networkPolicy:
+        enabled: false
+    asserts:
+      - notMatchRegexRaw:
+          pattern: 'only through its web'
+  - it: our MinIO build carries its AGPL source note (upstream commit + our patch)
+    set:
+      objectStorage:
+        minio:
+          image: ""
+    asserts:
+      - matchRegexRaw:
+          pattern: 'MinIO is AGPL-3\.0 software; this image is built from its \[source at\s+7aac2a2c5b7c\]\(https://github\.com/minio/minio/tree/7aac2a2c5b7c882e68c1ce017d8256be2feea27f\)'
+      - matchRegexRaw:
+          pattern: '\[our patch\]\(https://github\.com/UNGlobalPlatform/helm-charts-interactive-services/tree/main/charts/trade-data-tool/third-party/minio\)'
+  - it: the default (our tdt/minio build) carries the source note
+    asserts:
+      - matchRegexRaw:
+          pattern: 'MinIO is AGPL-3\.0 software'
+  - it: no source note when MinIO is overridden with another image
+    set:
+      objectStorage:
+        minio:
+          image: example.org/minio:custom
+    asserts:
+      - notMatchRegexRaw:
+          pattern: 'AGPL'
+  - it: no source note in s3 mode (no bundled MinIO)
+    set:
+      objectStorage:
+        provider: s3
+        s3: { accessKeyId: AK, secretAccessKey: SK }
+    asserts:
+      - notMatchRegexRaw:
+          pattern: 'AGPL'

@@ -43,10 +43,39 @@ spec:
         app.kubernetes.io/component: minio
     spec:
       automountServiceAccountToken: false
+      # Non-root: the S3 API is reachable from browsers through ingress-minio,
+      # and MinIO images run as root unless told otherwise. fsGroup makes a new
+      # volume group-writable for uid 1000 on first mount (OnRootMismatch skips
+      # the recursive walk after that).
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      {{- with .Values.image.pullSecretName }}
+      imagePullSecrets:
+        - name: {{ . }}
+      {{- end }}
       containers:
         - name: minio
-          image: {{ .Values.objectStorage.minio.image }}
+          # Our source build, published with the app images under the same tag
+          # (tdt/minio, from v3.1.0); objectStorage.minio.image overrides it.
+          image: {{ .Values.objectStorage.minio.image | default (printf "%s/minio:%s" .Values.image.registry .Values.image.tag) }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           args: ["server", "/data", "--console-address", ":9001"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          env:
+            # MinIO keeps its certs dir under $HOME/.minio; uid 1000 has no home
+            # in the image, so point it at the writable /tmp.
+            - name: HOME
+              value: /tmp
           envFrom:
             - secretRef:
                 name: {{ include "tdt.fullname" . }}-minio
@@ -55,19 +84,33 @@ spec:
               containerPort: 9000
             - name: console
               containerPort: 9001
+          # Both probes are httpGet, which the kubelet performs itself: the image
+          # (tdt/minio, distroless) has no shell or curl for an exec probe.
           readinessProbe:
             httpGet: { path: /minio/health/ready, port: s3 }
             initialDelaySeconds: 5
             periodSeconds: 10
+          # Restarts a hung server. Lenient (about 2 minutes of failures) so a
+          # slow start or a busy disk doesn't cause a restart loop.
+          livenessProbe:
+            httpGet: { path: /minio/health/live, port: s3 }
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 6
           volumeMounts:
             - name: data
               mountPath: /data
+            - name: tmp
+              mountPath: /tmp
           resources:
             {{- toYaml .Values.objectStorage.minio.resources | nindent 12 }}
       volumes:
         - name: data
           persistentVolumeClaim:
             claimName: {{ include "tdt.minioSvcName" . }}
+        - name: tmp
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service

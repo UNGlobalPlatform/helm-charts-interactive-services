@@ -14,8 +14,14 @@ metadata:
     {{- if and .Values.ingress.tls .Values.ingress.useCertManager }}
     cert-manager.io/cluster-issuer: {{ .Values.ingress.certManagerClusterIssuer }}
     {{- end }}
-    # nginx-only knobs (ignored by other controllers): uploads are single PUTs
-    # up to uploads.maxFileSizeBytes, far beyond nginx's 1m default.
+    # Uploads are single presigned PUTs up to uploads.maxFileSizeBytes, and
+    # MinIO can take a while to answer after a large one. Each controller
+    # ignores the other's annotations, so both sets are set.
+    # APISIX (the platform's class): no body-size limit by default; the
+    # upstream timeouts otherwise fall back to 60s.
+    k8s.apisix.apache.org/upstream-read-timeout: "600s"
+    k8s.apisix.apache.org/upstream-send-timeout: "600s"
+    # ingress-nginx (helm CLI installs elsewhere): its default body limit is 1m.
     nginx.ingress.kubernetes.io/proxy-body-size: 5g
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
@@ -25,6 +31,21 @@ spec:
     - host: {{ .Values.objectStorage.minio.ingress.hostname | quote }}
       http:
         paths:
+          # MinIO serves its admin, health, metrics and internode APIs under the
+          # reserved /minio prefix, on the same port as S3; "minio" can't be a
+          # bucket name, and presigned URLs are path-style (/<bucket>/<key>), so
+          # this never hides user data. Prefix matching is per path segment:
+          # /minio and /minio/..., not /miniodata. It is routed to a Service
+          # with no endpoints (the edge answers 502/503) and lives in THIS
+          # Ingress: the controller translates an Ingress all-or-nothing, so a
+          # broken deny fails closed instead of falling through to /.
+          - path: /minio
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "tdt.minioDenySvcName" . }}
+                port:
+                  number: 9000
           - path: /
             pathType: Prefix
             backend:
@@ -38,4 +59,25 @@ spec:
         - {{ .Values.objectStorage.minio.ingress.hostname | quote }}
       secretName: {{ printf "%s-minio-api" (include "tdt.fullname" .) | trunc 53 | trimSuffix "-" }}-tls
   {{- end }}
+---
+{{- /* Backend for the /minio deny rule above. Its selector matches no pod
+     (no template sets this component), so its Endpoints object exists but is
+     empty. The ingress controller needs both a selector and a declared port to
+     translate the route at all. */}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tdt.minioDenySvcName" . }}
+  labels:
+    {{- include "tdt.labels" . | nindent 4 }}
+    app.kubernetes.io/component: minio-deny
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      targetPort: 9000
+      name: deny
+  selector:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: minio-deny-no-pods
 {{- end }}

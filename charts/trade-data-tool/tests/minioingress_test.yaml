@@ -10,6 +10,26 @@ tests:
   # MinioConfig:ApiUrl (MinioObjectStorageProvider.CreatePresignClient). If that
   # is the in-cluster Service name, the browser cannot resolve it and every
   # upload dies client-side with zero server logs.
+  - it: sets APISIX upstream timeouts (the platform class ignores nginx annotations)
+    templates: [ingress-minio.yaml]
+    set:
+      objectStorage:
+        minio:
+          ingress:
+            hostname: user-sean-tdt-minio-abc123.dev.officialstatistics.org
+    documentSelector:
+      path: kind
+      value: Ingress
+    asserts:
+      - equal:
+          path: metadata.annotations["k8s.apisix.apache.org/upstream-read-timeout"]
+          value: 600s
+      - equal:
+          path: metadata.annotations["k8s.apisix.apache.org/upstream-send-timeout"]
+          value: 600s
+      - equal:
+          path: metadata.annotations["nginx.ingress.kubernetes.io/proxy-body-size"]
+          value: 5g
   - it: minio mode with a hostname renders an ingress to minio:9000
     templates: [ingress-minio.yaml]
     set:
@@ -17,18 +37,23 @@ tests:
         minio:
           ingress:
             hostname: user-sean-tdt-minio-abc123.dev.officialstatistics.org
+    documentSelector:
+      path: kind
+      value: Ingress
     asserts:
-      - hasDocuments:
-          count: 1
       - equal:
           path: spec.rules[0].host
           value: user-sean-tdt-minio-abc123.dev.officialstatistics.org
       - equal:
-          path: spec.rules[0].http.paths[0].backend.service.name
-          value: mytdt-trade-data-tool-minio
-      - equal:
-          path: spec.rules[0].http.paths[0].backend.service.port.number
-          value: 9000
+          path: spec.rules[0].http.paths[1]
+          value:
+            path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mytdt-trade-data-tool-minio
+                port:
+                  number: 9000
       - equal:
           path: spec.tls[0].hosts[0]
           value: user-sean-tdt-minio-abc123.dev.officialstatistics.org
@@ -97,3 +122,56 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+  - it: the ingress renders with its deny Service (Ingress + Service)
+    templates: [ingress-minio.yaml]
+    set:
+      objectStorage:
+        minio:
+          ingress:
+            hostname: user-sean-tdt-minio-abc123.dev.officialstatistics.org
+    asserts:
+      - hasDocuments:
+          count: 2
+  - it: MinIO's reserved /minio prefix (admin, health, metrics APIs) goes to the deny Service, in the SAME Ingress as /
+    templates: [ingress-minio.yaml]
+    set:
+      objectStorage:
+        minio:
+          ingress:
+            hostname: user-sean-tdt-minio-abc123.dev.officialstatistics.org
+    documentSelector:
+      path: kind
+      value: Ingress
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0]
+          value:
+            path: /minio
+            pathType: Prefix
+            backend:
+              service:
+                name: mytdt-trade-data-tool-minio-deny
+                port:
+                  number: 9000
+  - it: the deny Service has a selector and a declared port (the controller needs both) but matches no pod
+    templates: [ingress-minio.yaml]
+    set:
+      objectStorage:
+        minio:
+          ingress:
+            hostname: user-sean-tdt-minio-abc123.dev.officialstatistics.org
+    documentSelector:
+      path: kind
+      value: Service
+    asserts:
+      - equal:
+          path: metadata.name
+          value: mytdt-trade-data-tool-minio-deny
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/instance: mytdt
+            app.kubernetes.io/component: minio-deny-no-pods
+      - equal:
+          path: spec.ports
+          value: [{ port: 9000, targetPort: 9000, name: deny }]

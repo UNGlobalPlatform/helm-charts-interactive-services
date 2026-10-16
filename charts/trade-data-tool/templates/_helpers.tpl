@@ -104,6 +104,10 @@ In-cluster API base URL for a component: http://<svc>:<port>/api/<Path>/
 {{- printf "%s-minio" (include "tdt.fullname" .) | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
+{{- define "tdt.minioDenySvcName" -}}
+{{- printf "%s-minio-deny" (include "tdt.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
 {{/*
 JWT signing key: explicit value or a per-release derivation that is stable
 across upgrades (release UID would be ideal but isn't available; derive from
@@ -115,6 +119,16 @@ namespace+name+db password so it survives helm upgrade).
 {{- else }}
 {{- printf "%s|%s|%s|jwt" .Release.Namespace .Release.Name .Values.database.auth.password | sha256sum }}
 {{- end }}
+{{- end }}
+
+{{/*
+Secret holding this release's Connector:EncryptionKey (see
+secret-connector-key.yaml). Reaches CoreService and RuleService as the env var
+Connector__EncryptionKey, which outranks every appsettings file — including
+the image's base appsettings.json, which bakes a development key.
+*/}}
+{{- define "tdt.connectorKeySecretName" -}}
+{{- printf "%s-connector-key" (include "tdt.fullname" .) | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 
@@ -197,10 +211,19 @@ share the same database and object store anyway.
 }}
 {{- $cfg := dict }}
 {{- /* Every connection-string key any service reads — all one database now. */}}
+{{- /* GuidFormat=None on the two keys the images set it on (CoreService
+       DomainDBConnection, DataService DBConnection): export reads CHAR(36) PublicId
+       columns as strings, and MySqlConnector's Guid auto-detection breaks Dapper's
+       Read<string>(). No service reads a Guid from the database. */}}
+{{- $guidNone := printf "%s;GuidFormat=None" $conn }}
 {{- $_ := set $cfg "ConnectionStrings" (dict
-      "CoreDBConnection" $conn "DomainDBConnection" $conn "MetadataDBConnection" $conn
-      "FilesDBConnection" $conn "UserDBConnection" $conn "DBConnection" $conn
+      "CoreDBConnection" $conn "DomainDBConnection" $guidNone "MetadataDBConnection" $conn
+      "FilesDBConnection" $conn "UserDBConnection" $conn "DBConnection" $guidNone
       "LogDBConnection" $conn "DatasetDBConnection" $conn) }}
+{{- /* App >= 2.5.0 resolves its schema through DatabaseTopology: Single mode keeps
+       every module in one database, named here after the tenant database (the
+       default would be "dbtradetool", which this release's user cannot see). */}}
+{{- $_ := set $cfg "DatabaseTopology" (dict "Mode" "Single" "DatabaseName" (include "tdt.dbName" .)) }}
 {{- /* Direct service URLs; Dapr bypassed (DaprURL == LocalUrl, EnforceDapr false). */}}
 {{- range $name, $url := $urls }}
 {{- $_ := set $cfg $name (dict "LocalUrl" $url "DaprURL" $url "DaprPort" "3500" "DaprHealthURL" "http://localhost:{0}/v1.0/healthz") }}
@@ -211,13 +234,11 @@ share the same database and object store anyway.
        500ing every RuleService endpoint (the UI then calls the whole Rule
        Service "down"). Unconfigured -> a clearly-named placeholder, so only
        the Zeppelin status degrades. WebURL feeds the "/#/notebook/<ruleId>"
-       deep links; "#" keeps the razor pages' TrimEnd from an NRE. */}}
+       deep links; "#" keeps the razor pages' TrimEnd from an NRE. The login
+       and interpreter group are NOT appsettings since app 3.x: RuleService
+       reads them from stm.SystemConfig rows, which admin-seed-job.yaml writes. */}}
 {{- $zep := include "tdt.zeppelinResolved" . | fromJson }}
-{{- $_ := set $cfg "Zeppelin" (dict
-      "APIURL" $zep.apiUrl
-      "UserId" $zep.username
-      "Password" $zep.password
-      "DefaultInterpreterGroup" (.Values.ruleEngine.defaultInterpreterGroup | default "jdbc")) }}
+{{- $_ := set $cfg "Zeppelin" (dict "APIURL" $zep.apiUrl) }}
 {{- $_ := set (get $cfg "RuleService") "WebURL" $zep.webUrl }}
 {{- $_ := set (get $cfg "RuleService") "DaprWebURL" $zep.webUrl }}
 {{- $_ := set (get $cfg "FileService") "ImportDomainBucket" .Values.objectStorage.buckets.domain }}
@@ -239,6 +260,9 @@ share the same database and object store anyway.
        BROWSER, so ApiUrl must be the external ingress host over TLS whenever
        one exists. EndPoint stays in-cluster plaintext — that's the data plane
        (CreateDataClient never uses SSL). */}}
+{{- /* AutoCreateBuckets: the image's base appsettings.json turns it off, and this
+       release's MinIO starts empty, so without it every upload to domainfile,
+       metadatafile or system throws "Bucket ... does not exist". */}}
 {{- $minioApiHost := "" }}
 {{- if and .Values.ingress.enabled .Values.objectStorage.minio.ingress.hostname }}
 {{- $minioApiHost = .Values.objectStorage.minio.ingress.hostname }}
@@ -247,9 +271,8 @@ share the same database and object store anyway.
       "EndPoint" $minioHost
       "ApiUrl" (default $minioHost $minioApiHost)
       "ConsoleUrl" $minioHost
-      "AccessKey" .Values.objectStorage.minio.rootUser
-      "SecretKey" .Values.objectStorage.minio.rootPassword
-      "UseSSL" (ne $minioApiHost "") "ContentType" "application/octet-stream") }}
+      "UseSSL" (ne $minioApiHost "") "ContentType" "application/octet-stream"
+      "AutoCreateBuckets" true) }}
 {{- $_ := set $cfg "ObjectStorage" (dict "Provider" "minio") }}
 {{- else }}
 {{- $s3 := dict "Region" .Values.objectStorage.s3.region "ForcePathStyle" .Values.objectStorage.s3.forcePathStyle }}
@@ -275,6 +298,52 @@ share the same database and object store anyway.
 {{- $jwtKey := include "tdt.jwtKey" . }}
 {{- $_ := set $cfg "Jwt" (dict "Key" $jwtKey "Issuer" "unsd.com" "Audience" "Your_Audience") }}
 {{- $_ := set $cfg "JWTSettings" (dict "Key" $jwtKey "ValidIssuer" "unsd.com" "Audience" "Your_Audience") }}
+{{- /* Every service reports ServiceInfo:Version (the web side menu, the About page,
+       each GetServiceInfo endpoint), and every image bakes upstream's build date
+       there. Report the release's app version instead; ServiceName stays per image. */}}
+{{- $_ := set $cfg "ServiceInfo" (dict "Version" .Chart.AppVersion) }}
 {{- $merged := mustMergeOverwrite $cfg (deepCopy .Values.extraAppSettings) }}
 {{- mustToPrettyJson $merged }}
+{{- end }}
+
+{{/*
+Refuse an in-place upgrade of a release created by chart <= 0.6.x (app 2.x).
+App 3.x's schema bundle refuses a non-empty database and every service
+refuses a database without its topology record, so such an upgrade would
+"succeed" and leave the instance crash-looping until a rollback. The web
+Deployment's helm.sh/chart label records the chart that last rendered it,
+and it survives suspend (replicas 0). Fails open when lookup sees nothing
+(helm template, client-side dry-run). Onyxia never upgrades in place: resume
+re-runs the release's own chart version.
+*/}}
+{{- /* Every template that can fail includes this first (deployments.yaml,
+       secrets.yaml, secret-connector-key.yaml): helm stops at the first failing
+       template, so the 0.6.x answer must win wherever rendering starts. */}}
+{{- define "tdt.upgradeGuard" -}}
+{{- if .Release.IsUpgrade }}
+{{- $web := lookup "apps/v1" "Deployment" .Release.Namespace (include "tdt.svcName" (dict "ctx" . "key" "web")) }}
+{{- $from := dig "metadata" "labels" "helm.sh/chart" "" $web | trimPrefix (printf "%s-" .Chart.Name) }}
+{{- if regexMatch "^[0-9]+\\.[0-9]+\\.[0-9]+" $from }}
+{{- if semverCompare "<0.7.0-0" $from }}
+{{- fail (printf "This release was installed with chart %s %s (app 2.x). Chart %s runs app %s, whose database layout is new: it cannot upgrade a 2.x database in place (the schema bootstrap would refuse it and every service would crash-loop). Nothing has been changed. Keep this release on %s, or uninstall it (with default settings this deletes its database, rule notebooks and bundled MinIO files), install %s fresh and re-import your data." .Chart.Name $from .Chart.Version .Chart.AppVersion $from .Chart.Version) }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+What deleting this release destroys, as an English phrase ("its database, its
+rule notebooks and your uploaded files"). Shared by NOTES.txt for the
+delete and 30-day-uninstall warnings, so the copy follows the retain flags.
+*/}}
+{{- define "tdt.deletedOnUninstall" -}}
+{{- $items := list }}
+{{- if not .Values.database.lifecycle.retainOnDelete }}{{ $items = append $items "its database" }}{{ end }}
+{{- if and .Values.zeppelin.enabled (not ((.Values.zeppelin.persistence).retainOnDelete)) }}{{ $items = append $items "its rule notebooks" }}{{ end }}
+{{- if and (eq .Values.objectStorage.provider "minio") (not .Values.objectStorage.minio.persistence.retainOnDelete) }}{{ $items = append $items "your uploaded files" }}{{ end }}
+{{- if gt (len $items) 1 }}
+{{- printf "%s and %s" (initial $items | join ", ") (last $items) }}
+{{- else }}
+{{- join "" $items }}
+{{- end }}
 {{- end }}

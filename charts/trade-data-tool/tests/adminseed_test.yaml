@@ -36,7 +36,7 @@ tests:
       - equal:
           path: stringData.password
           value: hunter2
-  - it: disabling seed renders no admin-seed job
+  - it: disabling seed keeps the job for the rule-engine rows but drops the admin login
     templates: [admin-seed-job.yaml]
     set:
       security:
@@ -44,7 +44,66 @@ tests:
           seed: false
     asserts:
       - hasDocuments:
+          count: 1
+      - notExists:
+          path: spec.template.spec.containers[0].env[?(@.name=="TDT_ADMIN_PASSWORD")]
+      - exists:
+          path: spec.template.spec.containers[0].env[?(@.name=="TDT_ZEPPELIN_PASSWORD")]
+  - it: disabling seed with no Zeppelin anywhere renders no job
+    templates: [admin-seed-job.yaml]
+    set:
+      security:
+        admin:
+          seed: false
+      zeppelin:
+        enabled: false
+    asserts:
+      - hasDocuments:
           count: 0
+  - it: writes the bundled Zeppelin login into the rule-engine rows
+    templates: [admin-seed-job.yaml]
+    set:
+      zeppelin:
+        ingress:
+          hostname: user-sean-tdt-zeppelin-abc.dev.officialstatistics.org
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name=="TDT_ZEPPELIN_USER")].value
+          value: onyxia
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name=="TDT_ZEPPELIN_PASSWORD")].valueFrom.secretKeyRef
+          value: { name: mytdt-trade-data-tool-zeppelin, key: password }
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name=="TDT_ZEPPELIN_GROUP")].value
+          value: jdbc
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name=="TDT_ZEPPELIN_EXTERNAL_URL")].value
+          value: https://user-sean-tdt-zeppelin-abc.dev.officialstatistics.org/
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name=="TDT_CONNECTOR_KEY")].valueFrom.secretKeyRef
+          value: { name: mytdt-trade-data-tool-connector-key, key: key }
+  - it: an unexposed Zeppelin leaves ZeppelinExternalURL alone
+    templates: [admin-seed-job.yaml]
+    set:
+      zeppelin:
+        ingress:
+          hostname: ""
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[?(@.name=="TDT_ZEPPELIN_EXTERNAL_URL")].value
+          value: ""
+  - it: encrypts the password in the token layout RuleService decrypts
+    templates: [admin-seed-job.yaml]
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'nonce \+ sealed\[-16:\] \+ sealed\[:-16\]'
+  - it: writes nothing until the schema bootstrap reports Complete
+    templates: [admin-seed-job.yaml]
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'row\[0\] == "Complete"'
   - it: seed on adds the admin secret (db + zeppelin + admin + appsettings + minio = 5)
     templates: [secrets.yaml]
     asserts:

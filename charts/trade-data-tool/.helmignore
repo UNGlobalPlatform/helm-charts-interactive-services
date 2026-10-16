@@ -1,0 +1,3 @@
+# Source of our MinIO build, published in the repository for the AGPL
+# (linked from the README); not part of the chart package.
+third-party/

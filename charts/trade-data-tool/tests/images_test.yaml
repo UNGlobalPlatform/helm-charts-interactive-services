@@ -1,0 +1,56 @@
+suite: helper images come from ECR Public mirrors, not Docker Hub (shared anonymous limit)
+templates:
+  - readiness.yaml
+  - admin-seed-job.yaml
+  - zeppelin-config-job.yaml
+  - tests/zeppelin-smoke.yaml
+  - charts/zeppelin/templates/job-jdbc-config.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  - it: readiness marker (init and main) uses the busybox mirror
+    templates: [readiness.yaml]
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: public.ecr.aws/docker/library/busybox:1.36
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: public.ecr.aws/docker/library/busybox:1.36
+  - it: admin-seed Job uses the python mirror
+    templates: [admin-seed-job.yaml]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: public.ecr.aws/docker/library/python:3.12-slim
+  - it: zeppelin-config Job (external Zeppelin mode) uses the python mirror
+    templates: [zeppelin-config-job.yaml]
+    set:
+      zeppelin:
+        enabled: false
+      ruleEngine:
+        external:
+          apiUrl: http://zeppelin.example:8080
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: public.ecr.aws/docker/library/python:3.12-slim
+  - it: the zeppelin-smoke helm-test pod uses the python mirror
+    templates: [tests/zeppelin-smoke.yaml]
+    documentSelector:
+      path: kind
+      value: Pod
+    asserts:
+      - equal:
+          path: spec.containers[0].image
+          value: public.ecr.aws/docker/library/python:3.12-slim
+  - it: the bundled Zeppelin's jdbc-config Job uses the python mirror
+    templates: [charts/zeppelin/templates/job-jdbc-config.yaml]
+    documentSelector:
+      path: kind
+      value: Job
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: public.ecr.aws/docker/library/python:3.12-slim

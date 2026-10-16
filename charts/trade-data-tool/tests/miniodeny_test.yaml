@@ -1,0 +1,18 @@
+suite: the MinIO /minio deny Service must never select a pod
+templates:
+  - deployments.yaml
+  - minio.yaml
+  - readiness.yaml
+release:
+  name: mytdt
+  namespace: user-sean
+tests:
+  - it: no workload ever carries the deny Service's selector label
+    documentSelector:
+      path: kind
+      value: Deployment
+      matchMany: true
+    asserts:
+      - notEqual:
+          path: spec.template.metadata.labels["app.kubernetes.io/component"]
+          value: minio-deny-no-pods

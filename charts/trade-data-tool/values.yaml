@@ -7,7 +7,7 @@ global:
 image:
   registry: 142496269814.dkr.ecr.us-west-2.amazonaws.com/tdt
   # One tag for every service image (built together from the same commit).
-  tag: "v2.4.0"
+  tag: "v3.1.3"
   pullPolicy: IfNotPresent
   # Name of an existing docker-registry Secret in the release namespace, if the
   # registry is private.
@@ -117,9 +117,19 @@ objectStorage:
   # s3: AWS S3 with the caller's credentials.
   provider: minio
   minio:
-    image: minio/minio:RELEASE.2024-01-16T16-07-38Z
-    rootUser: tdt
-    rootPassword: "changeme-minio"
+    # Full image reference override. Empty = this release's own source-built
+    # MinIO, <image.registry>/minio:<image.tag> (tdt/minio, published with the
+    # app images from v3.1.0).
+    image: ""
+    # Root credentials are the ONLY identity this MinIO may use. Never enable
+    # OIDC or LDAP login (MINIO_IDENTITY_OPENID_* / MINIO_IDENTITY_LDAP_* env,
+    # or `mc admin config set ... identity_openid|identity_ldap` through the
+    # admin API): MinIO's own OIDC and LDAP login code carries critical CVEs
+    # with no upstream fix (the project is archived). See TradeDataTools#181.
+    # The root user and password are generated per release and kept in the
+    # <release>-trade-data-tool-minio Secret (MINIO_ROOT_USER/_PASSWORD); there
+    # are deliberately no values for them. Nobody outside the release needs
+    # them: TDT reaches MinIO only through FileService.
     ingress:
       # Browser-reachable hostname for MinIO's S3 API. The web UI uploads by
       # handing the browser a presigned URL built against MinioConfig:ApiUrl
@@ -127,6 +137,9 @@ objectStorage:
       # from outside the cluster. When empty, presigned URLs fall back to the
       # in-cluster endpoint (fine for headless/in-cluster use only). Onyxia
       # fills this next to the web hostname; rides the same wildcard cert.
+      # Its shape, {{project.id}}-tdt-minio-<digits>.<domain> (values.schema.json),
+      # is matched by a platform-side APISIX rule (TradeDataTools#191). Change
+      # the pattern only together with that rule, or new instances fall outside it.
       hostname: ""
     persistence:
       size: 10Gi
@@ -190,6 +203,9 @@ zeppelin:
     # secret-jdbc-target.yaml) with its render-time-derived coordinates —
     # subchart values are static YAML, so this is the only channel.
     existingSecret: "{{ .Release.Name }}-jdbc-target"
+    # The subchart's jdbc-config Job image, from the ECR Public mirror (same
+    # digest as Docker Hub's python:3.12-slim). The subchart default is left alone.
+    configImage: public.ecr.aws/docker/library/python:3.12-slim
   security:
     # Onyxia fills this with the project password (same as the TDT admin
     # login), keeping RuleService's Zeppelin login zero-copy.
@@ -201,10 +217,11 @@ zeppelin:
   defaultInterpreterGroup: jdbc
   persistence:
     # Rule notebooks and interpreter state live on this volume. It MUST stay
-    # enabled: the platform culler suspends services after ~12h (pods deleted,
-    # volumes kept), and without it every suspend cycle silently deletes the
-    # users' rules. Stated explicitly here even though 1.4.0's subchart
-    # default is also true.
+    # enabled: the platform culler suspends services 13h after their last
+    # launch or resume (pods deleted, volumes kept), and without it every
+    # suspend cycle silently deletes the users' rules. (Services suspended for
+    # more than 30 days are uninstalled, volumes included.) Stated explicitly
+    # here even though 1.4.0's subchart default is also true.
     enabled: true
     size: 10Gi
     # When true, helm uninstall keeps the notebook volume; a reinstall under
@@ -245,6 +262,9 @@ security:
     # Seeded accounts other than `username` to deactivate (IsActive=0).
     deactivateUsernames:
       - DAdmin
+    # Image for the admin-seed and zeppelin-config Jobs and the helm-test pod:
+    # the ECR Public mirror of the Docker Official python image (same digest).
+    seedImage: public.ecr.aws/docker/library/python:3.12-slim
 
 ingress:
   enabled: true
@@ -254,6 +274,15 @@ ingress:
   certManagerClusterIssuer: letsencrypt-prod
   useCertManager: true
 
+# Restricts who may connect INTO this release's pods (outbound traffic is not
+# restricted). The services accept only this release's own pods; the web UI,
+# MinIO and Zeppelin also accept the ingress controller. Anything else,
+# including other services in the same namespace, must use the public URLs.
+networkPolicy:
+  enabled: true
+  # Namespace of the ingress controller that serves the public hostnames.
+  ingressNamespace: ingress-apisix
+
 userPreferences:
   language: en
 
@@ -261,7 +290,9 @@ userPreferences:
 # (green only once the web UI actually serves HTTP). Disable for headless use.
 readiness:
   enabled: true
-  image: busybox:1.36
+  # AWS's ECR Public mirror of the Docker Official Image (same digest): Docker
+  # Hub's anonymous pull limit is shared by the whole cluster.
+  image: public.ecr.aws/docker/library/busybox:1.36
 
 # Extra appsettings merged into every service's configuration (escape hatch).
 extraAppSettings: {}

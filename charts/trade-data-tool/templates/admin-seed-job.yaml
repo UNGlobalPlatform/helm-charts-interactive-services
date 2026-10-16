@@ -1,14 +1,25 @@
-{{- if and .Values.security.admin.seed .Values.database.schema.bootstrap (not .Values.global.suspend) }}
+{{- $zep := include "tdt.zeppelinResolved" . | fromJson }}
+{{- $seedZeppelin := ne $zep.source "none" }}
+{{- if and .Values.database.schema.bootstrap (not .Values.global.suspend) (or .Values.security.admin.seed $seedZeppelin) }}
 {{/*
-Sets the TDT application admin account's password to the chosen value on every
-deploy, so login tracks the (Onyxia project) password rather than the upstream
-seed's undocumented one. Runs after the schema bootstrap has created and seeded
-usr.User (it waits for the row), and deactivates the other seeded accounts.
+Writes the release's own values over the upstream seed data, on every deploy,
+once the schema bootstrap has completed (stm.DatabaseTopology Status=Complete,
+the bundle's last statement):
 
-The password column holds an ASP.NET Core Identity v3 hash
-(PBKDF2-HMAC-SHA512, 100k iterations, 128-bit salt); the app's PasswordHasher
-ignores the user object on verify, so a hash computed here validates. The
-plaintext is read from a Secret and never logged.
+- Admin login (security.admin.seed): sets the TDT application admin account's
+  password to the chosen value, so login tracks the (Onyxia project) password
+  rather than the upstream seed's undocumented one, and deactivates the other
+  seeded accounts. The password column holds an ASP.NET Core Identity v3 hash
+  (PBKDF2-HMAC-SHA512, 100k iterations, 128-bit salt); the app's PasswordHasher
+  ignores the user object on verify, so a hash computed here validates.
+- Rule-engine login: RuleService reads its Zeppelin login from stm.SystemConfig
+  rows, not appsettings, and the upstream seed points them at upstream's own
+  Zeppelin account. Upserts ZeppelinUserId, ZeppelinPassword (AES-256-GCM under
+  the release's Connector:EncryptionKey, the token layout RuleService
+  decrypts), ZeppelinDefaultInterpreterGroup and ZeppelinExternalURL. Edits
+  made on the System Configuration page are overwritten on the next deploy.
+
+Plaintexts are read from Secrets and never logged.
 */}}
 apiVersion: batch/v1
 kind: Job
@@ -31,7 +42,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: admin-seed
-          image: {{ .Values.security.admin.seedImage | default "python:3.12-slim" }}
+          image: {{ .Values.security.admin.seedImage | default "public.ecr.aws/docker/library/python:3.12-slim" }}
           env:
             - name: TDT_DB_HOST
               value: {{ include "tdt.dbHost" . | quote }}
@@ -42,6 +53,7 @@ spec:
             - name: TDT_DB_PASSWORD
               valueFrom:
                 secretKeyRef: { name: {{ include "tdt.fullname" . }}-db, key: password }
+            {{- if .Values.security.admin.seed }}
             - name: TDT_ADMIN_USER
               value: {{ .Values.security.admin.username | quote }}
             - name: TDT_ADMIN_PASSWORD
@@ -49,12 +61,30 @@ spec:
                 secretKeyRef: { name: {{ include "tdt.fullname" . }}-admin, key: password }
             - name: TDT_DEACTIVATE
               value: {{ join "," .Values.security.admin.deactivateUsernames | quote }}
+            {{- end }}
+            {{- if $seedZeppelin }}
+            - name: TDT_ZEPPELIN_USER
+              value: {{ $zep.username | quote }}
+            - name: TDT_ZEPPELIN_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: {{ include "tdt.fullname" . }}-zeppelin, key: password }
+            - name: TDT_ZEPPELIN_GROUP
+              value: {{ .Values.ruleEngine.defaultInterpreterGroup | default "jdbc" | quote }}
+            - name: TDT_ZEPPELIN_EXTERNAL_URL
+              value: {{ ternary "" (printf "%s/" (trimSuffix "/" $zep.webUrl)) (eq $zep.webUrl "#") | quote }}
+            - name: TDT_CONNECTOR_KEY
+              valueFrom:
+                secretKeyRef: { name: {{ include "tdt.connectorKeySecretName" . }}, key: key }
+            {{- end }}
           command: ["python", "-c"]
           args:
             - |
               import os, time, base64, hashlib, struct, subprocess, sys
-              subprocess.run([sys.executable, "-m", "pip", "install", "-q", "PyMySQL"], check=True)
+              zeppelin_user = os.environ.get("TDT_ZEPPELIN_USER", "")
+              pkgs = ["PyMySQL"] + (["cryptography"] if zeppelin_user else [])
+              subprocess.run([sys.executable, "-m", "pip", "install", "-q", *pkgs], check=True)
               import pymysql
+              from pymysql.constants import CLIENT
 
               def aspnet_identity_v3_hash(password, iterations=100000):
                   salt = os.urandom(16)
@@ -63,41 +93,77 @@ spec:
                   blob = b"\x01" + struct.pack(">III", 2, iterations, len(salt)) + salt + subkey
                   return base64.b64encode(blob).decode()
 
+              def aes_gcm_token(plaintext, key_b64):
+                  # RuleService's layout: base64(nonce(12) | tag(16) | ciphertext), no AAD.
+                  from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+                  nonce = os.urandom(12)
+                  sealed = AESGCM(base64.b64decode(key_b64)).encrypt(nonce, plaintext.encode(), None)
+                  return base64.b64encode(nonce + sealed[-16:] + sealed[:-16]).decode()
+
               def connect():
                   return pymysql.connect(
                       host=os.environ["TDT_DB_HOST"], port=3306,
                       user=os.environ["TDT_DB_USER"], password=os.environ["TDT_DB_PASSWORD"],
-                      database=os.environ["TDT_DB_NAME"], autocommit=True)
+                      database=os.environ["TDT_DB_NAME"], autocommit=True,
+                      # UPDATE reports rows matched, not rows changed.
+                      client_flag=CLIENT.FOUND_ROWS)
 
-              admin = os.environ["TDT_ADMIN_USER"]
-              deactivate = [u for u in os.environ.get("TDT_DEACTIVATE", "").split(",") if u]
-
-              # Wait for the schema bootstrap to have created and seeded usr.User.
+              # Wait for the schema bootstrap to finish: the bundle marks its
+              # topology row Complete as its very last statement. Anything
+              # written earlier could be replaced by the bundle's own seed.
               conn = None
               for _ in range(120):
                   try:
                       conn = connect()
                       with conn.cursor() as c:
-                          c.execute("SELECT COUNT(*) FROM `usr.User` WHERE UserName=%s", (admin,))
+                          c.execute("SELECT COUNT(*) FROM information_schema.TABLES"
+                                    " WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='stm.DatabaseTopology'")
                           if c.fetchone()[0] == 1:
-                              break
-                      print("waiting for admin account %r to be seeded..." % admin)
+                              c.execute("SELECT Status FROM `stm.DatabaseTopology` WHERE Id=1")
+                              row = c.fetchone()
+                              if row and row[0] == "Complete":
+                                  break
+                      print("waiting for the schema bootstrap to complete...")
                   except Exception as e:
                       print("waiting for database: %s" % e)
                   time.sleep(5)
               else:
-                  sys.exit("admin account %r never appeared" % admin)
+                  sys.exit("the schema bootstrap never completed")
 
-              pw_hash = aspnet_identity_v3_hash(os.environ["TDT_ADMIN_PASSWORD"])
-              with conn.cursor() as c:
-                  n = c.execute(
-                      "UPDATE `usr.User` SET Password=%s, IsActive=1, IsPasswordChangeRequired=0 WHERE UserName=%s",
-                      (pw_hash, admin))
-                  print("set password on %r (%d row)" % (admin, n))
-                  for u in deactivate:
-                      d = c.execute("UPDATE `usr.User` SET IsActive=0 WHERE UserName=%s", (u,))
-                      print("deactivated %r (%d row)" % (u, d))
-              print("admin seed complete")
+              admin = os.environ.get("TDT_ADMIN_USER", "")
+              if admin:
+                  deactivate = [u for u in os.environ.get("TDT_DEACTIVATE", "").split(",") if u]
+                  pw_hash = aspnet_identity_v3_hash(os.environ["TDT_ADMIN_PASSWORD"])
+                  with conn.cursor() as c:
+                      n = c.execute(
+                          "UPDATE `usr.User` SET Password=%s, IsActive=1, IsPasswordChangeRequired=0 WHERE UserName=%s",
+                          (pw_hash, admin))
+                      if n != 1:
+                          sys.exit("admin account %r not found" % admin)
+                      print("set password on %r" % admin)
+                      for u in deactivate:
+                          d = c.execute("UPDATE `usr.User` SET IsActive=0 WHERE UserName=%s", (u,))
+                          print("deactivated %r (%d row)" % (u, d))
+
+              if zeppelin_user:
+                  rows = [
+                      ("ZeppelinUserId", zeppelin_user, "UserName"),
+                      ("ZeppelinPassword", aes_gcm_token(os.environ["TDT_ZEPPELIN_PASSWORD"], os.environ["TDT_CONNECTOR_KEY"]), "Encrypted"),
+                      ("ZeppelinDefaultInterpreterGroup", os.environ["TDT_ZEPPELIN_GROUP"], "Interpreter"),
+                  ]
+                  if os.environ.get("TDT_ZEPPELIN_EXTERNAL_URL"):
+                      rows.append(("ZeppelinExternalURL", os.environ["TDT_ZEPPELIN_EXTERNAL_URL"], "URL"))
+                  with conn.cursor() as c:
+                      for name, value, measure in rows:
+                          c.execute("SELECT COUNT(*) FROM `stm.SystemConfig` WHERE Name=%s", (name,))
+                          if c.fetchone()[0]:
+                              c.execute("UPDATE `stm.SystemConfig` SET Value=%s, IsActive=1, ModifiedOn=UTC_TIMESTAMP()"
+                                        " WHERE Name=%s", (value, name))
+                          else:
+                              c.execute("INSERT INTO `stm.SystemConfig` (Name, Value, Measure, IsActive, ModifiedBy, ModifiedOn)"
+                                        " VALUES (%s, %s, %s, 1, 1, UTC_TIMESTAMP())", (name, value, measure))
+                          print("set %s" % name)
+              print("seed complete")
           resources:
             requests: { cpu: 50m, memory: 96Mi }
             limits: { cpu: 250m, memory: 192Mi }

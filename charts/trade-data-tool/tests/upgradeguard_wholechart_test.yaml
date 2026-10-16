@@ -1,0 +1,57 @@
+suite: whole-chart render of a 0.6.x upgrade shows the upgrade refusal, not the key-rotation one
+release:
+  name: mytdt
+  namespace: user-sean
+  upgrade: true
+tests:
+  - it: every template that can fail on upgrade reports the 0.6.x refusal first
+    kubernetesProvider:
+      scheme:
+        "apps/v1/Deployment":
+          gvr: { group: "apps", version: "v1", resource: "deployments" }
+          namespaced: true
+        "v1/Secret":
+          gvr: { version: "v1", resource: "secrets" }
+          namespaced: true
+      objects:
+        # What a live 0.6.1 release has: a web Deployment labelled with its chart,
+        # an appsettings Secret, and no connector-key Secret.
+        - kind: Deployment
+          apiVersion: apps/v1
+          metadata:
+            name: mytdt-trade-data-tool-web
+            namespace: user-sean
+            labels: { helm.sh/chart: trade-data-tool-0.6.1 }
+        - kind: Secret
+          apiVersion: v1
+          metadata: { name: mytdt-trade-data-tool-appsettings, namespace: user-sean }
+          data: { appsettings.Production.json: e30= }
+    asserts:
+      - failedTemplate:
+          errorPattern: "installed with chart trade-data-tool 0.6.1 \\(app 2.x\\)"
+  - it: a live 0.7.0 release (key Secret present) upgrades cleanly, e.g. an Onyxia resume
+    kubernetesProvider:
+      scheme:
+        "apps/v1/Deployment":
+          gvr: { group: "apps", version: "v1", resource: "deployments" }
+          namespaced: true
+        "v1/Secret":
+          gvr: { version: "v1", resource: "secrets" }
+          namespaced: true
+      objects:
+        - kind: Deployment
+          apiVersion: apps/v1
+          metadata:
+            name: mytdt-trade-data-tool-web
+            namespace: user-sean
+            labels: { helm.sh/chart: trade-data-tool-0.7.0 }
+        - kind: Secret
+          apiVersion: v1
+          metadata: { name: mytdt-trade-data-tool-appsettings, namespace: user-sean }
+          data: { appsettings.Production.json: e30= }
+        - kind: Secret
+          apiVersion: v1
+          metadata: { name: mytdt-trade-data-tool-connector-key, namespace: user-sean }
+          data: { key: QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQT0= }
+    asserts:
+      - notFailedTemplate: {}

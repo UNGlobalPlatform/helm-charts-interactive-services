@@ -1,3 +1,4 @@
+{{- include "tdt.upgradeGuard" . }}
 {{- $ctx := . }}
 {{- $all := dict }}
 {{- range $key, $s := .Values.services }}{{- $_ := set $all $key $s }}{{- end }}
@@ -42,6 +43,28 @@ spec:
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: Production
+            {{- if has $key (list "coreservice" "ruleengineservice") }}
+            # The only two readers of Connector:EncryptionKey: CoreService
+            # encrypts connector credentials, RuleService decrypts the
+            # rule-engine password. The env var outranks the development key
+            # baked into the image's base appsettings.json.
+            - name: Connector__EncryptionKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "tdt.connectorKeySecretName" $ctx }}
+                  key: key
+            {{- end }}
+            {{- if and (eq $key "fileservice") (eq $ctx.Values.objectStorage.provider "minio") }}
+            # MinIO's generated root credentials. FileService is the only reader of
+            # MinioConfig:AccessKey/SecretKey, so they stay out of the shared
+            # appsettings file.
+            - name: MinioConfig__AccessKey
+              valueFrom:
+                secretKeyRef: { name: {{ include "tdt.fullname" $ctx }}-minio, key: MINIO_ROOT_USER }
+            - name: MinioConfig__SecretKey
+              valueFrom:
+                secretKeyRef: { name: {{ include "tdt.fullname" $ctx }}-minio, key: MINIO_ROOT_PASSWORD }
+            {{- end }}
           {{- if and (eq $key "fileservice") (eq $ctx.Values.objectStorage.provider "s3") }}
           # FileService's S3 adapter reads STS credentials from the AWS_* env.
           envFrom:

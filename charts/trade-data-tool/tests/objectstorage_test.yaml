@@ -12,6 +12,30 @@ tests:
     asserts:
       - hasDocuments:
           count: 3
+  - it: minio mode lets FileService create its buckets (a fresh MinIO is empty)
+    templates: [secrets.yaml]
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: '"MinioConfig": \{[^}]*"AutoCreateBuckets": true'
+  - it: s3 mode leaves bucket creation alone (buckets are prefixes of one shared bucket)
+    templates: [secrets.yaml]
+    set:
+      objectStorage:
+        provider: s3
+        s3:
+          accessKeyId: AK
+          secretAccessKey: SK
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - notMatchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: AutoCreateBuckets
   - it: s3 mode splits workingDirectoryPath into a shared bucket + base prefix
     templates: [secrets.yaml]
     set:

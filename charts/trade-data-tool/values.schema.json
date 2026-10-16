@@ -76,7 +76,7 @@
         "provider": {
           "type": "string",
           "title": "Provider",
-          "description": "MinIO deployed with this service (standard), or S3 with your platform credentials.",
+          "description": "MinIO deployed with this service (standard), or S3 with your platform credentials. S3 access expires about 11 hours after launch and isn't renewed when the service resumes, so use MinIO for work that lasts longer than a day.",
           "default": "minio",
           "enum": [
             "minio",
@@ -97,19 +97,6 @@
                     "overwriteDefaultWith": "{{project.id}}-tdt-minio-{{k8s.randomSubdomain}}.{{k8s.domain}}"
                   }
                 }
-              }
-            },
-            "rootPassword": {
-              "type": "string",
-              "title": "MinIO password",
-              "default": "changeme-minio",
-              "render": "password",
-              "hidden": {
-                "value": "s3",
-                "path": "objectStorage/provider"
-              },
-              "x-onyxia": {
-                "overwriteDefaultWith": "{{project.password}}"
               }
             },
             "persistence": {
@@ -236,10 +223,7 @@
               "sliderMin": 50,
               "sliderMax": 1000,
               "sliderStep": 50,
-              "sliderUnit": "m",
-              "x-onyxia": {
-                "overwriteDefaultWith": "{{region.resources.cpuRequest}}"
-              }
+              "sliderUnit": "m"
             },
             "memory": {
               "type": "string",
@@ -249,10 +233,7 @@
               "sliderMin": 256,
               "sliderMax": 2048,
               "sliderStep": 256,
-              "sliderUnit": "Mi",
-              "x-onyxia": {
-                "overwriteDefaultWith": "{{region.resources.memoryRequest}}"
-              }
+              "sliderUnit": "Mi"
             }
           }
         },
@@ -267,10 +248,7 @@
               "sliderMin": 100,
               "sliderMax": 1500,
               "sliderStep": 100,
-              "sliderUnit": "m",
-              "x-onyxia": {
-                "overwriteDefaultWith": "{{region.resources.cpuLimit}}"
-              }
+              "sliderUnit": "m"
             },
             "memory": {
               "type": "string",
@@ -280,10 +258,7 @@
               "sliderMin": 512,
               "sliderMax": 4096,
               "sliderStep": 512,
-              "sliderUnit": "Mi",
-              "x-onyxia": {
-                "overwriteDefaultWith": "{{region.resources.memoryLimit}}"
-              }
+              "sliderUnit": "Mi"
             }
           }
         }

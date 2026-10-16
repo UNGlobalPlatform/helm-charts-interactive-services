@@ -1,0 +1,35 @@
+diff --git a/cmd/auth-handler.go b/cmd/auth-handler.go
+index 6e824e3..e5c68a5 100644
+--- a/cmd/auth-handler.go
++++ b/cmd/auth-handler.go
+@@ -603,7 +603,13 @@ var supportedS3AuthTypes = map[authType]struct{}{
+ 	authTypePostPolicy:               {},
+ 	authTypeStreamingSigned:          {},
+ 	authTypeStreamingSignedTrailer:   {},
+-	authTypeStreamingUnsignedTrailer: {},
++	// authTypeStreamingUnsignedTrailer is deliberately absent: unsigned-trailer
++	// uploads are refused before authentication with HTTP 400 InvalidRequest
++	// (ErrSignatureVersionNotSupported, "The authorization mechanism you have
++	// provided is not supported"). This is upstream's
++	// advisory workaround for CVE-2026-40344 and CVE-2026-41145 (GHSA-9c4q-hq6p-c237,
++	// GHSA-hv4r-mvr4-25vw), which were fixed only after minio/minio was archived.
++	// Clients can use the signed variant, STREAMING-AWS4-HMAC-SHA256-PAYLOAD-TRAILER.
+ }
+ 
+ // Validate if the authType is valid and supported.
+diff --git a/cmd/auth-handler_test.go b/cmd/auth-handler_test.go
+index 47f12ad..d24abca 100644
+--- a/cmd/auth-handler_test.go
++++ b/cmd/auth-handler_test.go
+@@ -193,6 +193,11 @@ func TestS3SupportedAuthType(t *testing.T) {
+ 			authT: authType(9),
+ 			pass:  false,
+ 		},
++		// Test 11 - unsigned-trailer uploads are refused (CVE-2026-40344, CVE-2026-41145).
++		{
++			authT: authTypeStreamingUnsignedTrailer,
++			pass:  false,
++		},
+ 	}
+ 	// Validate all the test cases.
+ 	for i, tt := range testCases {

@@ -1,4 +1,8 @@
-- Trade Data Tool is starting: 8 services + web UI{{ if eq .Values.objectStorage.provider "minio" }} + MinIO{{ end }}.
+{{- $deleted := include "tdt.deletedOnUninstall" . }}
+{{- $zepNotes := include "tdt.zeppelinResolved" . | fromJson -}}
+**Trade Data Tool {{ .Chart.AppVersion }}** is starting: 7 services + web UI{{ if eq .Values.objectStorage.provider "minio" }} + MinIO{{ end }}{{ if eq $zepNotes.source "bundled" }} + Zeppelin{{ end }}.
+The first launch can take several minutes while the database is set up; the
+service shows as running once the web UI answers.
 {{- if .Values.ingress.enabled }}
 - Web UI: **http{{ if .Values.ingress.tls }}s{{ end }}://{{ .Values.ingress.hostname }}**
 {{- end }}
@@ -7,30 +11,58 @@
   - Password: **`{{ .Values.security.admin.password }}`** (your project password)
 
   ⚠️ Treat this like any credential — don't paste it into code or share it.
-  It is (re)applied to the admin account on every deploy.
+  It is (re)applied to the admin account each time the service is launched,
+  resumed or reconfigured.
 {{- end }}
+
+**Before you start**
+- Onyxia suspends this service 13 hours after it was launched or last resumed,
+  whether or not you are using it. Resume it from *My Services*; your data is kept.
+{{- if $deleted }}
+- ⚠️ A service left suspended for 30 days is deleted automatically, with
+  {{ $deleted }}. Resume it, or download what you need, before then.
+- ⚠️ Deleting this service permanently deletes {{ $deleted }}.
+{{- if eq .Values.objectStorage.provider "s3" }}
+  Your files stay in your S3 bucket, but a new service won't recognise them as datasets.
+{{- end }}
+{{- end }}
+{{- if eq .Values.objectStorage.provider "s3" }}
+- S3 access expires about 11 hours after launch and isn't renewed when the
+  service resumes. Use MinIO (the default) for work that lasts longer than a day.
+{{- end }}
+- Existing Trade Data Tool 2.x services keep running and resume as they are;
+  they can't be upgraded to {{ .Chart.AppVersion }}. Your datasets, metadata, rules and
+  users don't carry over: set them up again in this service, then import your files.
+  Keep the old service until you have downloaded what you need.
+
+**What's new in 3.x** ([full notes](https://github.com/UNGlobalPlatform/helm-charts-interactive-services/blob/main/charts/trade-data-tool/README.md#whats-new-in-3x))
+- **Dates default to day-first** when you import a file (new *Date/Time Format*
+  option; *Regional Format* is now *Decimal Format*).
+- **Data Search** (formerly *Advance Search*): faster paging, saved searches, and
+  *Download All* for large downloads, collected from the new *My Downloads* page.
+- **Pipeline**: *Retry from step*, *Reset* and *Delete batch* in the background,
+  and a new *Constraint* data-quality stage.
+- **Imports**: JSON files, and reusable column-mapping presets.
+- The *Bronze / Silver / Gold* menu links are gone: open data from a dataset's
+  *View Data* action.
+- You're signed out after 60 minutes of inactivity.
+
+**Details**
 - Database: **{{ include "tdt.dbName" . }}** on the platform's shared MariaDB
   ({{ include "tdt.dbHost" . }}) — no database pods were created for this service.
   Username: **{{ include "tdt.dbUserName" . }}**
-{{- if .Values.database.schema.bootstrap }}
-- The TDT schema (tables + stored procedures) is loaded automatically by the
-  `schema-bootstrap` job on first start; services become ready once it completes.
-{{- end }}
-{{- if .Values.database.lifecycle.retainOnDelete }}
-- On deletion, the database and user are **kept** on the shared cluster.
-{{- else }}
-- ⚠️ On deletion, the database and user are **dropped permanently**.
-{{- end }}
 {{- if eq .Values.objectStorage.provider "minio" }}
-- Files are stored in this release's MinIO ({{ include "tdt.minioSvcName" . }}:9000,
-  user `{{ .Values.objectStorage.minio.rootUser }}`).
-{{- else }}
-- Files are stored in S3 (region {{ .Values.objectStorage.s3.region }}) using your
-  platform credentials. Buckets: {{ .Values.objectStorage.buckets.domain }},
-  {{ .Values.objectStorage.buckets.metadata }}, {{ .Values.objectStorage.buckets.system }} —
-  your credentials must be allowed to create/use them.
+- Files are stored in this release's MinIO ({{ include "tdt.minioSvcName" . }}:9000);
+  the Trade Data Tool manages it for you.
+{{- if not .Values.objectStorage.minio.image }}
+  MinIO is AGPL-3.0 software; this image is built from its [source at
+  7aac2a2c5b7c](https://github.com/minio/minio/tree/7aac2a2c5b7c882e68c1ce017d8256be2feea27f) with
+  [our patch](https://github.com/UNGlobalPlatform/helm-charts-interactive-services/tree/main/charts/trade-data-tool/third-party/minio).
 {{- end }}
-{{- $zepNotes := include "tdt.zeppelinResolved" . | fromJson }}
+{{- else }}
+- Files are stored in your S3 working directory
+  (`{{ .Values.objectStorage.s3.workingDirectoryPath }}`, region {{ .Values.objectStorage.s3.region }}).
+{{- end }}
 {{- if eq $zepNotes.source "bundled" }}
 - Rule engine: a Zeppelin is bundled with this release. Open it at
   https://{{ (.Values.zeppelin.ingress).hostname }} (user `{{ $zepNotes.username }}`,
@@ -44,4 +76,14 @@
 - ⚠️ Rule engine: no Zeppelin bundled or found. Rules pages will show the
   engine as down. Launch a `zeppelin` service, then relaunch/save this service
   to connect automatically.
+{{- end }}
+{{- if ne $zepNotes.source "none" }}
+  The rule-engine connection settings in *System Configuration* are managed by
+  the platform. Don't edit them: they're overwritten each time the service is
+  launched, resumed or reconfigured, and a wrong value can stop rules from
+  running until then.
+{{- end }}
+{{- if .Values.networkPolicy.enabled }}
+- Other services in your project can reach this one only through its web
+  addresses above.
 {{- end }}

@@ -113,8 +113,11 @@ uploads:
   maxFileSizeBytes: 314572900
 
 objectStorage:
-  # minio: a small MinIO deployed with this release (default).
-  # s3: AWS S3 with the caller's credentials.
+  # minio: a small MinIO deployed with this release (default, and the only
+  #   option on the UN Global Platform; the Onyxia form doesn't offer a choice).
+  # s3: an external S3 bucket, for helm CLI installs elsewhere. NOT supported on
+  #   the UN Global Platform: its storage serves files only to services on the
+  #   platform, and S3 mode sends downloads straight from S3 to the browser.
   provider: minio
   minio:
     # Full image reference override. Empty = this release's own source-built
@@ -157,6 +160,8 @@ objectStorage:
       limits:
         cpu: 500m
         memory: 512Mi
+  # s3 mode only (helm CLI installs off the UN Global Platform); set these by
+  # hand. The credentials are read once at start and never renewed.
   s3:
     region: ""
     endpoint: ""
@@ -164,10 +169,9 @@ objectStorage:
     secretAccessKey: ""
     sessionToken: ""
     forcePathStyle: false
-    # Onyxia's working directory: "<shared-bucket>/<project folder>/" (see
-    # values.schema.json). The chart splits it into the real bucket and a base
+    # "<bucket>/<folder>/". The chart splits it into the real bucket and a base
     # prefix, and adds a subfolder named after the release: the files live under
-    # "<project folder>/<release>/" (tdt.s3Location).
+    # "<folder>/<release>/" (tdt.s3Location).
     workingDirectoryPath: ""
   buckets:
     domain: domainfile

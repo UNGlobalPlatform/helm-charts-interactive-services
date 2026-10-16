@@ -15,7 +15,15 @@ tests:
           pattern: 'Deleting this service permanently deletes its database, its rule notebooks and your uploaded files\.'
       - matchRegexRaw:
           pattern: "can't be upgraded to 3\\.1\\.7"
-  - it: in S3 mode, files outlive the service and the credential expiry is stated
+  - it: a default launch states MinIO storage and never mentions S3
+    asserts:
+      - matchRegexRaw:
+          pattern: 'is starting: 7 services \+ web UI \+ MinIO'
+      - matchRegexRaw:
+          pattern: "Files are stored in this release's MinIO"
+      - notMatchRegexRaw:
+          pattern: 'S3'
+  - it: in S3 mode (CLI installs elsewhere), files outlive the service and credentials aren't renewed
     set:
       objectStorage:
         provider: s3
@@ -25,11 +33,11 @@ tests:
           workingDirectoryPath: "datalab-142496269814-user-bucket/user-sean/"
     asserts:
       - matchRegexRaw:
-          pattern: 'permanently deletes its database and its rule notebooks\.\n\s+Your files stay in the `mytdt` folder in \*My Files\*, but a new\n\s+service won''t recognise them as datasets\. Delete that folder when you no longer need it\.'
+          pattern: 'permanently deletes its database and its rule notebooks\.\n\s+Your files stay in `datalab-142496269814-user-bucket/user-sean/mytdt/` in your S3 storage, but a new\n\s+service won''t recognise them as datasets\. Delete that folder when you no longer need it\.'
       - matchRegexRaw:
           pattern: 'Files are stored in your S3 storage, in a folder named after this service:\n\s+`datalab-142496269814-user-bucket/user-sean/mytdt/`'
       - matchRegexRaw:
-          pattern: "S3 access expires about 11 hours after launch and isn't renewed"
+          pattern: "S3 storage is for installs outside the UN Global Platform\\. Its credentials are\n\\s+read once at start and never renewed"
   - it: retained data is not claimed as deleted
     set:
       database:

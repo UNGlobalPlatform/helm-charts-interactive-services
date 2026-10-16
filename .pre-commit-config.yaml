@@ -64,3 +64,9 @@ repos:
     args:
     - --branch
     - main
+  - id: check_tdt_storage_form
+    name: trade-data-tool launch form offers no S3 storage
+    language: system
+    entry: python3 -m utils.check_tdt_storage_form
+    files: ^charts/trade-data-tool/values\.schema\.json$
+    pass_filenames: false

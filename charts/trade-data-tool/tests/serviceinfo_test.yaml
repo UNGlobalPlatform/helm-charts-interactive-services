@@ -14,7 +14,7 @@ tests:
     asserts:
       - matchRegex:
           path: stringData["appsettings.Production.json"]
-          pattern: '"ServiceInfo": \{\s*"Version": "3\.1\.4"\s*\}'
+          pattern: '"ServiceInfo": \{\s*"Version": "3\.1\.5"\s*\}'
   - it: all eight app Deployments mount that file, so all eight report it
     templates: [deployments.yaml]
     documentSelector:

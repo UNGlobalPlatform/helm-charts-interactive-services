@@ -74,7 +74,7 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: 142496269814.dkr.ecr.us-west-2.amazonaws.com/tdt/minio:v3.1.4
+          value: 142496269814.dkr.ecr.us-west-2.amazonaws.com/tdt/minio:v3.1.5
   - it: an explicit image reference still overrides it
     set:
       objectStorage:

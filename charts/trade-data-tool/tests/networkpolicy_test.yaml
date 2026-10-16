@@ -34,9 +34,17 @@ tests:
       path: metadata.name
       value: mytdt-trade-data-tool-edge
     asserts:
+      # Only the exposed components: a backend selected here would also accept
+      # the ingress controller.
       - equal:
-          path: spec.podSelector.matchExpressions[0].values
-          value: [web, minio]
+          path: spec.podSelector
+          value:
+            matchLabels:
+              app.kubernetes.io/instance: mytdt
+            matchExpressions:
+              - key: app.kubernetes.io/component
+                operator: In
+                values: [web, minio]
       - equal:
           path: spec.ingress[1]
           value:

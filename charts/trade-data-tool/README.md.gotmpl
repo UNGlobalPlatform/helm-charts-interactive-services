@@ -67,10 +67,10 @@ Trade Data Tool 3.x is based on upstream TDT 2.5.0. This chart ships {{ template
 
 ## Upgrading
 
-Chart {{ template "chart.version" . }} (app {{ template "chart.appVersion" . }}) is a **fresh install only**. App 3.x uses a new database layout and cannot take over a database created by chart 0.6.x or earlier (app 2.x).
+App 3.x uses a new database layout and cannot take over a database created by chart 0.6.x or earlier (app 2.x). Moving from chart 0.6.x to 0.7.x is therefore a **fresh install**.
 
 - From Onyxia, nothing changes for existing services: resuming re-runs the chart version they were launched with.
-- With the helm CLI, `helm upgrade` from 0.6.x to 0.7.0 is refused before anything is changed. Keep the release on 0.6.x, or uninstall it (this deletes its data, as above), install 0.7.0 and import the data again.
+- With the helm CLI, `helm upgrade` from 0.6.x to 0.7.x is refused before anything is changed. Keep the release on 0.6.x, or uninstall it (this deletes its data, as above), install {{ template "chart.version" . }} and import the data again.
 
 ## Third-party software
 

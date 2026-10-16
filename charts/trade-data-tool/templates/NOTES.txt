@@ -1,5 +1,6 @@
 {{- $deleted := include "tdt.deletedOnUninstall" . }}
 {{- $zepNotes := include "tdt.zeppelinResolved" . | fromJson -}}
+{{- $s3loc := include "tdt.s3Location" . | fromJson -}}
 **Trade Data Tool {{ .Chart.AppVersion }}** is starting: 7 services + web UI{{ if eq .Values.objectStorage.provider "minio" }} + MinIO{{ end }}{{ if eq $zepNotes.source "bundled" }} + Zeppelin{{ end }}.
 The first launch can take several minutes while the database is set up; the
 service shows as running once the web UI answers.
@@ -23,7 +24,8 @@ service shows as running once the web UI answers.
   {{ $deleted }}. Resume it, or download what you need, before then.
 - ⚠️ Deleting this service permanently deletes {{ $deleted }}.
 {{- if eq .Values.objectStorage.provider "s3" }}
-  Your files stay in your S3 bucket, but a new service won't recognise them as datasets.
+  Your files stay in the `{{ .Release.Name }}` folder in *My Files*, but a new
+  service won't recognise them as datasets. Delete that folder when you no longer need it.
 {{- end }}
 {{- end }}
 {{- if eq .Values.objectStorage.provider "s3" }}
@@ -60,8 +62,9 @@ service shows as running once the web UI answers.
   [our patch](https://github.com/UNGlobalPlatform/helm-charts-interactive-services/tree/main/charts/trade-data-tool/third-party/minio).
 {{- end }}
 {{- else }}
-- Files are stored in your S3 working directory
-  (`{{ .Values.objectStorage.s3.workingDirectoryPath }}`, region {{ .Values.objectStorage.s3.region }}).
+- Files are stored in your S3 storage, in a folder named after this service:
+  `{{ $s3loc.bucket }}/{{ $s3loc.prefix }}/` (region {{ .Values.objectStorage.s3.region }}).
+  Your other folders are left alone.
 {{- end }}
 {{- if eq $zepNotes.source "bundled" }}
 - Rule engine: a Zeppelin is bundled with this release. Open it at

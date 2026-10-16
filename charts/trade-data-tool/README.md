@@ -53,7 +53,8 @@ Trade Data Tool 3.x is based on upstream TDT 2.5.0. This chart ships 3.1.5.
 - **Suspension.** Onyxia suspends a service 13 hours after it was launched or last resumed, whether or not you are using it. Its pods stop; its database, files and rule notebooks are kept. Resume it from *My Services*.
 - **Work in progress.** If a batch is importing or running pipeline steps when the service is suspended, it is recovered up to about 4.5 hours after you resume, and you can then *Retry* it.
 - **Automatic deletion.** A service left suspended for **30 days is deleted, with its data**: its database, its rule notebooks and, with the built-in file storage, your uploaded files. Resume it, or download what you need, before then.
-- **Deleting a service** deletes the same data straight away. With your own S3 storage, files stay in your bucket but are no longer attached to any Trade Data Tool service.
+- **Deleting a service** deletes the same data straight away. With your own S3 storage, files stay in the service's folder but are no longer attached to any Trade Data Tool service. Delete that folder in *My Files* when you no longer need it.
+- **S3 storage location.** Each service keeps its files in its own folder inside the working directory you choose at launch, named after the service. On Onyxia that is `trade-data-tool-<number>`, with the same number as in the service's web address. Your other folders are left alone. Resuming a service keeps its folder.
 - **S3 storage.** S3 access uses temporary credentials that expire about 11 hours after launch and are not renewed when the service resumes. Use the built-in file storage (MinIO, the default) for work that lasts longer than a day.
 - **First launch** can take several minutes while the database is set up. The service shows as running once the web UI answers.
 - **If the first launch fails** partway through setting up the database, the service cannot repair itself. Delete it and launch a new one.

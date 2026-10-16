@@ -277,16 +277,10 @@ share the same database and object store anyway.
 {{- else }}
 {{- $s3 := dict "Region" .Values.objectStorage.s3.region "ForcePathStyle" .Values.objectStorage.s3.forcePathStyle }}
 {{- if .Values.objectStorage.s3.endpoint }}{{- $_ := set $s3 "Endpoint" .Values.objectStorage.s3.endpoint }}{{- end }}
-{{- /* Onyxia gives one shared bucket + a per-user prefix as workingDirectoryPath
-       (e.g. "datalab-<acct>-user-bucket/user-<handle>/"). Split it: first path
-       segment is the real bucket, the rest is the base prefix the logical buckets
-       (domainfile/…) live under. FileService folds its logical buckets into this. */}}
-{{- $wd := trimAll "/" (.Values.objectStorage.s3.workingDirectoryPath | default "") }}
-{{- if $wd }}
-{{- $parts := splitList "/" $wd }}
-{{- $_ := set $s3 "Bucket" (first $parts) }}
-{{- $_ := set $s3 "BasePrefix" (rest $parts | join "/") }}
-{{- end }}
+{{- /* FileService folds its logical buckets (domainfile/…) into Bucket/BasePrefix. */}}
+{{- $loc := include "tdt.s3Location" . | fromJson }}
+{{- $_ := set $s3 "Bucket" $loc.bucket }}
+{{- $_ := set $s3 "BasePrefix" $loc.prefix }}
 {{- $_ := set $cfg "ObjectStorage" (dict "Provider" "s3" "S3" $s3) }}
 {{- end }}
 {{- $_ := set $cfg "DatasetProcessingSettings" (dict "BucketName" .Values.objectStorage.buckets.system) }}
@@ -329,6 +323,26 @@ re-runs the release's own chart version.
 {{- end }}
 {{- end }}
 {{- end }}
+{{- end }}
+
+{{/*
+Where S3 mode keeps this release's files, as JSON {"bucket", "prefix"}.
+Onyxia fills workingDirectoryPath with the shared bucket plus the project's
+folder ("datalab-<acct>-user-bucket/user-<handle>/"). The first segment is the
+real bucket. The rest, plus a subfolder named after the release, is the base
+prefix: one folder per service, so its files stay paired with its own database
+and apart from the user's other folders. Onyxia names a release
+<chart>-<k8s.randomSubdomain>, the number in the service's web address, and
+resume keeps the release, so it keeps the folder. Slashes at either end, or
+doubled, don't matter.
+*/}}
+{{- define "tdt.s3Location" -}}
+{{- $bucket := "" }}
+{{- $prefix := list }}
+{{- range $i, $p := splitList "/" (.Values.objectStorage.s3.workingDirectoryPath | default "") | compact }}
+{{- if eq $i 0 }}{{ $bucket = $p }}{{ else }}{{ $prefix = append $prefix $p }}{{ end }}
+{{- end }}
+{{- dict "bucket" $bucket "prefix" (append $prefix .Release.Name | join "/") | toJson }}
 {{- end }}
 
 {{/*

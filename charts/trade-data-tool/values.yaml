@@ -164,9 +164,10 @@ objectStorage:
     secretAccessKey: ""
     sessionToken: ""
     forcePathStyle: false
-    # Onyxia's per-user working directory: "<shared-bucket>/<prefix>/". The chart
-    # splits it into the real bucket + the base prefix the logical buckets live
-    # under. Filled from the platform's ide/s3.json (see values.schema.json).
+    # Onyxia's working directory: "<shared-bucket>/<project folder>/" (see
+    # values.schema.json). The chart splits it into the real bucket and a base
+    # prefix, and adds a subfolder named after the release: the files live under
+    # "<project folder>/<release>/" (tdt.s3Location).
     workingDirectoryPath: ""
   buckets:
     domain: domainfile

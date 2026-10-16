@@ -22,9 +22,12 @@ tests:
         s3:
           accessKeyId: AK
           secretAccessKey: SK
+          workingDirectoryPath: "datalab-142496269814-user-bucket/user-sean/"
     asserts:
       - matchRegexRaw:
-          pattern: 'permanently deletes its database and its rule notebooks\.\n\s+Your files stay in your S3 bucket'
+          pattern: 'permanently deletes its database and its rule notebooks\.\n\s+Your files stay in the `mytdt` folder in \*My Files\*, but a new\n\s+service won''t recognise them as datasets\. Delete that folder when you no longer need it\.'
+      - matchRegexRaw:
+          pattern: 'Files are stored in your S3 storage, in a folder named after this service:\n\s+`datalab-142496269814-user-bucket/user-sean/mytdt/`'
       - matchRegexRaw:
           pattern: "S3 access expires about 11 hours after launch and isn't renewed"
   - it: retained data is not claimed as deleted
@@ -99,7 +102,7 @@ tests:
     set:
       objectStorage:
         provider: s3
-        s3: { accessKeyId: AK, secretAccessKey: SK }
+        s3: { accessKeyId: AK, secretAccessKey: SK, workingDirectoryPath: "datalab-142496269814-user-bucket/user-sean/" }
     asserts:
       - notMatchRegexRaw:
           pattern: 'AGPL'

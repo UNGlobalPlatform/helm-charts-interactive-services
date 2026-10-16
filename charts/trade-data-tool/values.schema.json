@@ -193,7 +193,7 @@
             "workingDirectoryPath": {
               "type": "string",
               "title": "Working directory",
-              "description": "Your S3 path (shared bucket + personal prefix). Files are stored here.",
+              "description": "Your S3 folder. Trade Data Tool keeps its files in a subfolder named after this service (for example trade-data-tool-123456), apart from your other files. Deleting the service leaves that subfolder in My Files.",
               "default": "",
               "hidden": {
                 "value": "minio",

@@ -29,6 +29,7 @@ tests:
         s3:
           accessKeyId: AK
           secretAccessKey: SK
+          workingDirectoryPath: "datalab-142496269814-user-bucket/user-sean/"
     documentSelector:
       path: metadata.name
       value: mytdt-trade-data-tool-appsettings
@@ -36,7 +37,7 @@ tests:
       - notMatchRegex:
           path: stringData["appsettings.Production.json"]
           pattern: AutoCreateBuckets
-  - it: s3 mode splits workingDirectoryPath into a shared bucket + base prefix
+  - it: s3 mode keeps files in a folder named after the release, inside the working directory
     templates: [secrets.yaml]
     set:
       objectStorage:
@@ -55,7 +56,164 @@ tests:
           pattern: "\"Bucket\": \"datalab-142496269814-user-bucket\""
       - matchRegex:
           path: stringData["appsettings.Production.json"]
-          pattern: "\"BasePrefix\": \"user-sean\""
+          pattern: "\"BasePrefix\": \"user-sean/mytdt\""
+  - it: an Onyxia launch lands in <project folder>/trade-data-tool-<n>, the number in its web address
+    templates: [secrets.yaml]
+    release:
+      name: trade-data-tool-546840
+    set:
+      objectStorage:
+        provider: s3
+        s3:
+          region: us-west-2
+          accessKeyId: AK
+          secretAccessKey: SK
+          workingDirectoryPath: "datalab-142496269814-user-bucket/user-r2levukldq/"
+    documentSelector:
+      path: metadata.name
+      value: trade-data-tool-546840-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "\"Bucket\": \"datalab-142496269814-user-bucket\""
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "\"BasePrefix\": \"user-r2levukldq/trade-data-tool-546840\""
+  - it: a working directory without the trailing slash gives the same folder
+    templates: [secrets.yaml]
+    set:
+      objectStorage:
+        provider: s3
+        s3:
+          region: us-west-2
+          accessKeyId: AK
+          secretAccessKey: SK
+          workingDirectoryPath: "datalab-142496269814-user-bucket/user-sean"
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "\"Bucket\": \"datalab-142496269814-user-bucket\""
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "\"BasePrefix\": \"user-sean/mytdt\""
+  - it: leading or doubled slashes give the same folder
+    templates: [secrets.yaml]
+    set:
+      objectStorage:
+        provider: s3
+        s3:
+          region: us-west-2
+          accessKeyId: AK
+          secretAccessKey: SK
+          workingDirectoryPath: "/datalab-142496269814-user-bucket//user-sean//"
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "\"Bucket\": \"datalab-142496269814-user-bucket\""
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "\"BasePrefix\": \"user-sean/mytdt\""
+  - it: a bucket-only working directory puts the folder at the bucket root
+    templates: [secrets.yaml]
+    set:
+      objectStorage:
+        provider: s3
+        s3:
+          region: us-west-2
+          accessKeyId: AK
+          secretAccessKey: SK
+          workingDirectoryPath: "datalab-142496269814-user-bucket/"
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "\"Bucket\": \"datalab-142496269814-user-bucket\""
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "\"BasePrefix\": \"mytdt\""
+  - it: a bucket-only working directory without a slash does too
+    templates: [secrets.yaml]
+    set:
+      objectStorage:
+        provider: s3
+        s3:
+          region: us-west-2
+          accessKeyId: AK
+          secretAccessKey: SK
+          workingDirectoryPath: "datalab-142496269814-user-bucket"
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "\"Bucket\": \"datalab-142496269814-user-bucket\""
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "\"BasePrefix\": \"mytdt\""
+  - it: a deeper working directory keeps every level
+    templates: [secrets.yaml]
+    set:
+      objectStorage:
+        provider: s3
+        s3:
+          region: us-west-2
+          accessKeyId: AK
+          secretAccessKey: SK
+          workingDirectoryPath: "datalab-142496269814-user-bucket/projet-trade/team-a/"
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "\"Bucket\": \"datalab-142496269814-user-bucket\""
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "\"BasePrefix\": \"projet-trade/team-a/mytdt\""
+  - it: resume (an upgrade of the same release) keeps the folder
+    templates: [secrets.yaml]
+    release:
+      upgrade: true
+    set:
+      objectStorage:
+        provider: s3
+        s3:
+          region: us-west-2
+          accessKeyId: AK
+          secretAccessKey: SK
+          workingDirectoryPath: "datalab-142496269814-user-bucket/user-sean/"
+    documentSelector:
+      path: metadata.name
+      value: mytdt-trade-data-tool-appsettings
+    asserts:
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "\"Bucket\": \"datalab-142496269814-user-bucket\""
+      - matchRegex:
+          path: stringData["appsettings.Production.json"]
+          pattern: "\"BasePrefix\": \"user-sean/mytdt\""
+  - it: s3 mode without a working directory fails with a clear message
+    templates: [secrets.yaml]
+    set:
+      objectStorage:
+        provider: s3
+        s3:
+          region: us-west-2
+          accessKeyId: AK
+          secretAccessKey: SK
+          workingDirectoryPath: "/"
+    asserts:
+      - failedTemplate:
+          errorPattern: "S3 storage needs a working directory\\. Set Working directory \\(objectStorage\\.s3\\.workingDirectoryPath\\).*Nothing has been changed\\."
   - it: s3 mode deploys no MinIO
     templates: [minio.yaml]
     set:
@@ -65,6 +223,7 @@ tests:
           region: us-west-2
           accessKeyId: AK
           secretAccessKey: SK
+          workingDirectoryPath: "datalab-142496269814-user-bucket/user-sean/"
     asserts:
       - hasDocuments:
           count: 0
@@ -77,6 +236,7 @@ tests:
           region: us-west-2
           accessKeyId: AK
           secretAccessKey: SK
+          workingDirectoryPath: "datalab-142496269814-user-bucket/user-sean/"
     documentSelector:
       # the Service shares the Deployment's name — select on a pod-spec path
       path: spec.template.spec.containers[0].name

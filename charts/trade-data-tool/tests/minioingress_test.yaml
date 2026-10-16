@@ -104,6 +104,7 @@ tests:
           region: us-west-2
           accessKeyId: AK
           secretAccessKey: SK
+          workingDirectoryPath: "datalab-142496269814-user-bucket/user-sean/"
         minio:
           ingress:
             hostname: user-sean-tdt-minio-abc123.dev.officialstatistics.org

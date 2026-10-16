@@ -78,7 +78,7 @@ tests:
     set:
       objectStorage:
         provider: s3
-        s3: { accessKeyId: AK, secretAccessKey: SK }
+        s3: { accessKeyId: AK, secretAccessKey: SK, workingDirectoryPath: "datalab-142496269814-user-bucket/user-sean/" }
     documentSelector:
       path: spec.template.metadata.labels["app.kubernetes.io/component"]
       value: fileservice

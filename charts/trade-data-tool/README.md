@@ -1,6 +1,6 @@
 # trade-data-tool
 
-![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.1.3](https://img.shields.io/badge/AppVersion-3.1.3-informational?style=flat-square)
+![Version: 0.7.1](https://img.shields.io/badge/Version-0.7.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.1.7](https://img.shields.io/badge/AppVersion-3.1.7-informational?style=flat-square)
 
 Trade Data Tool (UNSD) — seven .NET microservices and a Blazor web UI for processing trade datasets. Provisions its database serverlessly on the platform's shared MariaDB cluster and stores files in bundled MinIO or S3.
 
@@ -14,7 +14,7 @@ Trade Data Tool (UNSD) — seven .NET microservices and a Blazor web UI for proc
 
 ## What's new in 3.x
 
-Trade Data Tool 3.x is based on upstream TDT 2.5.0. This chart ships 3.1.3.
+Trade Data Tool 3.x is based on upstream TDT 2.5.0. This chart ships 3.1.7.
 
 **Find and download data**
 - **Data Search** (formerly *Advance Search*): faster paging with Previous/Next, an estimated total with a *Show exact* button, sorting by indexed columns. Queries stop after 30 seconds and suggest *Download All*.
@@ -53,7 +53,8 @@ Trade Data Tool 3.x is based on upstream TDT 2.5.0. This chart ships 3.1.3.
 - **Suspension.** Onyxia suspends a service 13 hours after it was launched or last resumed, whether or not you are using it. Its pods stop; its database, files and rule notebooks are kept. Resume it from *My Services*.
 - **Work in progress.** If a batch is importing or running pipeline steps when the service is suspended, it is recovered up to about 4.5 hours after you resume, and you can then *Retry* it.
 - **Automatic deletion.** A service left suspended for **30 days is deleted, with its data**: its database, its rule notebooks and, with the built-in file storage, your uploaded files. Resume it, or download what you need, before then.
-- **Deleting a service** deletes the same data straight away. With your own S3 storage, files stay in your bucket but are no longer attached to any Trade Data Tool service.
+- **Deleting a service** deletes the same data straight away. With your own S3 storage, files stay in the service's folder but are no longer attached to any Trade Data Tool service. Delete that folder in *My Files* when you no longer need it.
+- **S3 storage location.** Each service keeps its files in its own folder inside the working directory you choose at launch, named after the service. On Onyxia that is `trade-data-tool-<number>`, with the same number as in the service's web address. Your other folders are left alone. Resuming a service keeps its folder.
 - **S3 storage.** S3 access uses temporary credentials that expire about 11 hours after launch and are not renewed when the service resumes. Use the built-in file storage (MinIO, the default) for work that lasts longer than a day.
 - **First launch** can take several minutes while the database is set up. The service shows as running once the web UI answers.
 - **If the first launch fails** partway through setting up the database, the service cannot repair itself. Delete it and launch a new one.
@@ -62,10 +63,10 @@ Trade Data Tool 3.x is based on upstream TDT 2.5.0. This chart ships 3.1.3.
 
 ## Upgrading
 
-Chart 0.7.0 (app 3.1.3) is a **fresh install only**. App 3.x uses a new database layout and cannot take over a database created by chart 0.6.x or earlier (app 2.x).
+App 3.x uses a new database layout and cannot take over a database created by chart 0.6.x or earlier (app 2.x). Moving from chart 0.6.x to 0.7.x is therefore a **fresh install**.
 
 - From Onyxia, nothing changes for existing services: resuming re-runs the chart version they were launched with.
-- With the helm CLI, `helm upgrade` from 0.6.x to 0.7.0 is refused before anything is changed. Keep the release on 0.6.x, or uninstall it (this deletes its data, as above), install 0.7.0 and import the data again.
+- With the helm CLI, `helm upgrade` from 0.6.x to 0.7.x is refused before anything is changed. Keep the release on 0.6.x, or uninstall it (this deletes its data, as above), install 0.7.1 and import the data again.
 
 ## Third-party software
 
@@ -100,7 +101,7 @@ Chart 0.7.0 (app 3.1.3) is a **fresh install only**. App 3.x uses a new database
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.pullSecretName | string | `""` |  |
 | image.registry | string | `"142496269814.dkr.ecr.us-west-2.amazonaws.com/tdt"` |  |
-| image.tag | string | `"v3.1.3"` |  |
+| image.tag | string | `"v3.1.7"` |  |
 | ingress.certManagerClusterIssuer | string | `"letsencrypt-prod"` |  |
 | ingress.enabled | bool | `true` |  |
 | ingress.hostname | string | `"chart-example.local"` |  |

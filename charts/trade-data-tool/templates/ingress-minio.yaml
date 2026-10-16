@@ -14,7 +14,7 @@ metadata:
     {{- if and .Values.ingress.tls .Values.ingress.useCertManager }}
     cert-manager.io/cluster-issuer: {{ .Values.ingress.certManagerClusterIssuer }}
     {{- end }}
-    # Uploads are single presigned PUTs up to uploads.maxFileSizeBytes, and
+    # Uploads are single presigned PUTs up to the app's MaxUploadFileSizeMB, and
     # MinIO can take a while to answer after a large one. Each controller
     # ignores the other's annotations, so both sets are set.
     # APISIX (the platform's class): no body-size limit by default; the

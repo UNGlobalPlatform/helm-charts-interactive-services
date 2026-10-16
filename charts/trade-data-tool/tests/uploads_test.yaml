@@ -1,4 +1,4 @@
-suite: upload rules (the web images bake no FileService section, so these have no fallback)
+suite: upload rules (the web images bake no FileService section, so AllowedExt has no fallback)
 templates:
   - secrets.yaml
 release:
@@ -7,7 +7,7 @@ release:
 tests:
   # AppSettings.AllowedExt() returns null when the key is absent, and every
   # caller does .Split(',') on it unguarded -> NullReferenceException as soon as
-  # the user picks a file (UploadFile.razor:116, EditFile.razor:79).
+  # the user picks a file.
   - it: AllowedExt is present so the upload pages cannot NRE
     documentSelector:
       path: metadata.name
@@ -16,28 +16,20 @@ tests:
       - matchRegex:
           path: stringData["appsettings.Production.json"]
           pattern: '"AllowedExt": "tsv,txt,csv"'
-      - matchRegex:
-          path: stringData["appsettings.Production.json"]
-          pattern: '"ImportFileAllowedExt": "xlsx,csv,txt"'
-  # Convert.ToInt64(null) is 0 (it does not throw), so an absent MaxFileSize
-  # silently rejects every upload as larger than the limit.
-  - it: MaxFileSize is present and non-zero so uploads are not all rejected
+  # App 3.x reads the import file types and size caps from System Configuration
+  # rows; the matching appsettings keys have no reader, so they're not rendered.
+  - it: renders no settings that app 3.x never reads
     documentSelector:
       path: metadata.name
       value: mytdt-trade-data-tool-appsettings
     asserts:
-      - matchRegex:
-          path: stringData["appsettings.Production.json"]
-          pattern: '"MaxFileSize": "314572900"'
       - notMatchRegex:
           path: stringData["appsettings.Production.json"]
-          pattern: '"MaxFileSize": "0"'
-  - it: upload rules are configurable and stay strings
+          pattern: 'ImportFileAllowedExt|MaxFileSize'
+  - it: the upload file types are configurable
     set:
       uploads:
         allowedExtensions: "csv"
-        importAllowedExtensions: "csv"
-        maxFileSizeBytes: 1048576
     documentSelector:
       path: metadata.name
       value: mytdt-trade-data-tool-appsettings
@@ -45,7 +37,3 @@ tests:
       - matchRegex:
           path: stringData["appsettings.Production.json"]
           pattern: '"AllowedExt": "csv"'
-      # quoted, not a bare JSON number
-      - matchRegex:
-          path: stringData["appsettings.Production.json"]
-          pattern: '"MaxFileSize": "1048576"'

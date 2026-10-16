@@ -174,8 +174,6 @@ For a helm CLI install elsewhere, `objectStorage.provider=s3` stores files in an
 | services.userservice.image | string | `"user-service"` |  |
 | services.userservice.port | int | `6904` |  |
 | uploads.allowedExtensions | string | `"tsv,txt,csv"` |  |
-| uploads.importAllowedExtensions | string | `"xlsx,csv,txt"` |  |
-| uploads.maxFileSizeBytes | int | `314572900` |  |
 | userPreferences.language | string | `"en"` |  |
 | web.image | string | `"web-app"` |  |
 | web.port | int | `7108` |  |
